@@ -1,0 +1,144 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+**/node_modules
+# roadhog-api-doc ignore
+frontend/src/utils/request-temp.js
+frontend/_roadhog-api-doc
+
+# production
+frontend/dist
+frontend/.vscode
+
+# misc
+frontend/.DS_Store
+frontend/npm-debug.log*
+frontend/yarn-error.log
+
+frontend/coverage
+frontend/.idea
+frontend/yarn.lock
+frontend/package-lock.json
+*bak
+frontend/.vscode
+
+# visual studio code
+frontend/.history
+*.log
+frontend/functions/
+frontend/.temp
+
+# umi
+frontend/.umi
+frontend/src/.umi
+frontend/.umi-production
+
+# screenshot
+frontend/screenshot
+frontend/.firebase
+frontend/.eslintcache
+
+frontend/build
+
+
+
+# Byte-compiled / optimized / DLL files
+backend/__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+backend/.Python
+backend/env/
+backend/build/
+backend/develop-eggs/
+backend/dist/
+backend/downloads/
+backend/eggs/
+backend/.eggs/
+backend/lib/
+backend/lib64/
+backend/parts/
+backend/sdist/
+backend/var/
+backend/wheels/
+*.egg-info/
+backend/.installed.cfg
+*.egg
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+backend/pip-log.txt
+backend/pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+backend/htmlcov/
+backend/.tox/
+backend/.coverage
+backend/.coverage.*
+backend/.cache
+backend/nosetests.xml
+backend/coverage.xml
+*.cover
+backend/.hypothesis/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+backend/local_settings.py
+
+# Flask stuff:
+backend/.webassets-cache
+
+# Scrapy stuff:
+backend/.scrapy
+
+# Sphinx documentation
+backend/docs/_build/
+
+# PyBuilder
+backend/target/
+
+# Jupyter Notebook
+backend/.ipynb_checkpoints
+
+# pyenv
+backend/.python-version
+
+# celery beat schedule file
+backend/celerybeat-schedule
+
+# SageMath parsed files
+*.sage.py
+
+# dotenv
+backend/.env
+
+# virtualenv
+backend/.venv
+backend/venv/
+backend/ENV/
+
+# Spyder project settings
+backend/.spyderproject
+backend/.spyproject
+
+# Rope project settings
+backend/.ropeproject
+
+# mkdocs documentation
+backend/site
+
+# mypy
+backend/.mypy_cache/
