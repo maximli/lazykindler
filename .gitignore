@@ -81,6 +81,7 @@ backend/pip-delete-this-directory.txt
 
 # Unit test / coverage reports
 backend/htmlcov/
+backend/src/database/lazykindler.db
 backend/.tox/
 backend/.coverage
 backend/.coverage.*

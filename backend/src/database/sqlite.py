@@ -1,7 +1,8 @@
 import sqlite3
 from sqlite3 import Error
+import sys
 from ..util.service_logger import serviceLogger as logger
-from ..util.util import now
+from ..util.util import get_now
 from ..core.kindle.cover import get_mobi_cover
 
 
@@ -42,19 +43,24 @@ class DB:
         try:
             cursor = self.conn.cursor()
             cursor.execute(sql)
-            data=cursor.fetchall()
+
+            desc = cursor.description
+            column_names = [col[0] for col in desc]
+            data = [dict(zip(column_names, row))  
+                for row in cursor.fetchall()]
             return data
+
         except Exception as error:
             print("Failed to get record. ", error)
 
     def insert_book(self, uuid, title, publisher, book_content, author, book_size, extension, md5, book_path):
         cursor = self.conn.cursor()
         cursor.execute("begin")
-        try:
 
+        try:
             # 插入书籍元数据信息
-            sql = """INSERT INTO book_meta (uuid, book_name, book_size, publisher, 
-            author, cover_format, cover_content, md5, create_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) """
+            sql = """INSERT INTO book_meta (uuid, name, size, publisher, author, md5, create_time) 
+                                    VALUES (?, ?, ?, ?, ?, ?, ?) """
             cover_info = get_mobi_cover.get_mobi_cover(book_path)
 
             data_tuple = (
@@ -63,24 +69,28 @@ class DB:
                 book_size,
                 publisher,
                 author,
-                cover_info["cover_format"],
-                cover_info["content"],
                 md5,
-                now()
+                get_now()
             )
+            cursor.execute(sql, data_tuple)
+
+            # 插入书籍封面信息
+            sql = """INSERT INTO cover (uuid, name, format, size, content, create_time ) 
+                                        VALUES (?, ?, ?, ?, ?, ?) """
+            data_tuple = (uuid, title, cover_info["cover_format"], sys.getsizeof(cover_info["content"]), cover_info["content"], get_now())
             cursor.execute(sql, data_tuple)
 
 
             # 插入书籍信息
-            sql = """INSERT INTO book (uuid, book_name, book_format, book_size, book_content, 
-                                            create_time) VALUES (?, ?, ?, ?, ?, ?) """
-            data_tuple = (uuid, title, extension, book_size, book_content, now())
+            sql = """INSERT INTO book (uuid, name, format, size, content, create_time) 
+                                        VALUES (?, ?, ?, ?, ?, ?) """
+            data_tuple = (uuid, title, extension, book_size, book_content, get_now())
             cursor.execute(sql, data_tuple)
 
 
             # 插入临时书籍
             sql = """INSERT INTO tmp_book (uuid, create_time) VALUES (?, ?) """
-            data_tuple = (uuid, now())
+            data_tuple = (uuid, get_now())
             cursor.execute(sql, data_tuple)
 
         except Exception as error:
@@ -106,6 +116,37 @@ class DB:
 
         except Exception as error:
             print("Failed to get book record. ", error)
+
+
+    def insert_book_collection(self, uuid, name, description, subjects, stars, cover_content, cover_format):
+        cursor = self.conn.cursor()
+        cursor.execute("begin")
+        try:
+
+            sql = """INSERT INTO book_collection (uuid, name, description, subjects, stars, create_time) 
+                                        VALUES (?, ?, ?, ?, ?, ?) """
+            data_tuple = (
+                uuid,
+                name,
+                description, 
+                subjects, 
+                stars, 
+                get_now()
+            )
+            cursor.execute(sql, data_tuple)
+
+            if cover_content is not None:
+                sql = """INSERT INTO cover (uuid, name, format, size, content, create_time ) 
+                                            VALUES (?, ?, ?, ?, ?, ?) """
+                data_tuple = (uuid, name, cover_format, sys.getsizeof(cover_content), cover_content, get_now())
+                cursor.execute(sql, data_tuple)
+
+        except Exception as error:
+            self.conn.execute("rollback")
+            print("Failed to insert book_collection. ", error)
+
+        self.conn.commit()
+        cursor.close()
 
 
 db = DB()

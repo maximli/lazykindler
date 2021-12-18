@@ -4,7 +4,7 @@
 from flask import Flask
 from flask_cors import CORS
 
-from ..routes import books
+from ..routes import books, collection
 
 
 # local imports
@@ -17,4 +17,6 @@ app = Flask(__name__)
 # cross origin resource sharing
 CORS(app)
 
-app.add_url_rule('/book/upload', view_func=books.store_book, methods=['POST'])
+app.add_url_rule('/api/book/upload', view_func=books.store_books, methods=['POST'])
+app.add_url_rule('/api/book/all_meta', view_func=books.get_books_meta, methods=['GET'])
+app.add_url_rule('/api/collection/create', view_func=collection.create_book_collection, methods=['POST'])

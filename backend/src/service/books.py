@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import hashlib
 import os
 from uuid import uuid1
+from flask import jsonify
 import hashlib
 
 from ..database.sqlite import db
 from ..core.kindle.meta.metadata import get_metadata
-from ..util.util import convert_to_binary_data, get_md5, now
+from ..util.util import convert_to_binary_data, get_md5, get_now
 
 
 md5_hash = hashlib.md5()
@@ -21,8 +21,8 @@ def store_book_from_path(book_path):
     md5 = get_md5(book_path)
     book_meta_record = db.query("select uuid from book_meta where md5='{}'".format(md5))
     if len(book_meta_record) > 0:
-        uuid = book_meta_record[0][0]
-        db.run_sql("update tmp_book set create_time='{}' where uuid='{}'".format(now(), uuid))
+        uuid = book_meta_record[0]["uuid"]
+        db.run_sql("update tmp_book set create_time='{}' where uuid='{}'".format(get_now(), uuid))
     else:
         # 书名
         title = ""
@@ -48,3 +48,7 @@ def store_book_from_path(book_path):
             title = os.path.splitext(base)[0]
         db.insert_book(uuid, title, publisher, book_content, author, book_size, extension, md5, book_path)
 
+
+def get_books_meta():
+    data = db.query("select * from book_meta;")
+    return jsonify(data)

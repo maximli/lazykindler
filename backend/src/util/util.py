@@ -3,11 +3,6 @@ from flask import jsonify
 import hashlib
 
 
-def now():
-    now_time = datetime.now()
-    return str(now_time)
-
-
 def handle_error(err_msg):
     status_code = 500
     success = False
@@ -34,3 +29,8 @@ def get_md5(filepath):
         for byte_block in iter(lambda: f.read(4096),b""):
             md5_hash.update(byte_block)
         return md5_hash.hexdigest()
+
+
+def get_now():
+    from datetime import datetime
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")

@@ -1,9 +1,12 @@
+from flask import request
+import os
+import glob
+
 from ..util.service_logger import serviceLogger as logger
 from ..service import books
-from flask import request
 
 
-def store_book():
+def store_books():
     """
     GET request endpoint of UsersInfo
     :return:
@@ -13,6 +16,16 @@ def store_book():
     content = request.json
     book_paths = content['book_paths']
 
+
     for book_path in book_paths:
-        books.store_book_from_path(book_path)
+        if os.path.isdir(book_path):
+            glob_dir = os.path.join(book_path, "*")
+            bpaths = glob.glob(glob_dir)
+            for bpath in bpaths:
+                books.store_book_from_path(bpath)
     return "success"
+
+
+def get_books_meta():
+    data = books.get_books_meta();
+    return data
