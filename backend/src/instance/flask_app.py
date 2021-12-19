@@ -19,4 +19,6 @@ CORS(app)
 
 app.add_url_rule('/api/book/upload', view_func=books.store_books, methods=['POST'])
 app.add_url_rule('/api/book/all_meta', view_func=books.get_books_meta, methods=['GET'])
+app.add_url_rule('/api/book/cover', view_func=books.get_book_cover, methods=['GET'])
+
 app.add_url_rule('/api/collection/create', view_func=collection.create_book_collection, methods=['POST'])

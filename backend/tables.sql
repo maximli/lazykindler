@@ -32,7 +32,7 @@ CREATE TABLE cover (
     name           TEXT,         -- 书名
     format         TEXT,         -- 格式
     size           INTEGER,      -- 文件大小
-	content        BLOB,         -- 内容
+	content        TEXT,         -- 内容
 	create_time    TEXT          -- 创建时间
 );
 

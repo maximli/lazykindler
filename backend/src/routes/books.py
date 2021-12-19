@@ -16,16 +16,22 @@ def store_books():
     content = request.json
     book_paths = content['book_paths']
 
-
     for book_path in book_paths:
         if os.path.isdir(book_path):
             glob_dir = os.path.join(book_path, "*")
             bpaths = glob.glob(glob_dir)
             for bpath in bpaths:
                 books.store_book_from_path(bpath)
+        else:
+            books.store_book_from_path(book_path)
     return "success"
 
 
 def get_books_meta():
     data = books.get_books_meta();
     return data
+
+
+def get_book_cover():
+    uuid = request.args.get('uuid')
+    return books.get_book_cover(uuid);

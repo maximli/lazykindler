@@ -34,3 +34,10 @@ def get_md5(filepath):
 def get_now():
     from datetime import datetime
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+
+def is_all_chinese(strs):
+    for _char in strs:
+        if not '\u4e00' <= _char <= '\u9fa5':
+            return False
+    return True

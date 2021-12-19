@@ -1,4 +1,4 @@
-export default [
+﻿export default [
   { path: '/welcome', name: '欢迎', icon: 'smile', component: './Welcome' },
   {
     path: '/book_list',
@@ -8,8 +8,8 @@ export default [
       {
         name: '书籍',
         icon: 'smile',
-        path: '/book_list/projects',
-        component: './book_list/projects',
+        path: '/book_list/all_books',
+        component: './book_list/all_books',
       },
     ],
   },

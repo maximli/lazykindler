@@ -1,6 +1,7 @@
 import sqlite3
 from sqlite3 import Error
 import sys
+import base64
 from ..util.service_logger import serviceLogger as logger
 from ..util.util import get_now
 from ..core.kindle.cover import get_mobi_cover
@@ -53,20 +54,21 @@ class DB:
         except Exception as error:
             print("Failed to get record. ", error)
 
-    def insert_book(self, uuid, title, publisher, book_content, author, book_size, extension, md5, book_path):
+    def insert_book(self, uuid, title, publisher, subjects, book_content, author, book_size, extension, md5, book_path):
         cursor = self.conn.cursor()
         cursor.execute("begin")
 
         try:
             # 插入书籍元数据信息
-            sql = """INSERT INTO book_meta (uuid, name, size, publisher, author, md5, create_time) 
-                                    VALUES (?, ?, ?, ?, ?, ?, ?) """
+            sql = """INSERT INTO book_meta (uuid, name, size, subjects, publisher, author, md5, create_time) 
+                                    VALUES (?, ?, ?, ?, ?, ?, ?, ?) """
             cover_info = get_mobi_cover.get_mobi_cover(book_path)
 
             data_tuple = (
                 uuid,
                 title,
                 book_size,
+                subjects,
                 publisher,
                 author,
                 md5,
@@ -77,7 +79,7 @@ class DB:
             # 插入书籍封面信息
             sql = """INSERT INTO cover (uuid, name, format, size, content, create_time ) 
                                         VALUES (?, ?, ?, ?, ?, ?) """
-            data_tuple = (uuid, title, cover_info["cover_format"], sys.getsizeof(cover_info["content"]), cover_info["content"], get_now())
+            data_tuple = (uuid, title, cover_info["cover_format"], sys.getsizeof(cover_info["content"]), base64.b64encode(cover_info["content"]), get_now())
             cursor.execute(sql, data_tuple)
 
 
