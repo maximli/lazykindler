@@ -25,16 +25,17 @@ def store_book_from_path(book_path):
         db.run_sql("update tmp_book set create_time='{}' where uuid='{}'".format(get_now(), uuid))
     else:
         # 书名
-        title = ""
+        title = None
         # 出版商
-        publisher = ""
+        publisher = None
         # 作者
-        author = ""
+        author = None
+        # 标签
+        subjects = None
 
         extension = os.path.splitext(book_path)[1]
         book_size = os.path.getsize(book_path)
         meta = get_metadata(book_path)
-        subjects = ""
 
         for key, value in meta.items():
             if key == "subject":
@@ -56,7 +57,16 @@ def store_book_from_path(book_path):
         if title == "":
             base=os.path.basename(book_path)
             title = os.path.splitext(base)[0]
-        db.insert_book(uuid, title, publisher, subjects, book_content, author, book_size, extension, md5, book_path)
+        
+        if title == "":
+            title = "未命名"
+        if publisher == "":
+            publisher = "无出版社"
+        if author == "":
+            author = "未署名"
+        if subjects == "":
+            subjects = "无标签"
+        db.insert_book(uuid, title, "", author, subjects,  book_content, book_size, publisher, extension, md5, book_path)
 
 
 def get_books_meta():
