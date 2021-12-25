@@ -36,3 +36,13 @@ def get_books_meta():
 def get_book_cover():
     uuid = request.args.get('uuid')
     return books.get_book_cover(uuid);
+
+
+def delete_book():
+    uuid = request.args.get('uuid')
+    return books.delete_book(uuid);
+
+
+def delete_tmp_book():
+    uuid = request.args.get('uuid')
+    return books.delete_tmp_book(uuid);

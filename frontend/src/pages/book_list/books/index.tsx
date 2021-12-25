@@ -1,6 +1,6 @@
 import { getBooksMeta } from '@/services';
 import useWindowDimensions from '@/util';
-import { Card, List as AntList, Typography, Menu, Dropdown } from 'antd';
+import { Menu, Dropdown } from 'antd';
 import { FC, useEffect, useState } from 'react';
 import {
     List,
@@ -9,12 +9,10 @@ import {
     ListSubheader,
     ListItemButton,
     Grid,
-    Paper,
     Box,
 } from '@mui/material';
 
 import {
-    MoreOutlined,
     DownOutlined,
     StockOutlined,
     TagsOutlined,
@@ -23,10 +21,9 @@ import {
     DatabaseOutlined,
 } from '@ant-design/icons';
 import _ from 'lodash';
-import Cover from './components/Cover';
+import BookCardList from './components/BookCardList';
 import type { ListItemDataType } from './data.d';
-
-const { Text } = Typography;
+import PaperWrapper from './components/PaperWrapper';
 
 enum FilterType {
     All = '未分类',
@@ -69,7 +66,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
         Publisher: {},
     });
 
-    useEffect(() => {
+    const fetchBooks = () => {
         getBooksMeta(storeType).then((data) => {
             setAllBooksMeta(data);
             setData(data);
@@ -118,6 +115,10 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                 Publisher: publisher,
             });
         });
+    }
+
+    useEffect(() => {
+        fetchBooks();
     }, []);
 
     const filterData = (selectedKeyword: string) => {
@@ -168,59 +169,6 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                 break;
         }
     };
-
-    const cardList = (
-        <AntList<ListItemDataType>
-            rowKey="id"
-            grid={{
-                gutter: 16,
-                xs: 1,
-                sm: 2,
-                md: 3,
-                lg: 4,
-                xl: 5,
-                xxl: 6,
-            }}
-            pagination={{
-                position: 'top',
-                defaultPageSize: 40,
-                hideOnSinglePage: true,
-                style: { paddingBottom: 10 },
-            }}
-            dataSource={data}
-            renderItem={(item) => (
-                <AntList.Item>
-                    <Card
-                        hoverable
-                        cover={<Cover uuid={item.uuid} />}
-                        actions={[<MoreOutlined />]}
-                        bodyStyle={{
-                            paddingTop: 8,
-                            paddingLeft: 4,
-                            paddingRight: 4,
-                            paddingBottom: 8,
-                        }}
-                    >
-                        <Card.Meta
-                            title={
-                                <div style={{ maxHeight: 80, overflow: 'auto' }}>
-                                    <Text
-                                        style={{
-                                            wordBreak: 'break-all',
-                                            whiteSpace: 'break-spaces',
-                                            fontSize: 13,
-                                        }}
-                                    >
-                                        {item.name}
-                                    </Text>
-                                </div>
-                            }
-                        />
-                    </Card>
-                </AntList.Item>
-            )}
-        />
-    );
 
     const headerDropMenu = () => {
         return (
@@ -296,10 +244,6 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
         );
     };
 
-    const PaperWrapper = ({ children }: any) => {
-        return <Paper style={{ height: height - 95 }}>{children}</Paper>;
-    };
-
     return (
         <div style={{ height: height - 95 }}>
             <Box>
@@ -357,7 +301,9 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                         }}
                     >
                         <PaperWrapper>
-                            <div style={{ width: width - 530 }}>{cardList}</div>
+                            <div style={{ width: width - 530 }}>
+                                <BookCardList data={data}/>
+                            </div>
                         </PaperWrapper>
                     </Grid>
                 </Grid>

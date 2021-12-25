@@ -6,6 +6,8 @@ from uuid import uuid1
 from flask import jsonify
 import hashlib
 
+from ..service.collection import update_book_collection
+
 from ..database.sqlite import db
 from ..core.kindle.meta.metadata import get_metadata
 from ..util.util import convert_to_binary_data, get_md5, get_now, is_all_chinese
@@ -87,3 +89,22 @@ def get_books_meta(storeType):
 def get_book_cover(uuid):
     data = db.query("select content from cover where uuid='{}';".format(uuid))
     return data[0]['content']
+
+
+def delete_book(uuid):
+    db.run_sql("delete from book where uuid='{}'".format(uuid));
+    db.run_sql("delete from book_meta where uuid='{}'".format(uuid));
+    db.run_sql("delete from cover where uuid='{}'".format(uuid));
+    db.run_sql("delete from tmp_book where uuid='{}'".format(uuid));
+
+    book_collections = db.query("select uuid, book_uuids from book_collection where book_uuids like '%{}%'".format(uuid))
+    for book_collection in book_collections:
+        book_uuids = book_collection['book_uuids'].split(';')
+        book_uuids.remove(uuid)
+        update_book_collection(';'.join(book_uuids), book_collection['uuid'])
+    return "success"
+
+
+def delete_tmp_book(uuid):
+    db.run_sql("delete from tmp_book where uuid='{}'".format(uuid));
+    return "success"

@@ -12,15 +12,15 @@ def create_book_collection():
     if len(book_collection) > 0:
         return "success"
 
-    description = None 
+    description = ""
     if 'description' in content:
         description = content['description']
 
-    subjects = None
+    subjects = ""
     if 'subjects' in content:
         subjects = content['subjects']
 
-    stars = None
+    stars = 0
     if 'stars' in content:
         stars = content['stars']
 
@@ -30,3 +30,12 @@ def create_book_collection():
 
     collection.create_book_collection(name, description, subjects, stars, cover_path)
     return "success"
+
+
+def get_book_collections():
+    return collection.get_book_collections();
+
+
+def delete_book_collection():
+    uuid = request.args.get('uuid')
+    return collection.delete_book_collections(uuid);

@@ -152,6 +152,6 @@ class DB:
 
         self.conn.commit()
         cursor.close()
-
+    
 
 db = DB()
