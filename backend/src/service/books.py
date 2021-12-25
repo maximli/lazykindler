@@ -53,18 +53,28 @@ def store_book_from_path(book_path):
                 publisher = ';'.join(value)
             if key == "author":
                 author = ";".join(value)
+        
+
+        if title != None:
+            title = title.strip()
+        if publisher != None:
+            publisher = publisher.strip()
+        if author != None:
+            author = author.strip()
+        if subjects != None:
+            subjects = subjects.strip()
 
         if title == "":
             base=os.path.basename(book_path)
             title = os.path.splitext(base)[0]
         
-        if title == "":
+        if title == "" or title == None:
             title = "未命名"
-        if publisher == "":
+        if publisher == "" or publisher == None:
             publisher = "无出版社"
-        if author == "":
+        if author == "" or author == None:
             author = "未署名"
-        if subjects == "":
+        if subjects == "" or subjects == None:
             subjects = "无标签"
         db.insert_book(uuid, title, "", author, subjects,  book_content, book_size, publisher, extension, md5, book_path)
 

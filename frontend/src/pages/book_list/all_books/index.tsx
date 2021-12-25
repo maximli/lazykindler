@@ -1,8 +1,17 @@
 import { getAllBooksMeta } from '@/services';
 import useWindowDimensions from '@/util';
-import { Card, List as AntList, Form, Typography, Layout, Menu, Dropdown } from 'antd';
+import { Card, List as AntList, Typography, Menu, Dropdown } from 'antd';
 import { FC, useEffect, useState } from 'react';
-import { List, ListItem, ListItemText, ListSubheader, ListItemButton } from '@mui/material';
+import {
+    List,
+    ListItem,
+    ListItemText,
+    ListSubheader,
+    ListItemButton,
+    Grid,
+    Paper,
+    Box,
+} from '@mui/material';
 
 import {
     MoreOutlined,
@@ -14,15 +23,9 @@ import {
     DatabaseOutlined,
 } from '@ant-design/icons';
 import _ from 'lodash';
-import StandardFormRow from './components/StandardFormRow';
-import TagSelect from './components/TagSelect';
 import Cover from './components/Cover';
 import type { ListItemDataType } from './data.d';
-import styles from './style.less';
 
-const { Sider, Content } = Layout;
-
-const FormItem = Form.Item;
 const { Text } = Typography;
 
 enum FilterType {
@@ -41,7 +44,7 @@ type SubHeaerType = {
 };
 
 const AllBooks: FC = () => {
-    const { height } = useWindowDimensions();
+    const { width, height } = useWindowDimensions();
     const [allBooksMeta, setAllBooksMeta] = useState([]);
     const [data, setData] = useState<any>([]);
 
@@ -49,7 +52,6 @@ const AllBooks: FC = () => {
     const [selectedType, setSelectedType] = useState<string>(FilterType.All);
     // 评分或者书签下面的列表
     const [selectedSubType, setSelectedSubType] = useState<string[]>([]);
-
 
     // 评分或者书签下选定的某一项
     const [selectedItemName, setSelectedItemName] = useState<any>(null);
@@ -78,7 +80,7 @@ const AllBooks: FC = () => {
                     stars[item.stars][item.uuid] = null;
                 }
 
-                if (item.subjects != '') {
+                if (item.subjects != null) {
                     let subjectsList = item.subjects.split(';');
                     subjectsList.forEach((subject) => {
                         if (subjects[subject] == null) {
@@ -113,7 +115,7 @@ const AllBooks: FC = () => {
     }, []);
 
     const filterData = (selectedKeyword: string) => {
-        setSelectedItemName(selectedKeyword)
+        setSelectedItemName(selectedKeyword);
 
         let filteredBooks;
         let o = {};
@@ -164,7 +166,6 @@ const AllBooks: FC = () => {
     const cardList = (
         <AntList<ListItemDataType>
             rowKey="id"
-            // loading={loading}
             grid={{
                 gutter: 16,
                 xs: 1,
@@ -289,85 +290,74 @@ const AllBooks: FC = () => {
         );
     };
 
+    const PaperWrapper = ({ children }: any) => {
+        return <Paper style={{ height: height - 95 }}>{children}</Paper>;
+    };
+
     return (
-        <div>
-            <div>
-                <Card>
-                    <Form
-                        layout="inline"
-                        onValuesChange={(_, values) => {
-                            // 表单项变化时请求数据
-                            // 模拟查询表单生效
-                            // run(values);
+        <div style={{ height: height - 95 }}>
+            <Box>
+                <Grid container spacing={2}>
+                    <Grid item xs={2} style={{ paddingLeft: 3, paddingTop: 23, overflow: 'auto' }}>
+                        <PaperWrapper>
+                            <List
+                                sx={{
+                                    width: '100%',
+                                    bgcolor: 'background.paper',
+                                    position: 'relative',
+                                    overflow: 'auto',
+                                    height: height - 95,
+                                    '& ul': { padding: 0 },
+                                }}
+                                subheader={<li />}
+                            >
+                                <ListSubheader>
+                                    <Dropdown overlay={headerDropMenu}>
+                                        <a
+                                            className="ant-dropdown-link"
+                                            onClick={(e) => e.preventDefault()}
+                                        >
+                                            <DatabaseOutlined style={{ paddingRight: 13 }} />
+                                            {selectedType}
+                                            <DownOutlined style={{ paddingLeft: 13 }} />
+                                        </a>
+                                    </Dropdown>
+                                </ListSubheader>
+                                {selectedSubType.map((item, index) => (
+                                    <ListItem
+                                        style={{ padding: 0 }}
+                                        key={index}
+                                        onClick={() => {
+                                            filterData(item);
+                                        }}
+                                    >
+                                        <ListItemButton
+                                            style={{ paddingLeft: 10, paddingRight: 10 }}
+                                            selected={item === selectedItemName}
+                                        >
+                                            <ListItemText primary={`${index + 1}. ${item}`} />
+                                        </ListItemButton>
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </PaperWrapper>
+                    </Grid>
+                    <Grid
+                        item
+                        xs={10}
+                        style={{
+                            paddingTop: 0,
+                            paddingLeft: 5,
+                            height: height - 70,
+                            overflow: 'auto',
                         }}
                     >
-                        <StandardFormRow title="存储类型" block style={{ paddingBottom: 11 }}>
-                            <FormItem name="category">
-                                <TagSelect hideCheckAll expandable>
-                                    <TagSelect.Option value="cat11">永久存储</TagSelect.Option>
-                                    <TagSelect.Option value="cat12">临时导入</TagSelect.Option>
-                                </TagSelect>
-                            </FormItem>
-                        </StandardFormRow>
-                    </Form>
-                </Card>
-            </div>
-
-            <Layout>
-                <Sider width={200} style={{ marginTop: 20 }}>
-                    <Card style={{ width: 260, height: height - 227, overflow: 'auto' }} bodyStyle={{ paddingLeft: 5, paddingRight: 0 }}>
-                        <List
-                            sx={{
-                                width: '100%',
-                                maxWidth: 360,
-                                bgcolor: 'background.paper',
-                                position: 'relative',
-                                overflow: 'auto',
-                                maxHeight: height - 277,
-                                '& ul': { padding: 0 },
-                            }}
-                            subheader={<li />}
-                        >
-                            <ListSubheader>
-                                <Dropdown overlay={headerDropMenu}>
-                                    <a
-                                        className="ant-dropdown-link"
-                                        onClick={(e) => e.preventDefault()}
-                                    >
-                                        <DatabaseOutlined style={{ paddingRight: 13 }} />
-                                        {selectedType}
-                                        <DownOutlined style={{ paddingLeft: 13 }} />
-                                    </a>
-                                </Dropdown>
-                            </ListSubheader>
-                            {selectedSubType.map((item, index) => (
-                                <ListItem
-                                    style={{ padding: 0 }}
-                                    key={index}
-                                    onClick={() => {
-                                        filterData(item);
-                                    }}
-                                >
-                                    <ListItemButton style={{ paddingLeft: 10, paddingRight: 10 }} selected={item === selectedItemName}>
-                                        <ListItemText primary={`${index + 1}. ${item}`} />
-                                    </ListItemButton>
-                                </ListItem>
-                            ))}
-                        </List>
-                    </Card>
-                </Sider>
-                <Content
-                    style={{
-                        padding: '0 24px',
-                        minHeight: 280,
-                        paddingLeft: 70,
-                        height: height - 227,
-                        overflow: 'auto',
-                    }}
-                >
-                    <div className={styles.cardList}>{cardList}</div>
-                </Content>
-            </Layout>
+                        <PaperWrapper>
+                            <div style={{ width: width - 530 }}>{cardList}</div>
+                        </PaperWrapper>
+                    </Grid>
+                </Grid>
+            </Box>
         </div>
     );
 };
