@@ -290,57 +290,51 @@ const AllBooks: FC = () => {
         );
     };
 
-    const PaperWrapper = ({ children }: any) => {
-        return <Paper style={{ height: height - 95 }}>{children}</Paper>;
-    };
-
     return (
         <div style={{ height: height - 95 }}>
             <Box>
                 <Grid container spacing={2}>
                     <Grid item xs={2} style={{ paddingLeft: 3, paddingTop: 23, overflow: 'auto' }}>
-                        <PaperWrapper>
-                            <List
-                                sx={{
-                                    width: '100%',
-                                    bgcolor: 'background.paper',
-                                    position: 'relative',
-                                    overflow: 'auto',
-                                    height: height - 95,
-                                    '& ul': { padding: 0 },
-                                }}
-                                subheader={<li />}
-                            >
-                                <ListSubheader>
-                                    <Dropdown overlay={headerDropMenu}>
-                                        <a
-                                            className="ant-dropdown-link"
-                                            onClick={(e) => e.preventDefault()}
-                                        >
-                                            <DatabaseOutlined style={{ paddingRight: 13 }} />
-                                            {selectedType}
-                                            <DownOutlined style={{ paddingLeft: 13 }} />
-                                        </a>
-                                    </Dropdown>
-                                </ListSubheader>
-                                {selectedSubType.map((item, index) => (
-                                    <ListItem
-                                        style={{ padding: 0 }}
-                                        key={index}
-                                        onClick={() => {
-                                            filterData(item);
-                                        }}
+                        <List
+                            sx={{
+                                width: '100%',
+                                bgcolor: 'background.paper',
+                                position: 'relative',
+                                overflow: 'auto',
+                                height: height - 95,
+                                '& ul': { padding: 0 },
+                            }}
+                            subheader={<li />}
+                        >
+                            <ListSubheader>
+                                <Dropdown overlay={headerDropMenu}>
+                                    <a
+                                        className="ant-dropdown-link"
+                                        onClick={(e) => e.preventDefault()}
                                     >
-                                        <ListItemButton
-                                            style={{ paddingLeft: 10, paddingRight: 10 }}
-                                            selected={item === selectedItemName}
-                                        >
-                                            <ListItemText primary={`${index + 1}. ${item}`} />
-                                        </ListItemButton>
-                                    </ListItem>
-                                ))}
-                            </List>
-                        </PaperWrapper>
+                                        <DatabaseOutlined style={{ paddingRight: 13 }} />
+                                        {selectedType}
+                                        <DownOutlined style={{ paddingLeft: 13 }} />
+                                    </a>
+                                </Dropdown>
+                            </ListSubheader>
+                            {selectedSubType.map((item, index) => (
+                                <ListItem
+                                    style={{ padding: 0 }}
+                                    key={index}
+                                    onClick={() => {
+                                        filterData(item);
+                                    }}
+                                >
+                                    <ListItemButton
+                                        style={{ paddingLeft: 10, paddingRight: 10 }}
+                                        selected={item === selectedItemName}
+                                    >
+                                        <ListItemText primary={`${index + 1}. ${item}`} />
+                                    </ListItemButton>
+                                </ListItem>
+                            ))}
+                        </List>
                     </Grid>
                     <Grid
                         item
