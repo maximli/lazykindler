@@ -2,9 +2,9 @@ import { axiosInstance } from "./axios";
 
 
 // 获取全部书籍信息列表
-export const getAllBooksMeta = () => {
+export const getBooksMeta = (storeType: string) => {
     return axiosInstance
-        .get(`/api/book/all_meta`)
+        .get(`/api/book/all_meta?storeType=${storeType}`)
         .then((data: any) => {
             return data.data;
         });

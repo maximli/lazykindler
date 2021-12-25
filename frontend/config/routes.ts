@@ -6,10 +6,16 @@
     name: '书籍列表',
     routes: [
       {
-        name: '书籍',
+        name: '正式书籍',
         icon: 'smile',
         path: '/book_list/all_books',
         component: './book_list/all_books',
+      },
+      {
+        name: '临时书籍',
+        icon: 'smile',
+        path: '/book_list/tmp_books',
+        component: './book_list/tmp_books',
       },
     ],
   },

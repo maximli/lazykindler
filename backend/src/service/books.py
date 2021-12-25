@@ -79,7 +79,7 @@ def store_book_from_path(book_path):
         db.insert_book(uuid, title, "", author, subjects,  book_content, book_size, publisher, extension, md5, book_path)
 
 
-def get_books_meta():
+def get_books_meta(storeType):
     data = db.query("select * from book_meta;")
     return jsonify(data)
 

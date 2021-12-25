@@ -28,7 +28,8 @@ def store_books():
 
 
 def get_books_meta():
-    data = books.get_books_meta();
+    storeType = request.args.get('storeType')
+    data = books.get_books_meta(storeType);
     return data
 
 
