@@ -1,6 +1,6 @@
 import { getBooksMeta } from '@/services';
 import { useWindowDimensions } from '@/util';
-import { Menu, Dropdown } from 'antd';
+import { Menu as AntMenu, Dropdown } from 'antd';
 import { FC, useEffect, useState } from 'react';
 import {
     List,
@@ -22,8 +22,7 @@ import {
 } from '@ant-design/icons';
 import _ from 'lodash';
 import BookCardList from './components/BookCardList';
-import type { ListItemDataType } from './data.d';
-import PaperWrapper from './components/PaperWrapper';
+import type { BookMetaDataType } from './data.d';
 
 enum FilterType {
     All = '未分类',
@@ -41,11 +40,11 @@ type SubHeaerType = {
 };
 
 type BooksProps = {
-    storeType: string
-}
+    storeType: string;
+};
 
 const Books: FC<BooksProps> = (props: BooksProps) => {
-    const { storeType } = props;    
+    const { storeType } = props;
 
     const { width, height } = useWindowDimensions();
     const [allBooksMeta, setAllBooksMeta] = useState([]);
@@ -75,7 +74,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
             const subjects = {};
             const authors = {};
             const publisher = {};
-            _.forEach(data, (item: ListItemDataType) => {
+            _.forEach(data, (item: BookMetaDataType) => {
                 if (stars[item.stars] == null) {
                     stars[item.stars] = {};
                 }
@@ -115,7 +114,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                 Publisher: publisher,
             });
         });
-    }
+    };
 
     useEffect(() => {
         fetchBooks();
@@ -129,7 +128,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
         switch (selectedType) {
             case FilterType.Stars:
                 o = classifiedInfo.Stars[selectedKeyword];
-                filteredBooks = _.filter(allBooksMeta, (v: ListItemDataType) => {
+                filteredBooks = _.filter(allBooksMeta, (v: BookMetaDataType) => {
                     if (v.uuid in o) {
                         return true;
                     }
@@ -139,7 +138,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                 break;
             case FilterType.Subjects:
                 o = classifiedInfo.Subjects[selectedKeyword];
-                filteredBooks = _.filter(allBooksMeta, (v: ListItemDataType) => {
+                filteredBooks = _.filter(allBooksMeta, (v: BookMetaDataType) => {
                     if (v.uuid in o) {
                         return true;
                     }
@@ -149,7 +148,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                 break;
             case FilterType.Author:
                 o = classifiedInfo.Author[selectedKeyword];
-                filteredBooks = _.filter(allBooksMeta, (v: ListItemDataType) => {
+                filteredBooks = _.filter(allBooksMeta, (v: BookMetaDataType) => {
                     if (v.uuid in o) {
                         return true;
                     }
@@ -159,7 +158,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                 break;
             case FilterType.Publisher:
                 o = classifiedInfo.Publisher[selectedKeyword];
-                filteredBooks = _.filter(allBooksMeta, (v: ListItemDataType) => {
+                filteredBooks = _.filter(allBooksMeta, (v: BookMetaDataType) => {
                     if (v.uuid in o) {
                         return true;
                     }
@@ -172,8 +171,8 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
 
     const headerDropMenu = () => {
         return (
-            <Menu style={{ width: 150 }}>
-                <Menu.Item key="all" icon={<DatabaseOutlined />}>
+            <AntMenu style={{ width: 150 }}>
+                <AntMenu.Item key="all" icon={<DatabaseOutlined />}>
                     <a
                         target="_blank"
                         rel="noopener noreferrer"
@@ -187,8 +186,8 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                     >
                         未分类
                     </a>
-                </Menu.Item>
-                <Menu.Item key="stars" icon={<StockOutlined />}>
+                </AntMenu.Item>
+                <AntMenu.Item key="stars" icon={<StockOutlined />}>
                     <a
                         target="_blank"
                         rel="noopener noreferrer"
@@ -200,8 +199,8 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                     >
                         评分
                     </a>
-                </Menu.Item>
-                <Menu.Item key="subjects" icon={<TagsOutlined />}>
+                </AntMenu.Item>
+                <AntMenu.Item key="subjects" icon={<TagsOutlined />}>
                     <a
                         target="_blank"
                         rel="noopener noreferrer"
@@ -213,8 +212,8 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                     >
                         标签
                     </a>
-                </Menu.Item>
-                <Menu.Item key="author" icon={<UserOutlined />}>
+                </AntMenu.Item>
+                <AntMenu.Item key="author" icon={<UserOutlined />}>
                     <a
                         target="_blank"
                         rel="noopener noreferrer"
@@ -226,8 +225,8 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                     >
                         作者
                     </a>
-                </Menu.Item>
-                <Menu.Item key="publisher" icon={<BankOutlined />}>
+                </AntMenu.Item>
+                <AntMenu.Item key="publisher" icon={<BankOutlined />}>
                     <a
                         target="_blank"
                         rel="noopener noreferrer"
@@ -239,8 +238,8 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                     >
                         出版社
                     </a>
-                </Menu.Item>
-            </Menu>
+                </AntMenu.Item>
+            </AntMenu>
         );
     };
 
@@ -249,46 +248,46 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
             <Box>
                 <Grid container spacing={2}>
                     <Grid item xs={2} style={{ paddingLeft: 3, paddingTop: 23, overflow: 'auto' }}>
-                            <List
-                                sx={{
-                                    width: '100%',
-                                    bgcolor: 'background.paper',
-                                    position: 'relative',
-                                    overflow: 'auto',
-                                    height: height - 95,
-                                    '& ul': { padding: 0 },
-                                }}
-                                subheader={<li />}
-                            >
-                                <ListSubheader>
-                                    <Dropdown overlay={headerDropMenu}>
-                                        <a
-                                            className="ant-dropdown-link"
-                                            onClick={(e) => e.preventDefault()}
-                                        >
-                                            <DatabaseOutlined style={{ paddingRight: 13 }} />
-                                            {selectedType}
-                                            <DownOutlined style={{ paddingLeft: 13 }} />
-                                        </a>
-                                    </Dropdown>
-                                </ListSubheader>
-                                {selectedSubType.map((item, index) => (
-                                    <ListItem
-                                        style={{ padding: 0 }}
-                                        key={index}
-                                        onClick={() => {
-                                            filterData(item);
-                                        }}
+                        <List
+                            sx={{
+                                width: '100%',
+                                bgcolor: 'background.paper',
+                                position: 'relative',
+                                overflow: 'auto',
+                                height: height - 95,
+                                '& ul': { padding: 0 },
+                            }}
+                            subheader={<li />}
+                        >
+                            <ListSubheader>
+                                <Dropdown overlay={headerDropMenu}>
+                                    <a
+                                        className="ant-dropdown-link"
+                                        onClick={(e) => e.preventDefault()}
                                     >
-                                        <ListItemButton
-                                            style={{ paddingLeft: 10, paddingRight: 10 }}
-                                            selected={item === selectedItemName}
-                                        >
-                                            <ListItemText primary={`${index + 1}. ${item}`} />
-                                        </ListItemButton>
-                                    </ListItem>
-                                ))}
-                            </List>
+                                        <DatabaseOutlined style={{ paddingRight: 13 }} />
+                                        {selectedType}
+                                        <DownOutlined style={{ paddingLeft: 13 }} />
+                                    </a>
+                                </Dropdown>
+                            </ListSubheader>
+                            {selectedSubType.map((item, index) => (
+                                <ListItem
+                                    style={{ padding: 0 }}
+                                    key={index}
+                                    onClick={() => {
+                                        filterData(item);
+                                    }}
+                                >
+                                    <ListItemButton
+                                        style={{ paddingLeft: 10, paddingRight: 10 }}
+                                        selected={item === selectedItemName}
+                                    >
+                                        <ListItemText primary={`${index + 1}. ${item}`} />
+                                    </ListItemButton>
+                                </ListItem>
+                            ))}
+                        </List>
                     </Grid>
                     <Grid
                         item
@@ -300,11 +299,9 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                             overflow: 'auto',
                         }}
                     >
-                        <PaperWrapper>
-                            <div style={{ width: width - 530 }}>
-                                <BookCardList data={data}/>
-                            </div>
-                        </PaperWrapper>
+                        <div style={{ width: width - 530 }}>
+                            <BookCardList data={data} />
+                        </div>
                     </Grid>
                 </Grid>
             </Box>

@@ -9,6 +9,7 @@ CREATE TABLE book_meta (
 	stars               INTEGER,      -- 评分。满分10分
     size                INTEGER,      -- 图书大小
     publisher           TEXT,         -- 出版商
+	collection_names    TEXT,          -- book_collections names列表，分号相隔
 	done_dates          TEXT,         -- 读完日期
 	md5                 TEXT,         -- md5
 	create_time         TEXT          -- 创建时间

@@ -27,13 +27,15 @@ def store_book_from_path(book_path):
         db.run_sql("update tmp_book set create_time='{}' where uuid='{}'".format(get_now(), uuid))
     else:
         # 书名
-        title = None
+        title = ""
         # 出版商
-        publisher = None
+        publisher = ""
         # 作者
-        author = None
+        author = ""
         # 标签
-        subjects = None
+        subjects = ""
+        # 集合
+        collection_names=""
 
         extension = os.path.splitext(book_path)[1]
         book_size = os.path.getsize(book_path)
@@ -78,7 +80,9 @@ def store_book_from_path(book_path):
             author = "未署名"
         if subjects == "" or subjects == None:
             subjects = "无标签"
-        db.insert_book(uuid, title, "", author, subjects,  book_content, book_size, publisher, extension, md5, book_path)
+        if collection_names == "" or collection_names == None:
+            collection_names = "无集合"
+        db.insert_book(uuid, title, "", author, subjects,  book_content, book_size, publisher, collection_names, extension, md5, book_path)
 
 
 def get_books_meta(storeType):
@@ -107,4 +111,9 @@ def delete_book(uuid):
 
 def delete_tmp_book(uuid):
     db.run_sql("delete from tmp_book where uuid='{}'".format(uuid));
+    return "success"
+
+
+def update_book_meta(uuid, key, value):
+    db.run_sql("update book_meta set '{}'='{}' where uuid='{}'".format(key, value, uuid));
     return "success"

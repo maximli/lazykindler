@@ -54,14 +54,14 @@ class DB:
         except Exception as error:
             print("Failed to get record. ", error)
 
-    def insert_book(self, uuid, title, description, author, subjects,  book_content, book_size, publisher, extension, md5, book_path):
+    def insert_book(self, uuid, title, description, author, subjects,  book_content, book_size, publisher, collection_names, extension, md5, book_path):
         cursor = self.conn.cursor()
         cursor.execute("begin")
 
         try:
             # 插入书籍元数据信息
-            sql = """INSERT INTO book_meta (uuid, name, description, author, subjects, stars, size, publisher, done_dates, md5, create_time) 
-                                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) """
+            sql = """INSERT INTO book_meta (uuid, name, description, author, subjects, stars, size, publisher, collection_names, done_dates, md5, create_time) 
+                                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) """
             cover_info = get_mobi_cover.get_mobi_cover(book_path)
 
             data_tuple = (
@@ -73,6 +73,7 @@ class DB:
                 0,
                 book_size,
                 publisher,
+                collection_names,
                 "",
                 md5,
                 get_now()
@@ -80,9 +81,9 @@ class DB:
             cursor.execute(sql, data_tuple)
 
             # 插入书籍封面信息
-            sql = """INSERT INTO cover (uuid, name, format, size, content, create_time ) 
-                                        VALUES (?, ?, ?, ?, ?, ?) """
-            data_tuple = (uuid, title, cover_info["cover_format"], sys.getsizeof(cover_info["content"]), base64.b64encode(cover_info["content"]), get_now())
+            sql = """INSERT INTO cover (uuid, name, size, content, create_time ) 
+                                        VALUES (?, ?, ?, ?, ?) """
+            data_tuple = (uuid, title, sys.getsizeof(cover_info["content"]), base64.b64encode(cover_info["content"]), get_now())
             cursor.execute(sql, data_tuple)
 
 

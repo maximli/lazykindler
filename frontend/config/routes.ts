@@ -18,7 +18,7 @@
         component: './book_list/tmp_books',
       },
       {
-        name: '集合',
+        name: '书籍集合',
         icon: 'smile',
         path: '/book_list/book_collections',
         component: './book_list/book_collections',

@@ -46,3 +46,11 @@ def delete_book():
 def delete_tmp_book():
     uuid = request.args.get('uuid')
     return books.delete_tmp_book(uuid);
+
+
+def update_book_meta():
+    content = request.json
+    uuid = content['uuid']
+    key = content['key']
+    value = content['value']
+    return books.update_book_meta(uuid, key, value);

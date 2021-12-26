@@ -7,7 +7,7 @@ export type Member = {
 export interface Params {
     count: number;
 }
-export interface ListItemDataType {
+export interface BookMetaDataType {
     author: string;
     create_time: string;
     description: string;
@@ -20,4 +20,5 @@ export interface ListItemDataType {
     stars: number;
     subjects: string;
     uuid: string;
+    collection_names: string;
 }
