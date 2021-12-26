@@ -1,5 +1,5 @@
 import { getBooksMeta } from '@/services';
-import useWindowDimensions from '@/util';
+import { useWindowDimensions } from '@/util';
 import { Menu, Dropdown } from 'antd';
 import { FC, useEffect, useState } from 'react';
 import {

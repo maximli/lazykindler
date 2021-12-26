@@ -1,4 +1,4 @@
-import useWindowDimensions from '@/util';
+import { useWindowDimensions } from '@/util';
 import { Paper } from '@mui/material';
 
 const PaperWrapper = ({ children }: any) => {

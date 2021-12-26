@@ -30,7 +30,6 @@ CREATE TABLE cover (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	uuid           TEXT,
     name           TEXT,         -- 书名
-    format         TEXT,         -- 格式
     size           INTEGER,      -- 文件大小
 	content        TEXT,         -- 内容
 	create_time    TEXT          -- 创建时间

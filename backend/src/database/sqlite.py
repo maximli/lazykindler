@@ -123,7 +123,7 @@ class DB:
             print("Failed to get book record. ", error)
 
 
-    def insert_book_collection(self, uuid, name, description, subjects, stars, cover_content, cover_format):
+    def insert_book_collection(self, uuid, name, description, subjects, stars, cover_content):
         cursor = self.conn.cursor()
         cursor.execute("begin")
         try:
@@ -141,9 +141,9 @@ class DB:
             cursor.execute(sql, data_tuple)
 
             if cover_content is not None:
-                sql = """INSERT INTO cover (uuid, name, format, size, content, create_time ) 
-                                            VALUES (?, ?, ?, ?, ?, ?) """
-                data_tuple = (uuid, name, cover_format, sys.getsizeof(cover_content), cover_content, get_now())
+                sql = """INSERT INTO cover (uuid, name, size, content, create_time ) 
+                                            VALUES (?, ?, ?, ?, ?) """
+                data_tuple = (uuid, name, sys.getsizeof(cover_content), cover_content, get_now())
                 cursor.execute(sql, data_tuple)
 
         except Exception as error:

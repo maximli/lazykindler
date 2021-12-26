@@ -12,6 +12,7 @@ import {
     Button,
     TextField,
 } from '@mui/material';
+import Dropzone from 'react-dropzone';
 
 import ListItemIcon from '@mui/material/ListItemIcon';
 import AddIcon from '@mui/icons-material/Add';
@@ -20,7 +21,7 @@ import BookCardList from '../books/components/BookCardList';
 import PaperWrapper from '../books/components/PaperWrapper';
 import { useEffect, useState } from 'react';
 import { createBookCollection, getBookCollections } from '@/services';
-import useWindowDimensions from '@/util';
+import { useWindowDimensions, toBase64 } from '@/util';
 import { BookCollectionDataType } from './data';
 
 export default function BookCollections() {
@@ -55,25 +56,35 @@ export default function BookCollections() {
         let description = formData['description'];
         let subjects = formData['subjects'];
         let stars = formData['stars'];
+        let cover = formData['cover'];
+
         if (name == null || name.trim() == '') {
-            return;
+            return false;
         }
         if (description == null || description.trim() == '') {
-          description = ''
+            description = '';
         }
         if (subjects == null || subjects.trim() == '') {
-            return;
+            return false;
         }
         if (stars == null || stars.trim() == '') {
-            return;
+            return false;
+        }
+        if (cover == null || cover.trim() == '') {
+            return false;
         }
 
-        let name = name.trim() 
-        let description = description.trim()
-        let subjectsList = subjects.trim() 
-        let starsStr = stars.trim()
+        name = name.trim();
+        description = description.trim();
+        let subjectsList = subjects.trim().split(';');
+        if (isNaN(stars.trim())) {
+            return false;
+        }
+        stars = Number(stars.trim());
+        cover = cover.trim();
 
-        createBookCollection(name, description);
+        createBookCollection(name, description, subjectsList.join(';'), stars, cover);
+        return true;
     };
 
     return (
@@ -111,7 +122,7 @@ export default function BookCollections() {
                                 </ListItem>
                             ))}
                             <ListItemButton onClick={handleClickOpen}>
-                                <ListItemIcon style={{ paddingLeft: 88 }}>
+                                <ListItemIcon style={{ paddingLeft: 70 }}>
                                     <AddIcon />
                                 </ListItemIcon>
                             </ListItemButton>
@@ -188,11 +199,35 @@ export default function BookCollections() {
                                 setFormData({ ...formData, stars: event.target.value });
                             }}
                         />
+                        <Dropzone
+                            onDrop={async (acceptedFiles) => {
+                                console.log(acceptedFiles);
+                                let base64Str = await toBase64(acceptedFiles[0])
+                                setFormData({ ...formData, cover: base64Str });
+                            }}
+                        >
+                            {({ getRootProps, getInputProps }) => (
+                                <section>
+                                    <div {...getRootProps()}>
+                                        <input {...getInputProps()} />
+                                        <p>集合封面，脱宅上传</p>
+                                    </div>
+                                </section>
+                            )}
+                        </Dropzone>
                     </Box>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>取消</Button>
-                    <Button onClick={handleClose} autoFocus>
+                    <Button
+                        onClick={() => {
+                            let ok = handleCreate();
+                            if (ok) {
+                                handleClose();
+                            }
+                        }}
+                        autoFocus
+                    >
                         确认
                     </Button>
                 </DialogActions>

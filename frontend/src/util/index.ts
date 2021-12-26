@@ -9,7 +9,7 @@ function getWindowDimensions() {
 }
 
 // 用于获取当前窗口的宽高
-export default function useWindowDimensions() {
+export const useWindowDimensions: any = () => {
     const [windowDimensions, setWindowDimensions] = useState(
         getWindowDimensions()
     );
@@ -25,3 +25,10 @@ export default function useWindowDimensions() {
 
     return windowDimensions;
 }
+
+export const toBase64 = (file: File) => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+});

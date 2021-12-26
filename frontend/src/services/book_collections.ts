@@ -8,22 +8,20 @@ export const getBookCollections = () => {
 };
 
 // 创建书籍集合
-export const createBookCollection = (
+export const createBookCollection = async (
     name: string,
     description: string,
     subjects: string,
     stars: number,
     cover: string,
 ) => {
-    return axiosInstance
+    const data = await axiosInstance
         .post(`/api/collection/create`, {
             name,
             description,
             subjects,
             stars,
             cover,
-        })
-        .then((data: any) => {
-            return data.data;
         });
+    return data.data;
 };

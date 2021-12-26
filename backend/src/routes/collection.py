@@ -24,11 +24,11 @@ def create_book_collection():
     if 'stars' in content:
         stars = content['stars']
 
-    cover_path = None
-    if 'cover_path' in content:
-        cover_path = content['cover_path']
+    cover = ""
+    if 'cover' in content:
+        cover = content['cover']
 
-    collection.create_book_collection(name, description, subjects, stars, cover_path)
+    collection.create_book_collection(name, description, subjects, stars, cover)
     return "success"
 
 
