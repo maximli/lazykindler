@@ -107,12 +107,42 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                 }
             });
 
-            setClassifiedInfo({
+            let allInfo = {
                 Stars: stars,
                 Subjects: subjects,
                 Author: authors,
                 Publisher: publisher,
-            });
+            };
+
+            setClassifiedInfo(allInfo);
+
+            enum FilterType {
+                All = '未分类',
+                Stars = '评分',
+                Subjects = '标签',
+                Author = '作者',
+                Publisher = '出版社',
+            }
+
+            switch (selectedType) {
+                case FilterType.All:
+                    setSelectedSubType([]);
+                    break;
+                case FilterType.Stars:
+                    setSelectedSubType(Object.keys(allInfo.Stars));
+                    break;
+                case FilterType.Subjects:
+                    setSelectedSubType(Object.keys(allInfo.Subjects));
+                    break;
+                case FilterType.Author:
+                    setSelectedSubType(Object.keys(allInfo.Author));
+                    break;
+                case FilterType.Publisher:
+                    setSelectedSubType(Object.keys(allInfo.Subjects));
+                    break;
+            }
+
+            filterData(allInfo, selectedItemName);
         });
     };
 
@@ -120,14 +150,23 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
         fetchBooks();
     }, []);
 
-    const filterData = (selectedKeyword: string) => {
+    const filterData = (data: any, selectedKeyword: any) => {
+        let allInfo;
+        if (data != null) {
+            allInfo = data;
+        } else {
+            allInfo = classifiedInfo;
+        }
         setSelectedItemName(selectedKeyword);
 
         let filteredBooks;
         let o = {};
         switch (selectedType) {
             case FilterType.Stars:
-                o = classifiedInfo.Stars[selectedKeyword];
+                o = allInfo.Stars[selectedKeyword];
+                if (o == null) {
+                    o = {};
+                }
                 filteredBooks = _.filter(allBooksMeta, (v: BookMetaDataType) => {
                     if (v.uuid in o) {
                         return true;
@@ -137,7 +176,10 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                 setData(filteredBooks);
                 break;
             case FilterType.Subjects:
-                o = classifiedInfo.Subjects[selectedKeyword];
+                o = allInfo.Subjects[selectedKeyword];
+                if (o == null) {
+                    o = {};
+                }
                 filteredBooks = _.filter(allBooksMeta, (v: BookMetaDataType) => {
                     if (v.uuid in o) {
                         return true;
@@ -147,7 +189,10 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                 setData(filteredBooks);
                 break;
             case FilterType.Author:
-                o = classifiedInfo.Author[selectedKeyword];
+                o = allInfo.Author[selectedKeyword];
+                if (o == null) {
+                    o = {};
+                }
                 filteredBooks = _.filter(allBooksMeta, (v: BookMetaDataType) => {
                     if (v.uuid in o) {
                         return true;
@@ -157,7 +202,10 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                 setData(filteredBooks);
                 break;
             case FilterType.Publisher:
-                o = classifiedInfo.Publisher[selectedKeyword];
+                o = allInfo.Publisher[selectedKeyword];
+                if (o == null) {
+                    o = {};
+                }
                 filteredBooks = _.filter(allBooksMeta, (v: BookMetaDataType) => {
                     if (v.uuid in o) {
                         return true;
@@ -276,7 +324,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                                     style={{ padding: 0 }}
                                     key={index}
                                     onClick={() => {
-                                        filterData(item);
+                                        filterData(null, item);
                                     }}
                                 >
                                     <ListItemButton
@@ -300,7 +348,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                         }}
                     >
                         <div style={{ width: width - 530 }}>
-                            <BookCardList data={data} />
+                            <BookCardList data={data} fetchBooks={fetchBooks} />
                         </div>
                     </Grid>
                 </Grid>

@@ -1,5 +1,11 @@
 import { Card, List as AntList } from 'antd';
 import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 import _ from 'lodash';
 import Cover from '../../../books/components/Cover';
@@ -10,7 +16,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { BookMetaDataType } from '../../data';
 import ChangeInfo from './changeInfo';
 import { useState } from 'react';
-import { updateBookMeta } from '@/services';
+import { updateBookMeta, deleteBook } from '@/services';
 
 const { SubMenu } = Menu;
 
@@ -22,6 +28,7 @@ const RedTextTypography = withStyles({
 
 type BookCardListProps = {
     data: any;
+    fetchBooks: any;
 };
 
 const initialDialogInfo = {
@@ -32,12 +39,23 @@ const initialDialogInfo = {
 };
 
 export default function BookCardList(props: BookCardListProps) {
-    const { data } = props;
+    const { data, fetchBooks } = props;
 
     const [dialogInfo, setDialogInfo] = useState<any>(initialDialogInfo);
+    const [openDeleteBook, setOpenDeleteBook] = useState(false);
+    const [deleteBookUUID, setDeleteBookUUID] = useState("");
 
     const handleCloseDialog = () => {
         setDialogInfo(initialDialogInfo);
+    };
+
+    const handleClickOpen = (uuid: string) => {
+        setDeleteBookUUID(uuid);
+        setOpenDeleteBook(true);
+    };
+
+    const handleClose = () => {
+        setOpenDeleteBook(false);
     };
 
     return (
@@ -73,13 +91,16 @@ export default function BookCardList(props: BookCardListProps) {
                                             onClick={() => {
                                                 setDialogInfo({
                                                     title: '修改评分',
+                                                    oldValue: item.stars,
                                                     allowEmptyStr: false,
                                                     handleOK: (newValue: any) => {
                                                         updateBookMeta(
                                                             item.uuid,
                                                             'stars',
                                                             newValue,
-                                                        );
+                                                        ).then(() => {
+                                                            fetchBooks();
+                                                        });
                                                     },
                                                     open: true,
                                                 });
@@ -92,13 +113,16 @@ export default function BookCardList(props: BookCardListProps) {
                                             onClick={() => {
                                                 setDialogInfo({
                                                     title: '修改标签',
+                                                    oldValue: item.subjects,
                                                     allowEmptyStr: false,
                                                     handleOK: (newValue: any) => {
                                                         updateBookMeta(
                                                             item.uuid,
                                                             'subjects',
                                                             newValue,
-                                                        );
+                                                        ).then(() => {
+                                                            fetchBooks();
+                                                        });
                                                     },
                                                     open: true,
                                                 });
@@ -111,13 +135,16 @@ export default function BookCardList(props: BookCardListProps) {
                                             onClick={() => {
                                                 setDialogInfo({
                                                     title: '修改集合',
+                                                    oldValue: item.collection_names,
                                                     allowEmptyStr: false,
                                                     handleOK: (newValue: any) => {
                                                         updateBookMeta(
                                                             item.uuid,
                                                             'collection_names',
                                                             newValue,
-                                                        );
+                                                        ).then(() => {
+                                                            fetchBooks();
+                                                        });
                                                     },
                                                     open: true,
                                                 });
@@ -130,13 +157,16 @@ export default function BookCardList(props: BookCardListProps) {
                                             onClick={() => {
                                                 setDialogInfo({
                                                     title: '修改作者',
+                                                    oldValue: item.author,
                                                     allowEmptyStr: false,
                                                     handleOK: (newValue: any) => {
                                                         updateBookMeta(
                                                             item.uuid,
                                                             'author',
                                                             newValue,
-                                                        );
+                                                        ).then(() => {
+                                                            fetchBooks();
+                                                        });
                                                     },
                                                     open: true,
                                                 });
@@ -149,13 +179,16 @@ export default function BookCardList(props: BookCardListProps) {
                                             onClick={() => {
                                                 setDialogInfo({
                                                     title: '修改出版社',
+                                                    oldValue: item.publisher,
                                                     allowEmptyStr: false,
                                                     handleOK: (newValue: any) => {
                                                         updateBookMeta(
                                                             item.uuid,
                                                             'publisher',
                                                             newValue,
-                                                        );
+                                                        ).then(() => {
+                                                            fetchBooks();
+                                                        });
                                                     },
                                                     open: true,
                                                 });
@@ -163,7 +196,14 @@ export default function BookCardList(props: BookCardListProps) {
                                         >
                                             修改出版社
                                         </Menu.Item>
-                                        <Menu.Item key="6">删除</Menu.Item>
+                                        <Menu.Item
+                                            key="6"
+                                            onClick={() => {
+                                                handleClickOpen(item.uuid);
+                                            }}
+                                        >
+                                            删除
+                                        </Menu.Item>
                                     </SubMenu>
                                 </Menu>,
                             ]}
@@ -267,11 +307,45 @@ export default function BookCardList(props: BookCardListProps) {
             />
             <ChangeInfo
                 title={dialogInfo['title']}
+                oldValue={dialogInfo['oldValue']}
                 allowEmptyStr={dialogInfo['allowEmptyStr']}
                 handleClose={handleCloseDialog}
                 handleOK={dialogInfo['handleOK']}
                 open={dialogInfo['open']}
             />
+
+            <div>
+                <Dialog
+                    open={openDeleteBook}
+                    onClose={handleClose}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                    fullWidth
+                >
+                    <DialogTitle id="alert-dialog-title">
+                        警告
+                    </DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            确定删除这本书吗？
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose}>取消</Button>
+                        <Button
+                            onClick={() => {
+                                handleClose();
+                                deleteBook(deleteBookUUID).then(() => {
+                                    fetchBooks();
+                                });
+                            }}
+                            autoFocus
+                        >
+                            确定
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </div>
         </>
     );
 }

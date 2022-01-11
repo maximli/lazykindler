@@ -8,6 +8,7 @@ import TextField from '@mui/material/TextField';
 
 type ChangeInfoProp = {
     title: string;
+    oldValue: any;
     allowEmptyStr: boolean;
     handleClose: any;
     handleOK: any;
@@ -15,12 +16,16 @@ type ChangeInfoProp = {
 };
 
 export default function ChangeInfo(prop: ChangeInfoProp) {
-    const { title, allowEmptyStr, handleClose, handleOK, open } = prop;
+    const { title, allowEmptyStr, handleClose, handleOK, open, oldValue } = prop;
 
-    const [value, setValue] = React.useState<any>(null);
+    const [value, setValue] = React.useState<any>(oldValue);
 
     const handleClickOk = () => {
-        if (allowEmptyStr == false && value == null) {
+        if (value == oldValue) {
+            handleClose();
+            return
+        }
+        if (allowEmptyStr == false && (value == null || value == "")) {
             return;
         }
         handleOK(value);
@@ -42,9 +47,11 @@ export default function ChangeInfo(prop: ChangeInfoProp) {
                         id="outlined-basic"
                         label="新值"
                         variant="outlined"
+                        defaultValue={oldValue}
                         fullWidth
                         onChange={(e) => {
-                            setValue(e.target.value);
+                            let newValue = e.target.value.trim();
+                            setValue(newValue);
                         }}
                     />
                 </DialogContent>

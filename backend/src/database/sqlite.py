@@ -47,8 +47,8 @@ class DB:
 
             desc = cursor.description
             column_names = [col[0] for col in desc]
-            data = [dict(zip(column_names, row))  
-                for row in cursor.fetchall()]
+            data = [dict(zip(column_names, row))
+                    for row in cursor.fetchall()]
             return data
 
         except Exception as error:
@@ -83,16 +83,16 @@ class DB:
             # 插入书籍封面信息
             sql = """INSERT INTO cover (uuid, name, size, content, create_time ) 
                                         VALUES (?, ?, ?, ?, ?) """
-            data_tuple = (uuid, title, sys.getsizeof(cover_info["content"]), base64.b64encode(cover_info["content"]), get_now())
+            data_tuple = (uuid, title, sys.getsizeof(
+                cover_info["content"]), base64.b64encode(cover_info["content"]), get_now())
             cursor.execute(sql, data_tuple)
-
 
             # 插入书籍信息
             sql = """INSERT INTO book (uuid, name, format, size, content, create_time) 
                                         VALUES (?, ?, ?, ?, ?, ?) """
-            data_tuple = (uuid, title, extension, book_size, book_content, get_now())
+            data_tuple = (uuid, title, extension, book_size,
+                          book_content, get_now())
             cursor.execute(sql, data_tuple)
-
 
             # 插入临时书籍
             sql = """INSERT INTO tmp_book (uuid, create_time) VALUES (?, ?) """
@@ -105,7 +105,6 @@ class DB:
 
         self.conn.commit()
         cursor.close()
-
 
     def get_book(self, uuid, filepath):
         try:
@@ -123,7 +122,6 @@ class DB:
         except Exception as error:
             print("Failed to get book record. ", error)
 
-
     def insert_book_collection(self, uuid, name, description, subjects, stars, cover_content):
         cursor = self.conn.cursor()
         cursor.execute("begin")
@@ -134,9 +132,9 @@ class DB:
             data_tuple = (
                 uuid,
                 name,
-                description, 
-                subjects, 
-                stars, 
+                description,
+                subjects,
+                stars,
                 get_now()
             )
             cursor.execute(sql, data_tuple)
@@ -144,7 +142,8 @@ class DB:
             if cover_content is not None:
                 sql = """INSERT INTO cover (uuid, name, size, content, create_time ) 
                                             VALUES (?, ?, ?, ?, ?) """
-                data_tuple = (uuid, name, sys.getsizeof(cover_content), cover_content, get_now())
+                data_tuple = (uuid, name, sys.getsizeof(
+                    cover_content), cover_content, get_now())
                 cursor.execute(sql, data_tuple)
 
         except Exception as error:
@@ -153,6 +152,6 @@ class DB:
 
         self.conn.commit()
         cursor.close()
-    
+
 
 db = DB()

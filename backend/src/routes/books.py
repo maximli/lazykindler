@@ -29,23 +29,18 @@ def store_books():
 
 def get_books_meta():
     storeType = request.args.get('storeType')
-    data = books.get_books_meta(storeType);
+    data = books.get_books_meta(storeType)
     return data
 
 
 def get_book_cover():
     uuid = request.args.get('uuid')
-    return books.get_book_cover(uuid);
+    return books.get_book_cover(uuid)
 
 
 def delete_book():
     uuid = request.args.get('uuid')
-    return books.delete_book(uuid);
-
-
-def delete_tmp_book():
-    uuid = request.args.get('uuid')
-    return books.delete_tmp_book(uuid);
+    return books.delete_book(uuid)
 
 
 def update_book_meta():
@@ -53,4 +48,4 @@ def update_book_meta():
     uuid = content['uuid']
     key = content['key']
     value = content['value']
-    return books.update_book_meta(uuid, key, value);
+    return books.update_book_meta(uuid, key, value)

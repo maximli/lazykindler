@@ -8,7 +8,8 @@ def create_book_collection():
     content = request.json
     name = content['name']
 
-    book_collection = db.query("select uuid from book_collection where name='{}'".format(name))
+    book_collection = db.query(
+        "select uuid from book_collection where name='{}'".format(name))
     if len(book_collection) > 0:
         return "success"
 
@@ -28,14 +29,15 @@ def create_book_collection():
     if 'cover' in content:
         cover = content['cover']
 
-    collection.create_book_collection(name, description, subjects, stars, cover)
+    collection.create_book_collection(
+        name, description, subjects, stars, cover)
     return "success"
 
 
 def get_book_collections():
-    return collection.get_book_collections();
+    return collection.get_book_collections()
 
 
 def delete_book_collection():
     uuid = request.args.get('uuid')
-    return collection.delete_book_collections(uuid);
+    return collection.delete_book_collections(uuid)

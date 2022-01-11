@@ -23,3 +23,10 @@ export const updateBookMeta = async (uuid: string, key: string, value: any) => {
     });
     return data.data;
 };
+
+// 删除书籍
+export const deleteBook = (uuid: string) => {
+    return axiosInstance.delete(`/api/book/delete?uuid=${uuid}`).then((data: any) => {
+        return data.data;
+    });
+};

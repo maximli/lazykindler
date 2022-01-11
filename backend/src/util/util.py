@@ -15,6 +15,7 @@ def handle_error(err_msg):
 
     return jsonify(response), status_code
 
+
 def convert_to_binary_data(filename):
     # Convert digital data to binary format
     with open(filename, 'rb') as file:
@@ -24,9 +25,9 @@ def convert_to_binary_data(filename):
 
 def get_md5(filepath):
     md5_hash = hashlib.md5()
-    with open(filepath,"rb") as f:
+    with open(filepath, "rb") as f:
         # Read and update hash in chunks of 4K
-        for byte_block in iter(lambda: f.read(4096),b""):
+        for byte_block in iter(lambda: f.read(4096), b""):
             md5_hash.update(byte_block)
         return md5_hash.hexdigest()
 
