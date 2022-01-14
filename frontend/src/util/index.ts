@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import _ from 'lodash';
 
 function getWindowDimensions() {
     const { innerWidth: width, innerHeight: height } = window;
@@ -32,3 +33,13 @@ export const toBase64 = (file: File) => new Promise((resolve, reject) => {
     reader.onload = () => resolve(reader.result);
     reader.onerror = error => reject(error);
 });
+
+
+export const preHandleSubjects = (subjects: string) => {
+    let subjectsList = subjects.trim().split(';');
+    subjectsList = _.map(subjectsList, subject => {
+        return subject.trim()
+    })
+    subjectsList =  _.uniq(subjectsList)
+    return subjectsList.join(';')
+}

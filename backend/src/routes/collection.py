@@ -40,4 +40,13 @@ def get_book_collections():
 
 def delete_book_collection():
     uuid = request.args.get('uuid')
-    return collection.delete_book_collections(uuid)
+    name = request.args.get('name')
+    return collection.delete_book_collections(uuid, name)
+
+
+def update_book_collection():
+    content = request.json
+    uuid = content['uuid']
+    key = content['key']
+    value = content['value']
+    return collection.update_collection(uuid, key, value)

@@ -8,13 +8,13 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
 import _ from 'lodash';
-import Cover from '../../../books/components/Cover';
+import Cover from '../../../components/Cover';
 
 import { Menu } from 'antd';
 import { SettingOutlined } from '@ant-design/icons';
 import { withStyles } from '@material-ui/core/styles';
-import { BookMetaDataType } from '../../data';
-import ChangeInfo from './changeInfo';
+import { BookMetaDataType } from '../../../../data';
+import ChangeInfo from '../../../components/ChangeInfoDialog';
 import { useState } from 'react';
 import { updateBookMeta, deleteBook } from '@/services';
 
@@ -202,7 +202,7 @@ export default function BookCardList(props: BookCardListProps) {
                                                 handleClickOpen(item.uuid);
                                             }}
                                         >
-                                            删除
+                                            <span style={{ color: "red" }}>删除</span>
                                         </Menu.Item>
                                     </SubMenu>
                                 </Menu>,
@@ -320,7 +320,6 @@ export default function BookCardList(props: BookCardListProps) {
                     onClose={handleClose}
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
-                    fullWidth
                 >
                     <DialogTitle id="alert-dialog-title">
                         警告

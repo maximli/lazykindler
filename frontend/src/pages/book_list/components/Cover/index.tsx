@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { Image } from 'antd';
-import { getBookCover } from '@/services';
+import { getCover } from '@/services';
 
 type CoverProps = {
     uuid: string;
@@ -11,7 +11,7 @@ const Cover: FC<CoverProps> = (props: CoverProps) => {
     const [base64Cover, setBase64Cover] = useState<string>('');
 
     useEffect(() => {
-        getBookCover(uuid).then((data) => {
+        getCover(uuid).then((data: any) => {
             setBase64Cover(data);
         });
     }, []);

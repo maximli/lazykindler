@@ -11,19 +11,23 @@ import {
     DialogContent,
     DialogTitle,
     Button,
-    TextField,
+    Input,
+    Chip,
+    Typography,
+    FormControl,
+    FormHelperText,
 } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ListItemIcon from '@mui/material/ListItemIcon';
 import { Menu, Dropdown } from 'antd';
 import { DownOutlined, StockOutlined, TagsOutlined, DatabaseOutlined } from '@ant-design/icons';
 import Dropzone from 'react-dropzone';
-
-import ListItemIcon from '@mui/material/ListItemIcon';
 import AddIcon from '@mui/icons-material/Add';
 import _ from 'lodash';
 import BookCardList from './components/BookCardList';
 import { useEffect, useState } from 'react';
 import { createBookCollection, getBookCollections } from '@/services';
-import { useWindowDimensions, toBase64 } from '@/util';
+import { useWindowDimensions, toBase64, preHandleSubjects } from '@/util';
 import { BookCollectionDataType } from './data';
 
 enum FilterType {
@@ -54,6 +58,7 @@ export default function BookCollections() {
         Subjects: {},
     });
 
+
     const [formData, setFormData] = useState<any>({});
 
     const [open, setOpen] = useState(false);
@@ -66,7 +71,7 @@ export default function BookCollections() {
         setOpen(false);
     };
 
-    const fetchData = () => {
+    const fetchBookCollections = () => {
         getBookCollections().then((data: BookCollectionDataType[]) => {
             setAllBookCollections(data);
             setData(data);
@@ -92,15 +97,31 @@ export default function BookCollections() {
                 }
             });
 
-            setClassifiedInfo({
+            let allInfo = {
                 Stars: stars,
                 Subjects: subjects,
-            });
+            };
+
+            setClassifiedInfo(allInfo);
+
+            switch (selectedType) {
+                case FilterType.All:
+                    setSelectedSubType([]);
+                    break;
+                case FilterType.Stars:
+                    setSelectedSubType(Object.keys(allInfo.Stars));
+                    break;
+                case FilterType.Subjects:
+                    setSelectedSubType(Object.keys(allInfo.Subjects));
+                    break;
+            }
+
+            filterData(allInfo, selectedItemName);
         });
     };
 
     useEffect(() => {
-        fetchData();
+        fetchBookCollections();
     }, []);
 
     const handleCreate = () => {
@@ -128,14 +149,15 @@ export default function BookCollections() {
 
         name = name.trim();
         description = description.trim();
-        let subjectsList = subjects.trim().split(';');
         if (isNaN(stars.trim())) {
             return false;
         }
         stars = Number(stars.trim());
         cover = cover.trim();
 
-        createBookCollection(name, description, subjectsList.join(';'), stars, cover);
+        createBookCollection(name, description, preHandleSubjects(subjects), stars, cover).then(() => {
+            fetchBookCollections();
+        });
         return true;
     };
 
@@ -187,14 +209,23 @@ export default function BookCollections() {
         );
     };
 
-    const filterData = (selectedKeyword: string) => {
+    const filterData = (data: any, selectedKeyword: string) => {
+        let allInfo;
+        if (data != null) {
+            allInfo = data;
+        } else {
+            allInfo = classifiedInfo;
+        }
         setSelectedItemName(selectedKeyword);
 
         let filteredBooks;
         let o = {};
         switch (selectedType) {
             case FilterType.Stars:
-                o = classifiedInfo.Stars[selectedKeyword];
+                o = allInfo.Stars[selectedKeyword];
+                if (o == null) {
+                    o = {};
+                }
                 filteredBooks = _.filter(allBookCollections, (v: BookCollectionDataType) => {
                     if (v.uuid in o) {
                         return true;
@@ -204,7 +235,10 @@ export default function BookCollections() {
                 setData(filteredBooks);
                 break;
             case FilterType.Subjects:
-                o = classifiedInfo.Subjects[selectedKeyword];
+                o = allInfo.Subjects[selectedKeyword];
+                if (o == null) {
+                    o = {};
+                }
                 filteredBooks = _.filter(allBookCollections, (v: BookCollectionDataType) => {
                     if (v.uuid in o) {
                         return true;
@@ -249,7 +283,7 @@ export default function BookCollections() {
                                     style={{ padding: 0 }}
                                     key={index}
                                     onClick={() => {
-                                        filterData(item);
+                                        filterData(null, item);
                                     }}
                                 >
                                     <ListItemButton
@@ -278,7 +312,7 @@ export default function BookCollections() {
                         }}
                     >
                         <div style={{ width: width - 530 }}>
-                            <BookCardList data={data} />
+                            <BookCardList data={data} fetchBookCollections={fetchBookCollections} />
                         </div>
                     </Grid>
                 </Grid>
@@ -301,57 +335,150 @@ export default function BookCollections() {
                             '& .MuiTextField-root': { width: '25ch' },
                         }}
                     >
-                        <TextField
-                            label={'name'}
-                            id="name"
-                            helperText="不能为空"
-                            margin="dense"
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setFormData({ ...formData, name: event.target.value });
-                            }}
-                        />
-                        <TextField
-                            label={'description'}
-                            id="description"
-                            margin="dense"
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setFormData({ ...formData, description: event.target.value });
-                            }}
-                        />
-                        <TextField
-                            label={'subjects'}
-                            id="subjects"
-                            helperText="标签，多个标签分号相隔"
-                            margin="dense"
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setFormData({ ...formData, subjects: event.target.value });
-                            }}
-                        />
-                        <TextField
-                            label={'stars'}
-                            id="stars"
-                            helperText="整数，建议最高9分"
-                            margin="dense"
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setFormData({ ...formData, stars: event.target.value });
-                            }}
-                        />
-                        <Dropzone
-                            onDrop={async (acceptedFiles) => {
-                                console.log(acceptedFiles);
-                                let base64Str = await toBase64(acceptedFiles[0]);
-                                setFormData({ ...formData, cover: base64Str });
-                            }}
-                        >
-                            {({ getRootProps, getInputProps }) => (
-                                <section>
-                                    <div {...getRootProps()}>
-                                        <input {...getInputProps()} />
-                                        <p>集合封面，拖拽上传</p>
-                                    </div>
-                                </section>
-                            )}
-                        </Dropzone>
+                        <FormControl variant="standard" sx={{ m: 1, mt: 3, width: '25ch' }}>
+                            <Typography
+                                style={{ position: 'relative', paddingTop: 5 }}
+                                variant="subtitle1"
+                                gutterBottom
+                                component="div"
+                            >
+                                名称:
+                            </Typography>
+                            <div style={{ position: 'absolute', paddingLeft: 45 }}>
+                                <Input
+                                    id="standard-adornment-weight"
+                                    aria-describedby="standard-weight-helper-text"
+                                    inputProps={{
+                                        'aria-label': 'weight',
+                                    }}
+                                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                        setFormData({ ...formData, name: event.target.value });
+                                    }}
+                                />
+                                <FormHelperText id="standard-weight-helper-text">
+                                    不能为空
+                                </FormHelperText>
+                            </div>
+                        </FormControl>
+                        <FormControl variant="standard" sx={{ m: 1, mt: 3, width: '25ch' }}>
+                            <Typography
+                                style={{ position: 'relative', paddingTop: 5 }}
+                                variant="subtitle1"
+                                gutterBottom
+                                component="div"
+                            >
+                                描述:
+                            </Typography>
+                            <div style={{ position: 'absolute', paddingLeft: 45 }}>
+                                <Input
+                                    id="standard-adornment-weight"
+                                    aria-describedby="standard-weight-helper-text"
+                                    inputProps={{
+                                        'aria-label': 'weight',
+                                    }}
+                                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                        setFormData({
+                                            ...formData,
+                                            description: event.target.value,
+                                        });
+                                    }}
+                                />
+                            </div>
+                        </FormControl>
+                        <FormControl variant="standard" sx={{ m: 1, mt: 3, width: '25ch' }}>
+                            <Typography
+                                style={{ position: 'relative', paddingTop: 5 }}
+                                variant="subtitle1"
+                                gutterBottom
+                                component="div"
+                            >
+                                标签:
+                            </Typography>
+                            <div style={{ position: 'absolute', paddingLeft: 45 }}>
+                                <Input
+                                    id="standard-adornment-weight"
+                                    aria-describedby="standard-weight-helper-text"
+                                    inputProps={{
+                                        'aria-label': 'weight',
+                                    }}
+                                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                        setFormData({ ...formData, subjects: event.target.value });
+                                    }}
+                                />
+                                <FormHelperText id="standard-weight-helper-text">
+                                    多个标签分号相隔。不能为空
+                                </FormHelperText>
+                            </div>
+                        </FormControl>
+                        <FormControl variant="standard" sx={{ m: 1, mt: 3, width: '25ch' }}>
+                            <Typography
+                                style={{ position: 'relative', paddingTop: 5 }}
+                                variant="subtitle1"
+                                gutterBottom
+                                component="div"
+                            >
+                                评分:
+                            </Typography>
+                            <div style={{ position: 'absolute', paddingLeft: 45 }}>
+                                <Input
+                                    id="standard-adornment-weight"
+                                    aria-describedby="standard-weight-helper-text"
+                                    inputProps={{
+                                        'aria-label': 'weight',
+                                    }}
+                                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                        setFormData({ ...formData, stars: event.target.value });
+                                    }}
+                                />
+                                <FormHelperText id="standard-weight-helper-text">
+                                    整数，建议最高9分。不能为空
+                                </FormHelperText>
+                            </div>
+                        </FormControl>
+                        <FormControl variant="standard" sx={{ m: 1, mt: 3, width: '25ch' }}>
+                            <Typography
+                                style={{ position: 'relative', paddingTop: 5 }}
+                                variant="subtitle1"
+                                gutterBottom
+                                component="div"
+                            >
+                                封面:
+                            </Typography>
+                            <div style={{ position: 'absolute', paddingLeft: 45 }}>
+                                <Dropzone
+                                    onDrop={async (acceptedFiles) => {
+                                        let base64Str = await toBase64(acceptedFiles[0]);
+                                        setFormData({ ...formData, cover: base64Str });
+                                    }}
+                                >
+                                    {({ getRootProps, getInputProps }) => (
+                                        <section>
+                                            <div {...getRootProps()}>
+                                                <input {...getInputProps()} />
+                                                {formData.cover == null ? (
+                                                    <Button variant="contained">上传</Button>
+                                                ) : (
+                                                    <Chip
+                                                        label="封面"
+                                                        onDelete={() => {
+                                                            setFormData({
+                                                                ...formData,
+                                                                cover: null,
+                                                            });
+                                                        }}
+                                                        deleteIcon={<DeleteIcon />}
+                                                        variant="outlined"
+                                                    />
+                                                )}
+                                            </div>
+                                        </section>
+                                    )}
+                                </Dropzone>
+                                <FormHelperText id="standard-weight-helper-text">
+                                    不能为空
+                                </FormHelperText>
+                            </div>
+                        </FormControl>
                     </Box>
                 </DialogContent>
                 <DialogActions>
@@ -369,6 +496,7 @@ export default function BookCollections() {
                     </Button>
                 </DialogActions>
             </Dialog>
+
         </div>
     );
 }

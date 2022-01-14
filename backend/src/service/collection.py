@@ -6,6 +6,8 @@ from uuid import uuid1
 from flask import jsonify
 import hashlib
 
+from .common import update_book_meta
+
 from ..database.sqlite import db
 from ..util.util import convert_to_binary_data
 
@@ -34,6 +36,20 @@ def get_book_collections():
     return jsonify(data)
 
 
-def delete_book_collections(uuid):
+def delete_book_collections(uuid, collection_name):
+    db.run_sql("delete from cover where uuid='{}'".format(uuid))
+    book_metas = db.query(
+        "select uuid, collection_names from book_meta where collection_names like '%{}%'".format(collection_name))
+    for book_meta in book_metas:
+        collection_names = book_meta['collection_names'].split(';')
+        collection_names.remove(collection_name)
+        update_book_meta(book_meta['uuid'], 'collection_names', ';'.join(collection_names))
+
     db.run_sql("delete from book_collection where uuid='{}';".format(uuid))
+    return "success"
+
+
+def update_collection(uuid, key, value):
+    db.run_sql("update book_collection set '{}'='{}' where uuid='{}'".format(
+        key, value, uuid))
     return "success"

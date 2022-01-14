@@ -22,7 +22,7 @@ import {
 } from '@ant-design/icons';
 import _ from 'lodash';
 import BookCardList from './components/BookCardList';
-import type { BookMetaDataType } from './data.d';
+import type { BookMetaDataType } from '../../data';
 
 enum FilterType {
     All = '未分类',
@@ -116,14 +116,6 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
 
             setClassifiedInfo(allInfo);
 
-            enum FilterType {
-                All = '未分类',
-                Stars = '评分',
-                Subjects = '标签',
-                Author = '作者',
-                Publisher = '出版社',
-            }
-
             switch (selectedType) {
                 case FilterType.All:
                     setSelectedSubType([]);
@@ -138,7 +130,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                     setSelectedSubType(Object.keys(allInfo.Author));
                     break;
                 case FilterType.Publisher:
-                    setSelectedSubType(Object.keys(allInfo.Subjects));
+                    setSelectedSubType(Object.keys(allInfo.Publisher));
                     break;
             }
 
