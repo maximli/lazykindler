@@ -11,6 +11,9 @@ import {
     Grid,
     Box,
 } from '@mui/material';
+import { alpha, styled } from '@mui/material/styles';
+import TextField, { TextFieldProps } from '@mui/material/TextField';
+import { OutlinedInputProps } from '@mui/material/OutlinedInput';
 
 import {
     DownOutlined,
@@ -23,6 +26,7 @@ import {
 import _ from 'lodash';
 import BookCardList from './components/BookCardList';
 import type { BookMetaDataType } from '../../data';
+import { withStyles } from '@material-ui/core/styles';
 
 enum FilterType {
     All = '未分类',
@@ -283,18 +287,52 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
         );
     };
 
+    const RedditTextField = styled((props: TextFieldProps) => (
+        <TextField
+            InputProps={{ disableUnderline: true } as Partial<OutlinedInputProps>}
+            {...props}
+        />
+    ))(({ theme }) => ({
+        '& .MuiFilledInput-root': {
+            border: '1px solid #e2e2e1',
+            overflow: 'hidden',
+            borderRadius: 4,
+            backgroundColor: theme.palette.mode === 'light' ? '#fcfcfb' : '#2b2b2b',
+            transition: theme.transitions.create([
+                'border-color',
+                'background-color',
+                'box-shadow',
+            ]),
+            '&:hover': {
+                backgroundColor: 'transparent',
+            },
+            '&.Mui-focused': {
+                backgroundColor: 'transparent',
+                boxShadow: `${alpha(theme.palette.primary.main, 0.25)} 0 0 0 2px`,
+                borderColor: theme.palette.primary.main,
+            },
+        },
+    }));
+
     return (
-        <div style={{ height: height - 95 }}>
+        <div>
             <Box>
+                <RedditTextField
+                    label="请输入任意关键字进行搜索"
+                    id="reddit-input"
+                    variant="filled"
+                    style={{ width: width - 180, paddingBottom: 25, marginLeft: -14, marginTop: -14 }}
+                    fullWidth
+                />
                 <Grid container spacing={2}>
-                    <Grid item xs={2} style={{ paddingLeft: 3, paddingTop: 23, overflow: 'auto' }}>
+                    <Grid item xs={2} style={{ paddingLeft: 3, paddingTop: 0, overflow: 'auto' }}>
                         <List
                             sx={{
                                 width: '100%',
                                 bgcolor: 'background.paper',
                                 position: 'relative',
-                                overflow: 'auto',
-                                height: height - 95,
+                                // overflow: 'auto',
+                                height: height - 150,
                                 '& ul': { padding: 0 },
                             }}
                             subheader={<li />}
@@ -311,6 +349,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                                     </a>
                                 </Dropdown>
                             </ListSubheader>
+
                             {selectedSubType.map((item, index) => (
                                 <ListItem
                                     style={{ padding: 0 }}
@@ -335,13 +374,11 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                         style={{
                             paddingTop: 0,
                             paddingLeft: 5,
-                            height: height - 70,
+                            height: height - 150,
                             overflow: 'auto',
                         }}
                     >
-                        <div style={{ width: width - 530 }}>
-                            <BookCardList data={data} fetchBooks={fetchBooks} />
-                        </div>
+                        <BookCardList data={data} fetchBooks={fetchBooks} />
                     </Grid>
                 </Grid>
             </Box>

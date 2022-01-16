@@ -17,6 +17,7 @@ import { BookMetaDataType } from '../../../../data';
 import ChangeInfo from '../../../components/ChangeInfoDialog';
 import { useState } from 'react';
 import { updateBookMeta, deleteBook } from '@/services';
+import { useWindowDimensions } from '@/util';
 
 const { SubMenu } = Menu;
 
@@ -40,10 +41,11 @@ const initialDialogInfo = {
 
 export default function BookCardList(props: BookCardListProps) {
     const { data, fetchBooks } = props;
+    const { width, height } = useWindowDimensions();
 
     const [dialogInfo, setDialogInfo] = useState<any>(initialDialogInfo);
     const [openDeleteBook, setOpenDeleteBook] = useState(false);
-    const [deleteBookUUID, setDeleteBookUUID] = useState("");
+    const [deleteBookUUID, setDeleteBookUUID] = useState('');
 
     const handleCloseDialog = () => {
         setDialogInfo(initialDialogInfo);
@@ -58,253 +60,257 @@ export default function BookCardList(props: BookCardListProps) {
         setOpenDeleteBook(false);
     };
 
+
     return (
-        <>
-            <AntList<any>
-                rowKey="id"
-                grid={{
-                    gutter: 16,
-                    xs: 1,
-                    sm: 2,
-                    md: 3,
-                    lg: 4,
-                    xl: 5,
-                    xxl: 6,
-                }}
-                pagination={{
-                    position: 'top',
-                    defaultPageSize: 40,
-                    hideOnSinglePage: true,
-                    style: { paddingBottom: 10 },
-                }}
-                dataSource={data}
-                renderItem={(item: BookMetaDataType) => (
-                    <AntList.Item>
-                        <Card
-                            hoverable
-                            cover={<Cover uuid={item.uuid} />}
-                            actions={[
-                                <Menu mode="vertical" selectable={false}>
-                                    <SubMenu key="sub4" icon={<SettingOutlined />} title="操作">
-                                        <Menu.Item
-                                            key="1"
-                                            onClick={() => {
-                                                setDialogInfo({
-                                                    title: '修改评分',
-                                                    oldValue: item.stars,
-                                                    allowEmptyStr: false,
-                                                    handleOK: (newValue: any) => {
-                                                        updateBookMeta(
-                                                            item.uuid,
-                                                            'stars',
-                                                            newValue,
-                                                        ).then(() => {
-                                                            fetchBooks();
-                                                        });
-                                                    },
-                                                    open: true,
-                                                });
-                                            }}
-                                        >
-                                            修改评分
-                                        </Menu.Item>
-                                        <Menu.Item
-                                            key="2"
-                                            onClick={() => {
-                                                setDialogInfo({
-                                                    title: '修改标签',
-                                                    oldValue: item.subjects,
-                                                    allowEmptyStr: false,
-                                                    handleOK: (newValue: any) => {
-                                                        updateBookMeta(
-                                                            item.uuid,
-                                                            'subjects',
-                                                            newValue,
-                                                        ).then(() => {
-                                                            fetchBooks();
-                                                        });
-                                                    },
-                                                    open: true,
-                                                });
-                                            }}
-                                        >
-                                            修改标签
-                                        </Menu.Item>
-                                        <Menu.Item
-                                            key="3"
-                                            onClick={() => {
-                                                setDialogInfo({
-                                                    title: '修改集合',
-                                                    oldValue: item.collection_names,
-                                                    allowEmptyStr: false,
-                                                    handleOK: (newValue: any) => {
-                                                        updateBookMeta(
-                                                            item.uuid,
-                                                            'collection_names',
-                                                            newValue,
-                                                        ).then(() => {
-                                                            fetchBooks();
-                                                        });
-                                                    },
-                                                    open: true,
-                                                });
-                                            }}
-                                        >
-                                            修改集合
-                                        </Menu.Item>
-                                        <Menu.Item
-                                            key="4"
-                                            onClick={() => {
-                                                setDialogInfo({
-                                                    title: '修改作者',
-                                                    oldValue: item.author,
-                                                    allowEmptyStr: false,
-                                                    handleOK: (newValue: any) => {
-                                                        updateBookMeta(
-                                                            item.uuid,
-                                                            'author',
-                                                            newValue,
-                                                        ).then(() => {
-                                                            fetchBooks();
-                                                        });
-                                                    },
-                                                    open: true,
-                                                });
-                                            }}
-                                        >
-                                            修改作者
-                                        </Menu.Item>
-                                        <Menu.Item
-                                            key="5"
-                                            onClick={() => {
-                                                setDialogInfo({
-                                                    title: '修改出版社',
-                                                    oldValue: item.publisher,
-                                                    allowEmptyStr: false,
-                                                    handleOK: (newValue: any) => {
-                                                        updateBookMeta(
-                                                            item.uuid,
-                                                            'publisher',
-                                                            newValue,
-                                                        ).then(() => {
-                                                            fetchBooks();
-                                                        });
-                                                    },
-                                                    open: true,
-                                                });
-                                            }}
-                                        >
-                                            修改出版社
-                                        </Menu.Item>
-                                        <Menu.Item
-                                            key="6"
-                                            onClick={() => {
-                                                handleClickOpen(item.uuid);
-                                            }}
-                                        >
-                                            <span style={{ color: "red" }}>删除</span>
-                                        </Menu.Item>
-                                    </SubMenu>
-                                </Menu>,
-                            ]}
-                            bodyStyle={{
-                                paddingTop: 8,
-                                paddingLeft: 4,
-                                paddingRight: 4,
-                                paddingBottom: 8,
-                            }}
-                        >
-                            <Card.Meta
-                                title={
-                                    <div style={{ maxHeight: 80, overflow: 'auto' }}>
-                                        <Typography
-                                            variant="overline"
-                                            display="block"
-                                            style={{
-                                                wordBreak: 'break-all',
-                                                whiteSpace: 'break-spaces',
-                                                fontSize: 13,
-                                            }}
-                                            gutterBottom
-                                        >
-                                            {item.name}
-                                        </Typography>
-                                    </div>
-                                }
-                                description={
-                                    <div style={{ maxHeight: 150, overflow: 'auto' }}>
-                                        <RedTextTypography
-                                            variant="overline"
-                                            display="block"
-                                            style={{
-                                                wordBreak: 'break-all',
-                                                whiteSpace: 'break-spaces',
-                                                fontSize: 12,
-                                                marginBottom: 0,
-                                            }}
-                                            gutterBottom
-                                        >
-                                            {`评分: ${item.stars}`}
-                                        </RedTextTypography>
-                                        <RedTextTypography
-                                            variant="overline"
-                                            display="block"
-                                            style={{
-                                                wordBreak: 'break-all',
-                                                whiteSpace: 'break-spaces',
-                                                fontSize: 12,
-                                                marginBottom: 0,
-                                            }}
-                                            gutterBottom
-                                        >
-                                            {`集合: ${item.collection_names}`}
-                                        </RedTextTypography>
-                                        <RedTextTypography
-                                            variant="overline"
-                                            display="block"
-                                            style={{
-                                                wordBreak: 'break-all',
-                                                whiteSpace: 'break-spaces',
-                                                fontSize: 12,
-                                                marginBottom: 0,
-                                            }}
-                                            gutterBottom
-                                        >
-                                            {`标签: ${item.subjects}`}
-                                        </RedTextTypography>
-                                        <RedTextTypography
-                                            variant="overline"
-                                            display="block"
-                                            style={{
-                                                wordBreak: 'break-all',
-                                                whiteSpace: 'break-spaces',
-                                                fontSize: 12,
-                                                marginBottom: 0,
-                                            }}
-                                            gutterBottom
-                                        >
-                                            {`作者: ${item.author}`}
-                                        </RedTextTypography>
-                                        <RedTextTypography
-                                            variant="overline"
-                                            display="block"
-                                            style={{
-                                                wordBreak: 'break-all',
-                                                whiteSpace: 'break-spaces',
-                                                fontSize: 12,
-                                                marginBottom: 0,
-                                            }}
-                                            gutterBottom
-                                        >
-                                            {`出版社: ${item.publisher}`}
-                                        </RedTextTypography>
-                                    </div>
-                                }
-                            />
-                        </Card>
-                    </AntList.Item>
-                )}
-            />
+        <div style={{ paddingLeft: 5 }}>
+            <div style={{ height: height - 150, width: width - 390, overflow: 'auto' }}>
+                <AntList<any>
+                    style={{ width: width - 420 }}
+                    rowKey="id"
+                    grid={{
+                        gutter: 16,
+                        xs: 1,
+                        sm: 2,
+                        md: 3,
+                        lg: 4,
+                        xl: 5,
+                        xxl: 6,
+                    }}
+                    pagination={{
+                        position: 'bottom',
+                        defaultPageSize: 40,
+                        hideOnSinglePage: true,
+                        style: { paddingBottom: 10 },
+                    }}
+                    dataSource={data}
+                    renderItem={(item: BookMetaDataType) => (
+                        <AntList.Item>
+                            <Card
+                                hoverable
+                                cover={<Cover uuid={item.uuid} />}
+                                actions={[
+                                    <Menu mode="vertical" selectable={false}>
+                                        <SubMenu key="sub4" icon={<SettingOutlined />} title="操作">
+                                            <Menu.Item
+                                                key="1"
+                                                onClick={() => {
+                                                    setDialogInfo({
+                                                        title: '修改评分',
+                                                        oldValue: item.stars,
+                                                        allowEmptyStr: false,
+                                                        handleOK: (newValue: any) => {
+                                                            updateBookMeta(
+                                                                item.uuid,
+                                                                'stars',
+                                                                newValue,
+                                                            ).then(() => {
+                                                                fetchBooks();
+                                                            });
+                                                        },
+                                                        open: true,
+                                                    });
+                                                }}
+                                            >
+                                                修改评分
+                                            </Menu.Item>
+                                            <Menu.Item
+                                                key="2"
+                                                onClick={() => {
+                                                    setDialogInfo({
+                                                        title: '修改标签',
+                                                        oldValue: item.subjects,
+                                                        allowEmptyStr: false,
+                                                        handleOK: (newValue: any) => {
+                                                            updateBookMeta(
+                                                                item.uuid,
+                                                                'subjects',
+                                                                newValue,
+                                                            ).then(() => {
+                                                                fetchBooks();
+                                                            });
+                                                        },
+                                                        open: true,
+                                                    });
+                                                }}
+                                            >
+                                                修改标签
+                                            </Menu.Item>
+                                            <Menu.Item
+                                                key="3"
+                                                onClick={() => {
+                                                    setDialogInfo({
+                                                        title: '修改集合',
+                                                        oldValue: item.collection_names,
+                                                        allowEmptyStr: false,
+                                                        handleOK: (newValue: any) => {
+                                                            updateBookMeta(
+                                                                item.uuid,
+                                                                'collection_names',
+                                                                newValue,
+                                                            ).then(() => {
+                                                                fetchBooks();
+                                                            });
+                                                        },
+                                                        open: true,
+                                                    });
+                                                }}
+                                            >
+                                                修改集合
+                                            </Menu.Item>
+                                            <Menu.Item
+                                                key="4"
+                                                onClick={() => {
+                                                    setDialogInfo({
+                                                        title: '修改作者',
+                                                        oldValue: item.author,
+                                                        allowEmptyStr: false,
+                                                        handleOK: (newValue: any) => {
+                                                            updateBookMeta(
+                                                                item.uuid,
+                                                                'author',
+                                                                newValue,
+                                                            ).then(() => {
+                                                                fetchBooks();
+                                                            });
+                                                        },
+                                                        open: true,
+                                                    });
+                                                }}
+                                            >
+                                                修改作者
+                                            </Menu.Item>
+                                            <Menu.Item
+                                                key="5"
+                                                onClick={() => {
+                                                    setDialogInfo({
+                                                        title: '修改出版社',
+                                                        oldValue: item.publisher,
+                                                        allowEmptyStr: false,
+                                                        handleOK: (newValue: any) => {
+                                                            updateBookMeta(
+                                                                item.uuid,
+                                                                'publisher',
+                                                                newValue,
+                                                            ).then(() => {
+                                                                fetchBooks();
+                                                            });
+                                                        },
+                                                        open: true,
+                                                    });
+                                                }}
+                                            >
+                                                修改出版社
+                                            </Menu.Item>
+                                            <Menu.Item
+                                                key="6"
+                                                onClick={() => {
+                                                    handleClickOpen(item.uuid);
+                                                }}
+                                            >
+                                                <span style={{ color: 'red' }}>删除</span>
+                                            </Menu.Item>
+                                        </SubMenu>
+                                    </Menu>,
+                                ]}
+                                bodyStyle={{
+                                    paddingTop: 8,
+                                    paddingLeft: 4,
+                                    paddingRight: 4,
+                                    paddingBottom: 8,
+                                }}
+                            >
+                                <Card.Meta
+                                    title={
+                                        <div style={{ maxHeight: 80, overflow: 'auto' }}>
+                                            <Typography
+                                                variant="overline"
+                                                display="block"
+                                                style={{
+                                                    wordBreak: 'break-all',
+                                                    whiteSpace: 'break-spaces',
+                                                    fontSize: 13,
+                                                }}
+                                                gutterBottom
+                                            >
+                                                {item.name}
+                                            </Typography>
+                                        </div>
+                                    }
+                                    description={
+                                        <div style={{ maxHeight: 150, overflow: 'auto' }}>
+                                            <RedTextTypography
+                                                variant="overline"
+                                                display="block"
+                                                style={{
+                                                    wordBreak: 'break-all',
+                                                    whiteSpace: 'break-spaces',
+                                                    fontSize: 12,
+                                                    marginBottom: 0,
+                                                }}
+                                                gutterBottom
+                                            >
+                                                {`评分: ${item.stars}`}
+                                            </RedTextTypography>
+                                            <RedTextTypography
+                                                variant="overline"
+                                                display="block"
+                                                style={{
+                                                    wordBreak: 'break-all',
+                                                    whiteSpace: 'break-spaces',
+                                                    fontSize: 12,
+                                                    marginBottom: 0,
+                                                }}
+                                                gutterBottom
+                                            >
+                                                {`集合: ${item.collection_names}`}
+                                            </RedTextTypography>
+                                            <RedTextTypography
+                                                variant="overline"
+                                                display="block"
+                                                style={{
+                                                    wordBreak: 'break-all',
+                                                    whiteSpace: 'break-spaces',
+                                                    fontSize: 12,
+                                                    marginBottom: 0,
+                                                }}
+                                                gutterBottom
+                                            >
+                                                {`标签: ${item.subjects}`}
+                                            </RedTextTypography>
+                                            <RedTextTypography
+                                                variant="overline"
+                                                display="block"
+                                                style={{
+                                                    wordBreak: 'break-all',
+                                                    whiteSpace: 'break-spaces',
+                                                    fontSize: 12,
+                                                    marginBottom: 0,
+                                                }}
+                                                gutterBottom
+                                            >
+                                                {`作者: ${item.author}`}
+                                            </RedTextTypography>
+                                            <RedTextTypography
+                                                variant="overline"
+                                                display="block"
+                                                style={{
+                                                    wordBreak: 'break-all',
+                                                    whiteSpace: 'break-spaces',
+                                                    fontSize: 12,
+                                                    marginBottom: 0,
+                                                }}
+                                                gutterBottom
+                                            >
+                                                {`出版社: ${item.publisher}`}
+                                            </RedTextTypography>
+                                        </div>
+                                    }
+                                />
+                            </Card>
+                        </AntList.Item>
+                    )}
+                />
+            </div>
             <ChangeInfo
                 title={dialogInfo['title']}
                 oldValue={dialogInfo['oldValue']}
@@ -321,9 +327,7 @@ export default function BookCardList(props: BookCardListProps) {
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
                 >
-                    <DialogTitle id="alert-dialog-title">
-                        警告
-                    </DialogTitle>
+                    <DialogTitle id="alert-dialog-title">警告</DialogTitle>
                     <DialogContent>
                         <DialogContentText id="alert-dialog-description">
                             确定删除这本书吗？
@@ -345,6 +349,6 @@ export default function BookCardList(props: BookCardListProps) {
                     </DialogActions>
                 </Dialog>
             </div>
-        </>
+        </div>
     );
 }

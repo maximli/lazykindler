@@ -3,7 +3,7 @@
   {
     path: '/book_list',
     icon: 'table',
-    name: '书籍列表',
+    name: '书籍',
     routes: [
       {
         name: '正式书籍',

@@ -16,7 +16,7 @@ import { Menu } from 'antd';
 import { SettingOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { deleteBookCollection, updateBookCollection } from '@/services';
-import { preHandleSubjects } from '@/util';
+import { preHandleSubjects, useWindowDimensions } from '@/util';
 import AddBooks from '../AddBooks';
 
 const { SubMenu } = Menu;
@@ -41,6 +41,7 @@ const initialDialogInfo = {
 
 export default function BookCardList(props: BookCardListProps) {
     const { data, fetchBookCollections } = props;
+    const { width, height } = useWindowDimensions();
 
     const [dialogInfo, setDialogInfo] = useState<any>(initialDialogInfo);
 
