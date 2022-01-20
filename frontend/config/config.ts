@@ -14,7 +14,7 @@ export default defineConfig({
   layout: {
     // https://umijs.org/zh-CN/plugins/plugin-layout
     locale: true,
-    siderWidth: 150,
+    siderWidth: "10vw",
     ...defaultSettings,
   },
   dynamicImport: {

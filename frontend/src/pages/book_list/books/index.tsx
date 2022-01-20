@@ -1,5 +1,4 @@
 import { getBooksMeta } from '@/services';
-import { useWindowDimensions } from '@/util';
 import { Menu as AntMenu, Dropdown } from 'antd';
 import { FC, useEffect, useState } from 'react';
 import {
@@ -10,10 +9,12 @@ import {
     ListItemButton,
     Grid,
     Box,
+    InputBase,
+    MenuItem,
+    FormControl,
+    Select,
 } from '@mui/material';
-import { alpha, styled } from '@mui/material/styles';
-import TextField, { TextFieldProps } from '@mui/material/TextField';
-import { OutlinedInputProps } from '@mui/material/OutlinedInput';
+import { styled } from '@mui/material/styles';
 
 import {
     DownOutlined,
@@ -26,7 +27,39 @@ import {
 import _ from 'lodash';
 import BookCardList from './components/BookCardList';
 import type { BookMetaDataType } from '../../data';
-import { withStyles } from '@material-ui/core/styles';
+
+const BootstrapInput = styled(InputBase)(({ theme }) => ({
+    'label + &': {
+        marginTop: theme.spacing(3),
+    },
+    '& .MuiInputBase-input': {
+        borderRadius: 4,
+        position: 'relative',
+        backgroundColor: theme.palette.background.paper,
+        border: '1px solid #ced4da',
+        fontSize: 16,
+        padding: '10px 26px 10px 12px',
+        transition: theme.transitions.create(['border-color', 'box-shadow']),
+        // Use the system font instead of the default Roboto font.
+        fontFamily: [
+            '-apple-system',
+            'BlinkMacSystemFont',
+            '"Segoe UI"',
+            'Roboto',
+            '"Helvetica Neue"',
+            'Arial',
+            'sans-serif',
+            '"Apple Color Emoji"',
+            '"Segoe UI Emoji"',
+            '"Segoe UI Symbol"',
+        ].join(','),
+        '&:focus': {
+            borderRadius: 4,
+            borderColor: '#80bdff',
+            boxShadow: '0 0 0 0.2rem rgba(0,123,255,.25)',
+        },
+    },
+}));
 
 enum FilterType {
     All = '未分类',
@@ -50,17 +83,16 @@ type BooksProps = {
 const Books: FC<BooksProps> = (props: BooksProps) => {
     const { storeType } = props;
 
-    const { width, height } = useWindowDimensions();
     const [allBooksMeta, setAllBooksMeta] = useState([]);
     const [data, setData] = useState<any>([]);
 
     // 评分或者作者等等大类
-    const [selectedType, setSelectedType] = useState<string>(FilterType.All);
+    const [firstLevelType, setFirstLevelType] = useState<string>(FilterType.All);
     // 评分或者书签下面的列表
-    const [selectedSubType, setSelectedSubType] = useState<string[]>([]);
+    const [secondLevelMenuList, setSecondLevelMenuList] = useState<string[]>([]);
 
     // 评分或者书签下选定的某一项
-    const [selectedItemName, setSelectedItemName] = useState<any>(null);
+    const [selectedSecondLevel, setSelectedSecondLevel] = useState<any>(null);
 
     const [classifiedInfo, setClassifiedInfo] = useState<SubHeaerType>({
         Stars: {},
@@ -120,25 +152,25 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
 
             setClassifiedInfo(allInfo);
 
-            switch (selectedType) {
+            switch (firstLevelType) {
                 case FilterType.All:
-                    setSelectedSubType([]);
+                    setSecondLevelMenuList([]);
                     break;
                 case FilterType.Stars:
-                    setSelectedSubType(Object.keys(allInfo.Stars));
+                    setSecondLevelMenuList(Object.keys(allInfo.Stars));
                     break;
                 case FilterType.Subjects:
-                    setSelectedSubType(Object.keys(allInfo.Subjects));
+                    setSecondLevelMenuList(Object.keys(allInfo.Subjects));
                     break;
                 case FilterType.Author:
-                    setSelectedSubType(Object.keys(allInfo.Author));
+                    setSecondLevelMenuList(Object.keys(allInfo.Author));
                     break;
                 case FilterType.Publisher:
-                    setSelectedSubType(Object.keys(allInfo.Publisher));
+                    setSecondLevelMenuList(Object.keys(allInfo.Publisher));
                     break;
             }
 
-            filterData(allInfo, selectedItemName);
+            filterData(allInfo, selectedSecondLevel);
         });
     };
 
@@ -153,11 +185,11 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
         } else {
             allInfo = classifiedInfo;
         }
-        setSelectedItemName(selectedKeyword);
+        setSelectedSecondLevel(selectedKeyword);
 
         let filteredBooks;
         let o = {};
-        switch (selectedType) {
+        switch (firstLevelType) {
             case FilterType.Stars:
                 o = allInfo.Stars[selectedKeyword];
                 if (o == null) {
@@ -215,14 +247,14 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
 
     const headerDropMenu = () => {
         return (
-            <AntMenu style={{ width: 150 }}>
+            <AntMenu style={{ width: '9vw' }}>
                 <AntMenu.Item key="all" icon={<DatabaseOutlined />}>
                     <a
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={() => {
-                            setSelectedType(FilterType.All);
-                            setSelectedSubType([]);
+                            setFirstLevelType(FilterType.All);
+                            setSecondLevelMenuList([]);
 
                             setData(allBooksMeta);
                         }}
@@ -236,8 +268,8 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={() => {
-                            setSelectedType(FilterType.Stars);
-                            setSelectedSubType(Object.keys(classifiedInfo.Stars));
+                            setFirstLevelType(FilterType.Stars);
+                            setSecondLevelMenuList(Object.keys(classifiedInfo.Stars));
                         }}
                         style={{ paddingLeft: 13 }}
                     >
@@ -249,8 +281,8 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={() => {
-                            setSelectedType(FilterType.Subjects);
-                            setSelectedSubType(Object.keys(classifiedInfo.Subjects));
+                            setFirstLevelType(FilterType.Subjects);
+                            setSecondLevelMenuList(Object.keys(classifiedInfo.Subjects));
                         }}
                         style={{ paddingLeft: 13 }}
                     >
@@ -262,8 +294,8 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={() => {
-                            setSelectedType(FilterType.Author);
-                            setSelectedSubType(Object.keys(classifiedInfo.Author));
+                            setFirstLevelType(FilterType.Author);
+                            setSecondLevelMenuList(Object.keys(classifiedInfo.Author));
                         }}
                         style={{ paddingLeft: 13 }}
                     >
@@ -275,8 +307,8 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={() => {
-                            setSelectedType(FilterType.Publisher);
-                            setSelectedSubType(Object.keys(classifiedInfo.Publisher));
+                            setFirstLevelType(FilterType.Publisher);
+                            setSecondLevelMenuList(Object.keys(classifiedInfo.Publisher));
                         }}
                         style={{ paddingLeft: 13 }}
                     >
@@ -287,101 +319,95 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
         );
     };
 
-    const RedditTextField = styled((props: TextFieldProps) => (
-        <TextField
-            InputProps={{ disableUnderline: true } as Partial<OutlinedInputProps>}
-            {...props}
-        />
-    ))(({ theme }) => ({
-        '& .MuiFilledInput-root': {
-            border: '1px solid #e2e2e1',
-            overflow: 'hidden',
-            borderRadius: 4,
-            backgroundColor: theme.palette.mode === 'light' ? '#fcfcfb' : '#2b2b2b',
-            transition: theme.transitions.create([
-                'border-color',
-                'background-color',
-                'box-shadow',
-            ]),
-            '&:hover': {
-                backgroundColor: 'transparent',
-            },
-            '&.Mui-focused': {
-                backgroundColor: 'transparent',
-                boxShadow: `${alpha(theme.palette.primary.main, 0.25)} 0 0 0 2px`,
-                borderColor: theme.palette.primary.main,
-            },
-        },
-    }));
-
     return (
         <div>
-            <Box>
-                <RedditTextField
-                    label="请输入任意关键字进行搜索"
-                    id="reddit-input"
-                    variant="filled"
-                    style={{ width: width - 180, paddingBottom: 25, marginLeft: -14, marginTop: -14 }}
-                    fullWidth
-                />
-                <Grid container spacing={2}>
-                    <Grid item xs={2} style={{ paddingLeft: 3, paddingTop: 0, overflow: 'auto' }}>
-                        <List
-                            sx={{
-                                width: '100%',
-                                bgcolor: 'background.paper',
-                                position: 'relative',
-                                // overflow: 'auto',
-                                height: height - 150,
-                                '& ul': { padding: 0 },
-                            }}
-                            subheader={<li />}
-                        >
-                            <ListSubheader>
-                                <Dropdown overlay={headerDropMenu}>
-                                    <a
-                                        className="ant-dropdown-link"
-                                        onClick={(e) => e.preventDefault()}
-                                    >
-                                        <DatabaseOutlined style={{ paddingRight: 13 }} />
-                                        {selectedType}
-                                        <DownOutlined style={{ paddingLeft: 13 }} />
-                                    </a>
-                                </Dropdown>
-                            </ListSubheader>
-
-                            {selectedSubType.map((item, index) => (
-                                <ListItem
-                                    style={{ padding: 0 }}
-                                    key={index}
-                                    onClick={() => {
-                                        filterData(null, item);
-                                    }}
-                                >
-                                    <ListItemButton
-                                        style={{ paddingLeft: 10, paddingRight: 10 }}
-                                        selected={item === selectedItemName}
-                                    >
-                                        <ListItemText primary={`${index + 1}. ${item}`} />
-                                    </ListItemButton>
-                                </ListItem>
-                            ))}
-                        </List>
-                    </Grid>
-                    <Grid
-                        item
-                        xs={10}
-                        style={{
-                            paddingTop: 0,
-                            paddingLeft: 5,
-                            height: height - 150,
-                            overflow: 'auto',
-                        }}
+            <div>
+                <FormControl
+                    sx={{ m: 1 }}
+                    variant="standard"
+                    style={{ width: '7.7vw', marginBottom: 25, marginLeft: -14, marginTop: -14, position: "relative" }}
+                >
+                    <Select
+                        labelId="demo-customized-select-label"
+                        id="demo-customized-select"
+                        //   value={age}
+                        //   onChange={handleChange}
+                        input={<BootstrapInput />}
                     >
-                        <BookCardList data={data} fetchBooks={fetchBooks} />
-                    </Grid>
+                        <MenuItem value={10}>全部</MenuItem>
+                        <MenuItem value={20}>菜单栏</MenuItem>
+                        <MenuItem value={30}>书籍</MenuItem>
+                    </Select>
+                </FormControl>
+                <FormControl
+                    sx={{ m: 1 }}
+                    variant="standard"
+                    style={{
+                        width: '79.7vw',
+                        marginBottom: 25,
+                        marginLeft: -2,
+                        marginTop: -14,
+                        position: "absolute"
+                    }}
+                >
+                    <BootstrapInput id="demo-customized-textbox" />
+                </FormControl>
+            </div>
+
+            <Grid container spacing={2}>
+                <Grid item xs={2} style={{ paddingLeft: 3, paddingTop: 0 }}>
+                    <List
+                        sx={{
+                            // width: '100%',
+                            bgcolor: 'background.paper',
+                            // position: 'relative',
+                            height: '85vh',
+                            // '& ul': { padding: 0 },
+                        }}
+                        // subheader={<li />}
+                    >
+                        {/* <ListSubheader>
+                            <Dropdown overlay={headerDropMenu}>
+                                <a
+                                    className="ant-dropdown-link"
+                                    onClick={(e) => e.preventDefault()}
+                                >
+                                    <DatabaseOutlined style={{ paddingRight: 13 }} />
+                                    {firstLevelType}
+                                    <DownOutlined style={{ paddingLeft: 13 }} />
+                                </a>
+                            </Dropdown>
+                        </ListSubheader> */}
+
+                        {/* {secondLevelMenuList.map((item, index) => (
+                            <ListItem
+                                style={{ padding: 0 }}
+                                key={index}
+                                onClick={() => {
+                                    filterData(null, item);
+                                }}
+                            >
+                                <ListItemButton
+                                    style={{ paddingLeft: 10, paddingRight: 10 }}
+                                    selected={item === selectedSecondLevel}
+                                >
+                                    <ListItemText primary={`${index + 1}. ${item}`} />
+                                </ListItemButton>
+                            </ListItem>
+                        ))} */}
+                    </List>
                 </Grid>
-            </Box>
+                {/* <Grid
+                    item
+                    xs={10}
+                    style={{
+                        paddingTop: 0,
+                        paddingLeft: 5,
+                    }}
+                >
+                    <BookCardList data={data} fetchBooks={fetchBooks} />
+                </Grid> */}
+            </Grid>
         </div>
     );
 };

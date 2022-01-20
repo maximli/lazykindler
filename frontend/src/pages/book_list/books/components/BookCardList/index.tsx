@@ -17,7 +17,6 @@ import { BookMetaDataType } from '../../../../data';
 import ChangeInfo from '../../../components/ChangeInfoDialog';
 import { useState } from 'react';
 import { updateBookMeta, deleteBook } from '@/services';
-import { useWindowDimensions } from '@/util';
 
 const { SubMenu } = Menu;
 
@@ -41,7 +40,6 @@ const initialDialogInfo = {
 
 export default function BookCardList(props: BookCardListProps) {
     const { data, fetchBooks } = props;
-    const { width, height } = useWindowDimensions();
 
     const [dialogInfo, setDialogInfo] = useState<any>(initialDialogInfo);
     const [openDeleteBook, setOpenDeleteBook] = useState(false);
@@ -63,9 +61,9 @@ export default function BookCardList(props: BookCardListProps) {
 
     return (
         <div style={{ paddingLeft: 5 }}>
-            <div style={{ height: height - 150, width: width - 390, overflow: 'auto' }}>
+            <div style={{ height: "82vh", overflow: 'auto' }}>
                 <AntList<any>
-                    style={{ width: width - 420 }}
+                    style={{ width: "70vw" }}
                     rowKey="id"
                     grid={{
                         gutter: 16,
@@ -221,7 +219,7 @@ export default function BookCardList(props: BookCardListProps) {
                             >
                                 <Card.Meta
                                     title={
-                                        <div style={{ maxHeight: 80, overflow: 'auto' }}>
+                                        <div style={{ maxHeight: "30vh", overflow: 'auto' }}>
                                             <Typography
                                                 variant="overline"
                                                 display="block"
@@ -237,7 +235,7 @@ export default function BookCardList(props: BookCardListProps) {
                                         </div>
                                     }
                                     description={
-                                        <div style={{ maxHeight: 150, overflow: 'auto' }}>
+                                        <div style={{ maxHeight: "40vh", overflow: 'auto' }}>
                                             <RedTextTypography
                                                 variant="overline"
                                                 display="block"
