@@ -6,6 +6,14 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
+import StarIcon from '@mui/icons-material/Star';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import ArchiveIcon from '@mui/icons-material/Archive';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import DateRangeIcon from '@mui/icons-material/DateRange';
 
 import { withStyles } from '@material-ui/core/styles';
 import _ from 'lodash';
@@ -98,14 +106,14 @@ export default function BookCardList(props: BookCardListProps) {
                                             onClick={() => {
                                                 setOpenForAddBooks(true);
 
-                                                let book_uuids = []
+                                                let book_uuids = [];
                                                 if (item.book_uuids != null) {
-                                                    book_uuids = item.book_uuids.split(';') || []
+                                                    book_uuids = item.book_uuids.split(';') || [];
                                                 }
                                                 setCollectionInfo({
                                                     uuid: item.uuid,
                                                     book_uuids,
-                                                })
+                                                });
                                             }}
                                         >
                                             添加书籍
@@ -174,9 +182,15 @@ export default function BookCardList(props: BookCardListProps) {
                         >
                             <Card.Meta
                                 title={
-                                    <div style={{ maxHeight: 80, overflow: 'auto' }}>
+                                    <div
+                                        style={{
+                                            maxHeight: '30vh',
+                                            overflow: 'auto',
+                                            marginTop: 5,
+                                        }}
+                                    >
                                         <Typography
-                                            variant="overline"
+                                            variant="h6"
                                             display="block"
                                             style={{
                                                 wordBreak: 'break-all',
@@ -191,45 +205,47 @@ export default function BookCardList(props: BookCardListProps) {
                                 }
                                 description={
                                     <div style={{ maxHeight: 150, overflow: 'auto' }}>
-                                        <RedTextTypography
-                                            variant="overline"
-                                            display="block"
-                                            style={{
-                                                wordBreak: 'break-all',
-                                                whiteSpace: 'break-spaces',
-                                                fontSize: 12,
-                                                marginBottom: 0,
-                                            }}
-                                            gutterBottom
+                                        <Divider style={{ marginBottom: 10 }} />
+                                        <Box
+                                            display="flex"
+                                            alignItems="center"
+                                            style={{ marginBottom: 10 }}
                                         >
-                                            {`评分: ${item.stars}`}
-                                        </RedTextTypography>
-                                        <RedTextTypography
-                                            variant="overline"
-                                            display="block"
-                                            style={{
-                                                wordBreak: 'break-all',
-                                                whiteSpace: 'break-spaces',
-                                                fontSize: 12,
-                                                marginBottom: 0,
-                                            }}
-                                            gutterBottom
+                                            <StarIcon style={{ height: 20 }} />
+                                            <Typography
+                                                variant="body2"
+                                                style={{ paddingTop: 1.2, paddingLeft: 15 }}
+                                            >
+                                                {item.stars}
+                                            </Typography>
+                                        </Box>
+
+                                        <Box
+                                            display="flex"
+                                            alignItems="center"
+                                            style={{ marginBottom: 10 }}
                                         >
-                                            {`标签: ${item.subjects}`}
-                                        </RedTextTypography>
-                                        <RedTextTypography
-                                            variant="overline"
-                                            display="block"
-                                            style={{
-                                                wordBreak: 'break-all',
-                                                whiteSpace: 'break-spaces',
-                                                fontSize: 12,
-                                                marginBottom: 0,
-                                            }}
-                                            gutterBottom
+                                            <ArchiveIcon style={{ height: 16 }} />
+                                            <Typography
+                                                variant="body2"
+                                                style={{ paddingTop: 1.2, paddingLeft: 15 }}
+                                            >
+                                                {item.subjects}
+                                            </Typography>
+                                        </Box>
+                                        <Box
+                                            display="flex"
+                                            alignItems="center"
+                                            style={{ marginBottom: 10 }}
                                         >
-                                            {`时间: ${item.create_time.split(' ')[0]}`}
-                                        </RedTextTypography>
+                                            <DateRangeIcon style={{ height: 16 }} />
+                                            <Typography
+                                                variant="body2"
+                                                style={{ paddingTop: 1.2, paddingLeft: 15 }}
+                                            >
+                                                {item.create_time.split(' ')[0]}
+                                            </Typography>
+                                        </Box>
                                     </div>
                                 }
                             />

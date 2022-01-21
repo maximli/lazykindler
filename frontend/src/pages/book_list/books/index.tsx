@@ -23,6 +23,7 @@ import {
     UserOutlined,
     BankOutlined,
     DatabaseOutlined,
+    StarOutlined,
 } from '@ant-design/icons';
 import _ from 'lodash';
 import BookCardList from './components/BookCardList';
@@ -263,7 +264,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                         未分类
                     </a>
                 </AntMenu.Item>
-                <AntMenu.Item key="stars" icon={<StockOutlined />}>
+                <AntMenu.Item key="stars" icon={<StarOutlined />}>
                     <a
                         target="_blank"
                         rel="noopener noreferrer"
@@ -319,13 +320,95 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
         );
     };
 
+    const MenuHeader = () => {
+        switch (firstLevelType) {
+            case FilterType.All:
+                return (
+                    <ListSubheader>
+                        <Dropdown overlay={headerDropMenu}>
+                            <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
+                                <DatabaseOutlined style={{ paddingRight: 13 }} />
+                                {firstLevelType}
+                                <DownOutlined style={{ paddingLeft: 13 }} />
+                            </a>
+                        </Dropdown>
+                    </ListSubheader>
+                );
+                break;
+            case FilterType.Author:
+                return (
+                    <ListSubheader>
+                        <Dropdown overlay={headerDropMenu}>
+                            <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
+                                <DatabaseOutlined style={{ paddingRight: 13 }} />
+                                {firstLevelType}
+                                <DownOutlined style={{ paddingLeft: 13 }} />
+                            </a>
+                        </Dropdown>
+                    </ListSubheader>
+                );
+                break;
+
+            case FilterType.Publisher:
+                return (
+                    <ListSubheader>
+                        <Dropdown overlay={headerDropMenu}>
+                            <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
+                                <BankOutlined style={{ paddingRight: 13 }} />
+                                {firstLevelType}
+                                <DownOutlined style={{ paddingLeft: 13 }} />
+                            </a>
+                        </Dropdown>
+                    </ListSubheader>
+                );
+                break;
+
+            case FilterType.Stars:
+                return (
+                    <ListSubheader>
+                        <Dropdown overlay={headerDropMenu}>
+                            <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
+                                <StarOutlined style={{ paddingRight: 13 }} />
+                                {firstLevelType}
+                                <DownOutlined style={{ paddingLeft: 13 }} />
+                            </a>
+                        </Dropdown>
+                    </ListSubheader>
+                );
+                break;
+
+            case FilterType.Subjects:
+                return (
+                    <ListSubheader>
+                        <Dropdown overlay={headerDropMenu}>
+                            <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
+                                <TagsOutlined style={{ paddingRight: 13 }} />
+                                {firstLevelType}
+                                <DownOutlined style={{ paddingLeft: 13 }} />
+                            </a>
+                        </Dropdown>
+                    </ListSubheader>
+                );
+                break;
+            default:
+                return nil
+                break;
+        }
+    };
+
     return (
         <div>
             <div>
                 <FormControl
                     sx={{ m: 1 }}
                     variant="standard"
-                    style={{ width: '7.7vw', marginBottom: 25, marginLeft: -14, marginTop: -14, position: "relative" }}
+                    style={{
+                        width: '7.7vw',
+                        marginBottom: 25,
+                        marginLeft: -14,
+                        marginTop: -14,
+                        position: 'relative',
+                    }}
                 >
                     <Select
                         labelId="demo-customized-select-label"
@@ -347,7 +430,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                         marginBottom: 25,
                         marginLeft: -2,
                         marginTop: -14,
-                        position: "absolute"
+                        position: 'absolute',
                     }}
                 >
                     <BootstrapInput id="demo-customized-textbox" />
@@ -358,28 +441,20 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                 <Grid item xs={2} style={{ paddingLeft: 3, paddingTop: 0 }}>
                     <List
                         sx={{
-                            // width: '100%',
+                            width: '100%',
                             bgcolor: 'background.paper',
-                            // position: 'relative',
+                            position: 'relative',
                             height: '85vh',
-                            // '& ul': { padding: 0 },
+                            overflow: 'auto',
+                            '& ul': { padding: 0 },
                         }}
-                        // subheader={<li />}
+                        subheader={<li />}
                     >
-                        {/* <ListSubheader>
-                            <Dropdown overlay={headerDropMenu}>
-                                <a
-                                    className="ant-dropdown-link"
-                                    onClick={(e) => e.preventDefault()}
-                                >
-                                    <DatabaseOutlined style={{ paddingRight: 13 }} />
-                                    {firstLevelType}
-                                    <DownOutlined style={{ paddingLeft: 13 }} />
-                                </a>
-                            </Dropdown>
-                        </ListSubheader> */}
+                        {
+                            <MenuHeader />
+                        }
 
-                        {/* {secondLevelMenuList.map((item, index) => (
+                        {secondLevelMenuList.map((item, index) => (
                             <ListItem
                                 style={{ padding: 0 }}
                                 key={index}
@@ -394,10 +469,10 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                                     <ListItemText primary={`${index + 1}. ${item}`} />
                                 </ListItemButton>
                             </ListItem>
-                        ))} */}
+                        ))}
                     </List>
                 </Grid>
-                {/* <Grid
+                <Grid
                     item
                     xs={10}
                     style={{
@@ -406,7 +481,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                     }}
                 >
                     <BookCardList data={data} fetchBooks={fetchBooks} />
-                </Grid> */}
+                </Grid>
             </Grid>
         </div>
     );

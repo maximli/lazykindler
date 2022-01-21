@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Card, List as AntList } from 'antd';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -6,25 +7,23 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-
-import _ from 'lodash';
-import Cover from '../../../components/Cover';
-
+import StarIcon from '@mui/icons-material/Star';
 import { Menu } from 'antd';
+import Box from '@mui/material/Box';
 import { SettingOutlined } from '@ant-design/icons';
-import { withStyles } from '@material-ui/core/styles';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import ArchiveIcon from '@mui/icons-material/Archive';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import Divider from '@mui/material/Divider';
+import _ from 'lodash';
+
+import Cover from '../../../components/Cover';
 import { BookMetaDataType } from '../../../../data';
 import ChangeInfo from '../../../components/ChangeInfoDialog';
-import { useState } from 'react';
 import { updateBookMeta, deleteBook } from '@/services';
 
 const { SubMenu } = Menu;
-
-const RedTextTypography = withStyles({
-    root: {
-        color: '#f44336',
-    },
-})(Typography);
 
 type BookCardListProps = {
     data: any;
@@ -58,12 +57,11 @@ export default function BookCardList(props: BookCardListProps) {
         setOpenDeleteBook(false);
     };
 
-
     return (
         <div style={{ paddingLeft: 5 }}>
-            <div style={{ height: "82vh", overflow: 'auto' }}>
+            <div style={{ height: '82vh', overflow: 'auto' }}>
                 <AntList<any>
-                    style={{ width: "70vw" }}
+                    style={{ width: '70vw' }}
                     rowKey="id"
                     grid={{
                         gutter: 16,
@@ -219,9 +217,9 @@ export default function BookCardList(props: BookCardListProps) {
                             >
                                 <Card.Meta
                                     title={
-                                        <div style={{ maxHeight: "30vh", overflow: 'auto' }}>
+                                        <div style={{ maxHeight: '30vh', overflow: 'auto', marginTop: 5 }}>
                                             <Typography
-                                                variant="overline"
+                                                variant="h6"
                                                 display="block"
                                                 style={{
                                                     wordBreak: 'break-all',
@@ -235,72 +233,83 @@ export default function BookCardList(props: BookCardListProps) {
                                         </div>
                                     }
                                     description={
-                                        <div style={{ maxHeight: "40vh", overflow: 'auto' }}>
-                                            <RedTextTypography
-                                                variant="overline"
-                                                display="block"
-                                                style={{
-                                                    wordBreak: 'break-all',
-                                                    whiteSpace: 'break-spaces',
-                                                    fontSize: 12,
-                                                    marginBottom: 0,
-                                                }}
-                                                gutterBottom
+                                        <div
+                                            style={{
+                                                maxHeight: '40vh',
+                                                overflow: 'auto',
+                                                marginTop: 10,
+                                            }}
+                                        >
+                                            <Divider style={{ marginBottom: 10 }} />
+                                            <Box
+                                                display="flex"
+                                                alignItems="center"
+                                                style={{ marginBottom: 10 }}
                                             >
-                                                {`评分: ${item.stars}`}
-                                            </RedTextTypography>
-                                            <RedTextTypography
-                                                variant="overline"
-                                                display="block"
-                                                style={{
-                                                    wordBreak: 'break-all',
-                                                    whiteSpace: 'break-spaces',
-                                                    fontSize: 12,
-                                                    marginBottom: 0,
-                                                }}
-                                                gutterBottom
+                                                <StarIcon style={{ height: 20 }} />
+                                                <Typography
+                                                    variant="body2"
+                                                    style={{ paddingTop: 1.2, paddingLeft: 15 }}
+                                                >
+                                                    {item.stars}
+                                                </Typography>
+                                            </Box>
+
+                                            <Box
+                                                display="flex"
+                                                alignItems="center"
+                                                style={{ marginBottom: 10 }}
                                             >
-                                                {`集合: ${item.collection_names}`}
-                                            </RedTextTypography>
-                                            <RedTextTypography
-                                                variant="overline"
-                                                display="block"
-                                                style={{
-                                                    wordBreak: 'break-all',
-                                                    whiteSpace: 'break-spaces',
-                                                    fontSize: 12,
-                                                    marginBottom: 0,
-                                                }}
-                                                gutterBottom
+                                                <ArchiveIcon style={{ height: 16 }} />
+                                                <Typography
+                                                    variant="body2"
+                                                    style={{ paddingTop: 1.2, paddingLeft: 15 }}
+                                                >
+                                                    {item.collection_names}
+                                                </Typography>
+                                            </Box>
+
+                                            <Box
+                                                display="flex"
+                                                alignItems="center"
+                                                style={{ marginBottom: 10 }}
                                             >
-                                                {`标签: ${item.subjects}`}
-                                            </RedTextTypography>
-                                            <RedTextTypography
-                                                variant="overline"
-                                                display="block"
-                                                style={{
-                                                    wordBreak: 'break-all',
-                                                    whiteSpace: 'break-spaces',
-                                                    fontSize: 12,
-                                                    marginBottom: 0,
-                                                }}
-                                                gutterBottom
+                                                <LocalOfferIcon style={{ height: 20 }} />
+                                                <Typography
+                                                    variant="body2"
+                                                    style={{ paddingTop: 1.2, paddingLeft: 15 }}
+                                                >
+                                                    {item.subjects}
+                                                </Typography>
+                                            </Box>
+
+                                            <Box
+                                                display="flex"
+                                                alignItems="center"
+                                                style={{ marginBottom: 10 }}
                                             >
-                                                {`作者: ${item.author}`}
-                                            </RedTextTypography>
-                                            <RedTextTypography
-                                                variant="overline"
-                                                display="block"
-                                                style={{
-                                                    wordBreak: 'break-all',
-                                                    whiteSpace: 'break-spaces',
-                                                    fontSize: 12,
-                                                    marginBottom: 0,
-                                                }}
-                                                gutterBottom
+                                                <AccountCircleIcon style={{ height: 20 }} />
+                                                <Typography
+                                                    variant="body2"
+                                                    style={{ paddingTop: 1.2, paddingLeft: 15 }}
+                                                >
+                                                    {item.author}
+                                                </Typography>
+                                            </Box>
+
+                                            <Box
+                                                display="flex"
+                                                alignItems="center"
+                                                style={{ marginBottom: 10 }}
                                             >
-                                                {`出版社: ${item.publisher}`}
-                                            </RedTextTypography>
+                                                <AccountBalanceIcon style={{ height: 20 }} />
+                                                <Typography
+                                                    variant="body2"
+                                                    style={{ paddingTop: 1.2, paddingLeft: 15 }}
+                                                >
+                                                    {item.publisher}
+                                                </Typography>
+                                            </Box>
                                         </div>
                                     }
                                 />
