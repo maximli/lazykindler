@@ -1,30 +1,26 @@
-import { Card, List as AntList } from 'antd';
+import { CollectionDataType } from '@/pages/data';
+import { deleteBookCollection, updateBookCollection } from '@/services';
+import { preHandleSubjects } from '@/util';
+import { SettingOutlined } from '@ant-design/icons';
+import ArchiveIcon from '@mui/icons-material/Archive';
+import DateRangeIcon from '@mui/icons-material/DateRange';
+import StarIcon from '@mui/icons-material/Star';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
-import StarIcon from '@mui/icons-material/Star';
-import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import ArchiveIcon from '@mui/icons-material/Archive';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import DateRangeIcon from '@mui/icons-material/DateRange';
-
-import { withStyles } from '@material-ui/core/styles';
+import Typography from '@mui/material/Typography';
+import { List as AntList, Card, Menu } from 'antd';
 import _ from 'lodash';
-import Cover from '../../../components/Cover';
-import ChangeInfo from '../../../components/ChangeInfoDialog';
-
-import { Menu } from 'antd';
-import { SettingOutlined } from '@ant-design/icons';
 import { useState } from 'react';
-import { deleteBookCollection, updateBookCollection } from '@/services';
-import { preHandleSubjects, useWindowDimensions } from '@/util';
+import { v4 as uuidv4 } from 'uuid';
+
+import ChangeInfo from '../../../components/ChangeInfoDialog';
+import Cover from '../../../components/Cover';
 import AddBooks from '../AddBooks';
 
 const { SubMenu } = Menu;
@@ -34,12 +30,6 @@ type BookCardListProps = {
     fetchBookCollections: any;
 };
 
-const RedTextTypography = withStyles({
-    root: {
-        color: '#f44336',
-    },
-})(Typography);
-
 const initialDialogInfo = {
     title: '',
     allowEmptyStr: false,
@@ -47,18 +37,30 @@ const initialDialogInfo = {
     open: false,
 };
 
+interface AddBooksInfoType {
+    open: boolean;
+    collection_uuid: any;
+    book_type: any;    // 书籍类型。 tmp  noTmp
+}
+
+const initAddBooksInfo: AddBooksInfoType = {
+    open: false,
+    collection_uuid: null,
+    book_type: null,
+}
+
 export default function BookCardList(props: BookCardListProps) {
     const { data, fetchBookCollections } = props;
-    const { width, height } = useWindowDimensions();
+    const [uuid, setUUID] = useState<any>(uuidv4());
 
     const [dialogInfo, setDialogInfo] = useState<any>(initialDialogInfo);
 
     const [openDeleteBook, setOpenDeleteBook] = useState(false);
     const [deleteBookInfo, setDeleteBookInfo] = useState<any>({});
 
-    const [openForAddBooks, setOpenForAddBooks] = useState<boolean>(false);
+    const [addBooksInfo, setAddBooksInfo] = useState<AddBooksInfoType>(initAddBooksInfo);
 
-    const [collectionInfo, setCollectionInfo] = useState<any>({});
+    const [collectionUUID, setCollectionUUID] = useState<any>(null);
 
     const handleClickOpen = (uuid: string, name: string) => {
         setDeleteBookInfo({ uuid, name });
@@ -93,7 +95,7 @@ export default function BookCardList(props: BookCardListProps) {
                     style: { paddingBottom: 10 },
                 }}
                 dataSource={data}
-                renderItem={(item) => (
+                renderItem={(item: CollectionDataType) => (
                     <AntList.Item>
                         <Card
                             hoverable
@@ -102,21 +104,30 @@ export default function BookCardList(props: BookCardListProps) {
                                 <Menu mode="vertical" selectable={false}>
                                     <SubMenu key="sub4" icon={<SettingOutlined />} title="操作">
                                         <Menu.Item
-                                            key="0"
+                                            key="-1"
                                             onClick={() => {
-                                                setOpenForAddBooks(true);
-
-                                                let book_uuids = [];
-                                                if (item.book_uuids != null) {
-                                                    book_uuids = item.book_uuids.split(';') || [];
-                                                }
-                                                setCollectionInfo({
-                                                    uuid: item.uuid,
-                                                    book_uuids,
-                                                });
+                                                setUUID(uuidv4());
+                                                setAddBooksInfo({
+                                                    open: true,
+                                                    collection_uuid: item.uuid,
+                                                    book_type: "noTmp"
+                                                })
                                             }}
                                         >
-                                            添加书籍
+                                            添加正式书籍
+                                        </Menu.Item>
+                                        <Menu.Item
+                                            key="0"
+                                            onClick={() => {
+                                                setUUID(uuidv4());
+                                                setAddBooksInfo({
+                                                    open: true,
+                                                    collection_uuid: item.uuid,
+                                                    book_type: "tmp"
+                                                })
+                                            }}
+                                        >
+                                            添加临时书籍
                                         </Menu.Item>
                                         <Menu.Item
                                             key="1"
@@ -296,12 +307,13 @@ export default function BookCardList(props: BookCardListProps) {
             </div>
 
             <AddBooks
-                open={openForAddBooks}
+                key={uuid}
+                open={addBooksInfo.open}
                 handleClose={() => {
-                    setOpenForAddBooks(false);
+                    setAddBooksInfo(initAddBooksInfo)
                 }}
-                collection_uuid={collectionInfo['uuid']}
-                collection_book_uuids={collectionInfo['book_uuids']}
+                collection_uuid={addBooksInfo.collection_uuid}
+                book_type={addBooksInfo.book_type}
             />
         </div>
     );

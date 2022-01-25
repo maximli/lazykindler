@@ -1,33 +1,31 @@
 import { getBooksMeta } from '@/services';
-import { Menu as AntMenu, Dropdown } from 'antd';
-import { FC, useEffect, useState } from 'react';
 import {
+    BankOutlined,
+    DatabaseOutlined,
+    DownOutlined,
+    StarOutlined,
+    TagsOutlined,
+    UserOutlined,
+} from '@ant-design/icons';
+import {
+    FormControl,
+    Grid,
+    InputBase,
     List,
     ListItem,
+    ListItemButton,
     ListItemText,
     ListSubheader,
-    ListItemButton,
-    Grid,
-    Box,
-    InputBase,
     MenuItem,
-    FormControl,
     Select,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-
-import {
-    DownOutlined,
-    StockOutlined,
-    TagsOutlined,
-    UserOutlined,
-    BankOutlined,
-    DatabaseOutlined,
-    StarOutlined,
-} from '@ant-design/icons';
+import { Menu as AntMenu, Dropdown } from 'antd';
 import _ from 'lodash';
-import BookCardList from './components/BookCardList';
+import { FC, useEffect, useState } from 'react';
+
 import type { BookMetaDataType } from '../../data';
+import BookCardList from './components/BookCardList';
 
 const BootstrapInput = styled(InputBase)(({ theme }) => ({
     'label + &': {
@@ -391,7 +389,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                 );
                 break;
             default:
-                return nil
+                return null;
                 break;
         }
     };
@@ -450,9 +448,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                         }}
                         subheader={<li />}
                     >
-                        {
-                            <MenuHeader />
-                        }
+                        {<MenuHeader />}
 
                         {secondLevelMenuList.map((item, index) => (
                             <ListItem

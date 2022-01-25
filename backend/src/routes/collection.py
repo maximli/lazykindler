@@ -34,8 +34,13 @@ def create_book_collection():
     return "success"
 
 
-def get_book_collections():
-    return collection.get_book_collections()
+def get_all_collections():
+    return collection.get_all_collections()
+
+
+def get_specific_collection():
+    uuid = request.args.get('uuid')
+    return collection.get_specific_collection(uuid)
 
 
 def delete_book_collection():

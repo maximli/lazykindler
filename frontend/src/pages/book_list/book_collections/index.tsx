@@ -20,13 +20,13 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import { Menu, Dropdown } from 'antd';
-import { DownOutlined, StockOutlined, TagsOutlined, DatabaseOutlined } from '@ant-design/icons';
+import { DownOutlined, StarOutlined, TagsOutlined, DatabaseOutlined } from '@ant-design/icons';
 import Dropzone from 'react-dropzone';
 import AddIcon from '@mui/icons-material/Add';
 import _ from 'lodash';
 import BookCardList from './components/BookCardList';
 import { useEffect, useState } from 'react';
-import { createBookCollection, getBookCollections } from '@/services';
+import { createBookCollection, getAllCollections } from '@/services';
 import { useWindowDimensions, toBase64, preHandleSubjects } from '@/util';
 import { BookCollectionDataType } from './data';
 
@@ -72,7 +72,7 @@ export default function BookCollections() {
     };
 
     const fetchBookCollections = () => {
-        getBookCollections().then((data: BookCollectionDataType[]) => {
+        getAllCollections().then((data: BookCollectionDataType[]) => {
             setAllBookCollections(data);
             setData(data);
 
@@ -179,7 +179,7 @@ export default function BookCollections() {
                         未分类
                     </a>
                 </Menu.Item>
-                <Menu.Item key="stars" icon={<StockOutlined />}>
+                <Menu.Item key="stars" icon={<StarOutlined />}>
                     <a
                         target="_blank"
                         rel="noopener noreferrer"

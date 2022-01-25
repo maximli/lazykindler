@@ -1,8 +1,15 @@
 import { axiosInstance } from './axios';
 
 // 获取书籍集合列表
-export const getBookCollections = () => {
+export const getAllCollections = () => {
     return axiosInstance.get(`/api/collection/get`).then((data: any) => {
+        return data.data;
+    });
+};
+
+// 获取指定书籍集合
+export const getSpecificCollection = (uuid: string) => {
+    return axiosInstance.get(`/api/collection/get/one?uuid=${uuid}`).then((data: any) => {
         return data.data;
     });
 };

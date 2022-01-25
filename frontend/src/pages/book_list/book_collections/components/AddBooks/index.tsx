@@ -1,98 +1,170 @@
-import { BookMetaDataType } from '@/pages/data';
-import { getBooksMeta } from '@/services';
+import { BookMetaDataType, CollectionDataType } from '@/pages/data';
+import { getBooksMeta, getSpecificCollection, updateBookCollection } from '@/services';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import Checkbox from '@mui/material/Checkbox';
-import { useEffect, useState } from 'react';
+import { OutlinedInputProps } from '@mui/material/OutlinedInput';
+import TextField, { TextFieldProps } from '@mui/material/TextField';
+import { alpha, styled } from '@mui/material/styles';
+import { Table } from 'antd';
 import _ from 'lodash';
+import prettyBytes from 'pretty-bytes';
+import { useEffect, useState } from 'react';
+
+const RedditTextField = styled((props: TextFieldProps) => (
+    <TextField InputProps={{ disableUnderline: true } as Partial<OutlinedInputProps>} {...props} />
+))(({ theme }) => ({
+    '& .MuiFilledInput-root': {
+        border: '1px solid #e2e2e1',
+        overflow: 'hidden',
+        borderRadius: 4,
+        backgroundColor: theme.palette.mode === 'light' ? '#fcfcfb' : '#2b2b2b',
+        transition: theme.transitions.create(['border-color', 'background-color', 'box-shadow']),
+        '&:hover': {
+            backgroundColor: 'transparent',
+        },
+        '&.Mui-focused': {
+            backgroundColor: 'transparent',
+            boxShadow: `${alpha(theme.palette.primary.main, 0.25)} 0 0 0 2px`,
+            borderColor: theme.palette.primary.main,
+        },
+    },
+}));
 
 type AddBooksProps = {
     open: boolean;
     handleClose: any;
+    book_type: string;
     collection_uuid: string;
-    collection_book_uuids: string[];
 };
 
-export default function AddBooks(props: AddBooksProps) {
-    const { open, handleClose, collection_uuid, collection_book_uuids } = props;
-    const [allBooksMeta, setAllBooksMeta] = useState<BookMetaDataType[]>([]);
+const columns = [
+    {
+        title: '名称',
+        dataIndex: 'name',
+        width: '40%',
+    },
+    {
+        title: '作者',
+        dataIndex: 'author',
+        width: '40%',
+    },
+    {
+        title: '大小',
+        dataIndex: 'size',
+        render: (size: any) => {
+            return prettyBytes(size);
+        },
+        sorter: (a: BookMetaDataType, b: BookMetaDataType) => {
+            return a.size - b.size;
+        },
+    },
+];
 
-    const [checked, setChecked] = useState<any>({});
+export default function AddBooks(props: AddBooksProps) {
+    const { open, handleClose, collection_uuid, book_type } = props;
+    // allBooksMeta 用于保留所有数据
+    const [allBooksMeta, setAllBooksMeta] = useState<BookMetaDataType[]>([]);
+    // data 用于显示过滤后的数据
+    const [data, setData] = useState<any>([]);
+    const [selectedRowKeys, setSelectedRowKeys] = useState<any>([]);
+
+    const fetchAllBooks = () => {
+        getBooksMeta(book_type).then((data) => {
+            let d = _.map(data, (item: BookMetaDataType) => {
+                return Object.assign({}, item, { key: item.uuid });
+            });
+            setAllBooksMeta(d);
+        });
+    };
 
     useEffect(() => {
-        let book_uuid_hash = {}
-        _.forEach(collection_book_uuids, book_uuid => {
-            book_uuid_hash[book_uuid] = {}
-        })
-        setChecked(book_uuid_hash)
-
-        getBooksMeta('tmp').then((data) => {
-            setAllBooksMeta(data);
+        if (collection_uuid == null || book_type == null) {
+            return;
+        }
+        getSpecificCollection(collection_uuid).then((collectionInfo: CollectionDataType[]) => {
+            let book_uuids = collectionInfo[0].book_uuids;
+            if (book_uuids != null) {
+                setSelectedRowKeys(book_uuids.split(';'));
+            }
+        });
+        getBooksMeta(book_type).then((data) => {
+            let d = _.map(data, (item: BookMetaDataType) => {
+                return Object.assign({}, item, { key: item.uuid });
+            });
+            setAllBooksMeta(d);
+            setData(d);
         });
     }, []);
 
-    const handleToggle = (book_uuid: string) => () => {
-        const newChecked = Object.assign({...checked});
-        if (newChecked.hasOwnProperty(book_uuid)) {
-            delete newChecked[book_uuid]
-        } else {
-            newChecked[book_uuid] = {} 
-        }
-
-        setChecked(newChecked);
+    const rowSelection = {
+        selectedRowKeys,
+        onChange: (keys: any) => {
+            setSelectedRowKeys(keys);
+        },
     };
 
+    const handleOnClose = () => {
+        setSelectedRowKeys([]);
+        handleClose();
+    };
+
+    const handleOnOk = () => {
+        handleClose();
+        updateBookCollection(collection_uuid, 'book_uuids', selectedRowKeys.join(';')).then(() => {
+            fetchAllBooks();
+        });
+    };
+
+    const onSearchChange = (e: any) => {
+        const keyword = e.target.value;
+        setData(
+            _.filter(allBooksMeta, (item: BookMetaDataType) => {
+                return item.name.includes(keyword) || item.author.includes(keyword);
+            }),
+        );
+    };
 
     return (
         <div>
             <Dialog
                 open={open}
-                onClose={handleClose}
+                onClose={handleOnClose}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
                 fullWidth
                 maxWidth="md"
             >
-                <DialogTitle id="alert-dialog-title">添加书籍</DialogTitle>
-                <DialogContent style={{ margin: 'auto auto', width: 650 }}>
-                    <List dense sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-                        {allBooksMeta.map((bookMeta: BookMetaDataType, index: number) => {
-                            const labelId = `checkbox-list-secondary-label-${bookMeta.uuid}`;
-                            return (
-                                <ListItem
-                                    key={bookMeta.uuid}
-                                    style={{ width: 580 }}
-                                    secondaryAction={
-                                        <Checkbox
-                                            edge="end"
-                                            onChange={handleToggle(bookMeta.uuid)}
-                                            checked={checked.hasOwnProperty(bookMeta.uuid)}
-                                            inputProps={{ 'aria-labelledby': labelId }}
-                                        />
-                                    }
-                                    // disablePadding
-                                >
-                                    <ListItemButton>
-                                        <ListItemText
-                                            id={labelId}
-                                            primary={`${index + 1}: ${bookMeta.name}`}
-                                        />
-                                    </ListItemButton>
-                                </ListItem>
-                            );
-                        })}
-                    </List>
+                <DialogTitle id="alert-dialog-title">
+                    {book_type === 'tmp' ? '添加临时书籍' : '添加正式书籍'}
+                </DialogTitle>
+                <DialogContent style={{ margin: 'auto auto', width: '100%' }}>
+                    <RedditTextField
+                        label="搜索书名或作者"
+                        // defaultValue="react-reddit"
+                        id="reddit-input"
+                        variant="filled"
+                        style={{
+                            width: '100%',
+                            marginTop: 11,
+                            marginBottom: 5,
+                        }}
+                        onChange={onSearchChange}
+                    />
+                    <div style={{ height: 620, width: '100%' }}>
+                        <Table
+                            rowSelection={rowSelection}
+                            columns={columns}
+                            dataSource={data}
+                            scroll={{ y: 500 }}
+                        />
+                    </div>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>取消</Button>
-                    <Button onClick={handleClose} autoFocus>
+                    <Button onClick={handleOnClose}>取消</Button>
+                    <Button onClick={handleOnOk} autoFocus>
                         确定
                     </Button>
                 </DialogActions>

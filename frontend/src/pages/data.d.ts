@@ -22,3 +22,14 @@ export interface BookMetaDataType {
     uuid: string;
     collection_names: string;
 }
+
+export interface CollectionDataType {
+    id: number;
+    uuid: string;
+    name: string;
+    description: string;
+    book_uuids: string;
+    subjects: string;
+    stars: number;
+    create_time: string;
+}

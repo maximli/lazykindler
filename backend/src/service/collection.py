@@ -31,8 +31,12 @@ def update_book_collection(books_uuids, coll_uuid):
         books_uuids, coll_uuid))
 
 
-def get_book_collections():
+def get_all_collections():
     data = db.query("select * from book_collection;")
+    return jsonify(data)
+
+def get_specific_collection(uuid):
+    data = db.query("select * from book_collection where uuid='{}';".format(uuid))
     return jsonify(data)
 
 
@@ -52,4 +56,7 @@ def delete_book_collections(uuid, collection_name):
 def update_collection(uuid, key, value):
     db.run_sql("update book_collection set '{}'='{}' where uuid='{}'".format(
         key, value, uuid))
+    if key == "book_uuids":
+        book_uuids = value.split(";")
+        db.run_sql("delete from tmp_book where uuid in {}".format(tuple(book_uuids)))
     return "success"
