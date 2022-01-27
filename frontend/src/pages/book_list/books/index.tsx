@@ -25,7 +25,7 @@ import _ from 'lodash';
 import { FC, useEffect, useState } from 'react';
 
 import type { BookMetaDataType } from '../../data';
-import BookCardList from './components/BookCardList';
+import BookCardList from '../components/BookCardList';
 
 const BootstrapInput = styled(InputBase)(({ theme }) => ({
     'label + &': {

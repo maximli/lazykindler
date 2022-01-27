@@ -1,27 +1,27 @@
-import { useState } from 'react';
-import { Card, List as AntList } from 'antd';
-import Typography from '@mui/material/Typography';
+import { deleteBook, updateBookMeta } from '@/services';
+import { SettingOutlined } from '@ant-design/icons';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import ArchiveIcon from '@mui/icons-material/Archive';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import StarIcon from '@mui/icons-material/Star';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import StarIcon from '@mui/icons-material/Star';
-import { Menu } from 'antd';
-import Box from '@mui/material/Box';
-import { SettingOutlined } from '@ant-design/icons';
-import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import ArchiveIcon from '@mui/icons-material/Archive';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import Divider from '@mui/material/Divider';
+import Typography from '@mui/material/Typography';
+import { Menu } from 'antd';
+import { List as AntList, Card } from 'antd';
 import _ from 'lodash';
+import { useState } from 'react';
 
-import Cover from '../../../components/Cover';
-import { BookMetaDataType } from '../../../../data';
-import ChangeInfo from '../../../components/ChangeInfoDialog';
-import { updateBookMeta, deleteBook } from '@/services';
+import { BookMetaDataType } from '../../../data';
+import ChangeInfo from '../ChangeInfoDialog';
+import Cover from '../Cover';
 
 const { SubMenu } = Menu;
 
@@ -59,18 +59,18 @@ export default function BookCardList(props: BookCardListProps) {
 
     return (
         <div style={{ paddingLeft: 5 }}>
-            <div style={{ height: '82vh', overflow: 'auto' }}>
+            <div style={{ height: '100%', overflow: 'auto' }}>
                 <AntList<any>
-                    style={{ width: '70vw' }}
+                    style={{ width: '99%' }}
                     rowKey="id"
                     grid={{
                         gutter: 16,
                         xs: 1,
-                        sm: 2,
-                        md: 3,
-                        lg: 4,
-                        xl: 5,
-                        xxl: 6,
+                        sm: 1,
+                        md: 2,
+                        lg: 3,
+                        xl: 4,
+                        xxl: 5,
                     }}
                     pagination={{
                         position: 'bottom',
@@ -86,7 +86,12 @@ export default function BookCardList(props: BookCardListProps) {
                                 cover={<Cover uuid={item.uuid} />}
                                 actions={[
                                     <Menu mode="vertical" selectable={false}>
-                                        <SubMenu key="sub4" icon={<SettingOutlined />} title="操作">
+                                        <SubMenu
+                                            key="sub4"
+                                            icon={<SettingOutlined />}
+                                            title="操作"
+                                            style={{ zIndex: 10 }}
+                                        >
                                             <Menu.Item
                                                 key="1"
                                                 onClick={() => {
@@ -217,7 +222,13 @@ export default function BookCardList(props: BookCardListProps) {
                             >
                                 <Card.Meta
                                     title={
-                                        <div style={{ maxHeight: '30vh', overflow: 'auto', marginTop: 5 }}>
+                                        <div
+                                            style={{
+                                                maxHeight: '30vh',
+                                                overflow: 'auto',
+                                                marginTop: 5,
+                                            }}
+                                        >
                                             <Typography
                                                 variant="h6"
                                                 display="block"

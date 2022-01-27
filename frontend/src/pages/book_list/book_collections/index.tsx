@@ -24,7 +24,7 @@ import { DownOutlined, StarOutlined, TagsOutlined, DatabaseOutlined } from '@ant
 import Dropzone from 'react-dropzone';
 import AddIcon from '@mui/icons-material/Add';
 import _ from 'lodash';
-import BookCardList from './components/BookCardList';
+import BookCardList from './components/CollectionList';
 import { useEffect, useState } from 'react';
 import { createBookCollection, getAllCollections } from '@/services';
 import { useWindowDimensions, toBase64, preHandleSubjects } from '@/util';

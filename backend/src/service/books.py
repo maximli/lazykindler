@@ -122,3 +122,11 @@ def update_book_meta(uuid, key, value):
     db.run_sql("update book_meta set '{}'='{}' where uuid='{}'".format(
         key, value, uuid))
     return "success"
+
+
+def get_books_meta_by_uuids(uuids):
+    result = []
+    for uuid in uuids:
+        book_meta_list = db.query("select * from book_meta where uuid='{}'".format(uuid))
+        result = result + book_meta_list
+    return jsonify(result)

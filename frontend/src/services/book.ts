@@ -7,6 +7,15 @@ export const getBooksMeta = (storeType: string) => {
     });
 };
 
+// 获取指定uuids的书籍列表
+//
+// uuids是以分号连接的书籍uuid字符串
+export const getBooksMetaByUUIDs = (uuids: string) => {
+    return axiosInstance.get(`/api/book/get/uuids?uuids=${uuids}`).then((data: any) => {
+        return data.data;
+    });
+};
+
 // 获取封面
 export const getCover = (uuid: string) => {
     return axiosInstance.get(`/api/book/cover?uuid=${uuid}`).then((data: any) => {

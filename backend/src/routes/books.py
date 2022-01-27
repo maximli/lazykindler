@@ -32,6 +32,11 @@ def get_books_meta():
     data = books.get_books_meta(storeType)
     return data
 
+def get_books_meta_by_uuids():
+    uuids_str = request.args.get('uuids')
+    data = books.get_books_meta_by_uuids(uuids_str.split(";"))
+    return data
+
 
 def get_book_cover():
     uuid = request.args.get('uuid')

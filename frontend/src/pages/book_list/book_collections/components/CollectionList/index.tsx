@@ -22,6 +22,7 @@ import { v4 as uuidv4 } from 'uuid';
 import ChangeInfo from '../../../components/ChangeInfoDialog';
 import Cover from '../../../components/Cover';
 import AddBooks from '../AddBooks';
+import CollectionBooks from '../CollectionBooks';
 
 const { SubMenu } = Menu;
 
@@ -37,30 +38,27 @@ const initialDialogInfo = {
     open: false,
 };
 
-interface AddBooksInfoType {
+interface OpenDialogType {
     open: boolean;
     collection_uuid: any;
-    book_type: any;    // 书籍类型。 tmp  noTmp
+    book_type?: any; // 书籍类型。 tmp  noTmp
 }
 
-const initAddBooksInfo: AddBooksInfoType = {
+const intOpenDialogInfo: OpenDialogType = {
     open: false,
     collection_uuid: null,
     book_type: null,
-}
+};
 
 export default function BookCardList(props: BookCardListProps) {
     const { data, fetchBookCollections } = props;
     const [uuid, setUUID] = useState<any>(uuidv4());
-
     const [dialogInfo, setDialogInfo] = useState<any>(initialDialogInfo);
-
     const [openDeleteBook, setOpenDeleteBook] = useState(false);
     const [deleteBookInfo, setDeleteBookInfo] = useState<any>({});
-
-    const [addBooksInfo, setAddBooksInfo] = useState<AddBooksInfoType>(initAddBooksInfo);
-
-    const [collectionUUID, setCollectionUUID] = useState<any>(null);
+    const [addBooksInfo, setAddBooksInfo] = useState<OpenDialogType>(intOpenDialogInfo);
+    const [checkCollctionBooks, setCheckCollctionBooks] =
+        useState<OpenDialogType>(intOpenDialogInfo);
 
     const handleClickOpen = (uuid: string, name: string) => {
         setDeleteBookInfo({ uuid, name });
@@ -104,14 +102,26 @@ export default function BookCardList(props: BookCardListProps) {
                                 <Menu mode="vertical" selectable={false}>
                                     <SubMenu key="sub4" icon={<SettingOutlined />} title="操作">
                                         <Menu.Item
+                                            key="-2"
+                                            onClick={() => {
+                                                setUUID(uuidv4());
+                                                setCheckCollctionBooks({
+                                                    open: true,
+                                                    collection_uuid: item.uuid,
+                                                });
+                                            }}
+                                        >
+                                            查看书籍
+                                        </Menu.Item>
+                                        <Menu.Item
                                             key="-1"
                                             onClick={() => {
                                                 setUUID(uuidv4());
                                                 setAddBooksInfo({
                                                     open: true,
                                                     collection_uuid: item.uuid,
-                                                    book_type: "noTmp"
-                                                })
+                                                    book_type: 'noTmp',
+                                                });
                                             }}
                                         >
                                             添加正式书籍
@@ -123,8 +133,8 @@ export default function BookCardList(props: BookCardListProps) {
                                                 setAddBooksInfo({
                                                     open: true,
                                                     collection_uuid: item.uuid,
-                                                    book_type: "tmp"
-                                                })
+                                                    book_type: 'tmp',
+                                                });
                                             }}
                                         >
                                             添加临时书籍
@@ -310,10 +320,19 @@ export default function BookCardList(props: BookCardListProps) {
                 key={uuid}
                 open={addBooksInfo.open}
                 handleClose={() => {
-                    setAddBooksInfo(initAddBooksInfo)
+                    setAddBooksInfo(intOpenDialogInfo);
                 }}
                 collection_uuid={addBooksInfo.collection_uuid}
                 book_type={addBooksInfo.book_type}
+            />
+
+            <CollectionBooks
+                key={uuid}
+                open={checkCollctionBooks.open}
+                handleClose={() => {
+                    setCheckCollctionBooks(intOpenDialogInfo);
+                }}
+                collection_uuid={checkCollctionBooks.collection_uuid}
             />
         </div>
     );

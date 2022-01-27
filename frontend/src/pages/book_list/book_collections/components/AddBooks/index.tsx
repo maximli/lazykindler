@@ -102,7 +102,13 @@ export default function AddBooks(props: AddBooksProps) {
     const rowSelection = {
         selectedRowKeys,
         onChange: (keys: any) => {
-            setSelectedRowKeys(keys);
+            if (book_type === "tmp") {
+                // 如果是从临时书籍中添加，那就默为往集合总增加书籍，而不是覆盖
+                let mergedKeys = _.uniq(selectedRowKeys.concat(keys))
+                setSelectedRowKeys(mergedKeys);
+            } else {
+                setSelectedRowKeys(keys);
+            }
         },
     };
 

@@ -58,5 +58,6 @@ def update_collection(uuid, key, value):
         key, value, uuid))
     if key == "book_uuids":
         book_uuids = value.split(";")
-        db.run_sql("delete from tmp_book where uuid in {}".format(tuple(book_uuids)))
+        for book_uuid in book_uuids:
+            db.run_sql("delete from tmp_book where uuid='{}'".format(book_uuid))
     return "success"
