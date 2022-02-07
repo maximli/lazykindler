@@ -15,7 +15,6 @@ import { alpha, styled } from '@mui/material/styles';
 import { Menu as AntMenu, Dropdown } from 'antd';
 import _ from 'lodash';
 import { FC, useEffect, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 
 import type { BookMetaDataType, CollectionDataType } from '../../data';
 import BookCardList from '../components/BookCardList';
@@ -139,10 +138,10 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                         subjects[subject][item.uuid] = null;
                     });
                 } else {
-                    if (subjects["无标签"] == null)  {
-                        subjects["无标签"] = {}; 
+                    if (subjects['无标签'] == null) {
+                        subjects['无标签'] = {};
                     }
-                    subjects["无标签"][item.uuid] = null;
+                    subjects['无标签'][item.uuid] = null;
                 }
 
                 if (item.author == null) {
@@ -431,13 +430,16 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
         const bookList = filterData(null, selectedSecondLevel, allBooksMeta);
         setData(
             _.filter(bookList, (item: BookMetaDataType) => {
-                return (
-                    item.name.includes(keyword) ||
-                    item.author.includes(keyword) ||
-                    item.publisher.includes(keyword) ||
-                    item.subjects.includes(keyword) ||
-                    item.coll_uuids.includes(keyword)
-                );
+                if (
+                    (item.name != null && item.name.includes(keyword)) ||
+                    (item.author != null && item.author.includes(keyword)) ||
+                    (item.publisher != null && item.publisher.includes(keyword)) ||
+                    (item.subjects != null && item.subjects.includes(keyword)) ||
+                    (item.coll_uuids != null && item.coll_uuids.includes(keyword))
+                ) {
+                    return true;
+                }
+                return false;
             }),
         );
     };
