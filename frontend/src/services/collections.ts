@@ -2,14 +2,14 @@ import { axiosInstance } from './axios';
 
 // 获取书籍集合列表
 export const getAllCollections = () => {
-    return axiosInstance.get(`/api/collection/get`).then((data: any) => {
+    return axiosInstance.get(`/api/collection/get/all`).then((data: any) => {
         return data.data;
     });
 };
 
 // 获取指定书籍集合
-export const getSpecificCollection = (uuid: string) => {
-    return axiosInstance.get(`/api/collection/get/one?uuid=${uuid}`).then((data: any) => {
+export const getMultipleCollections = (uuids: string[]) => {
+    return axiosInstance.get(`/api/collection/get/multiple?uuids=${uuids.join(";")}`).then((data: any) => {
         return data.data;
     });
 };
@@ -40,10 +40,20 @@ export const updateBookCollection = (uuid: string, key: string, value: string) =
     });
 };
 
-// 获取书籍集合列表
-export const deleteBookCollection = (uuid: string, name: string) => {
+// 获取书籍集合列表 (保留集合中的书籍)
+export const deleteBookCollectionWithoutBooks = (uuid: string) => {
     return axiosInstance
-        .delete(`/api/collection/delete?uuid=${uuid}&name=${name}`)
+        .delete(`/api/collection/delete/withoutbooks?uuid=${uuid}`)
+        .then((data: any) => {
+            return data.data;
+        });
+};
+
+
+// 获取书籍集合列表 (不保留集合中的书籍)
+export const deleteBookCollectionWithBooks = (uuid: string) => {
+    return axiosInstance
+        .delete(`/api/collection/delete/withbooks?uuid=${uuid}`)
         .then((data: any) => {
             return data.data;
         });

@@ -18,16 +18,19 @@ import { Menu } from 'antd';
 import { List as AntList, Card } from 'antd';
 import _ from 'lodash';
 import { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 import { BookMetaDataType } from '../../../data';
 import ChangeInfo from '../ChangeInfoDialog';
 import Cover from '../Cover';
+import ChangeBookColl from './ChangeBookColl';
 
 const { SubMenu } = Menu;
 
 type BookCardListProps = {
     data: any;
     fetchBooks: any;
+    height: Number;
 };
 
 const initialDialogInfo = {
@@ -38,11 +41,16 @@ const initialDialogInfo = {
 };
 
 export default function BookCardList(props: BookCardListProps) {
-    const { data, fetchBooks } = props;
+    const { data, fetchBooks, height } = props;
 
     const [dialogInfo, setDialogInfo] = useState<any>(initialDialogInfo);
+    const [changeBookCollInfo, setChangeBookCollInfo] = useState<any>({
+        book_uuid: '',
+        open: false,
+    });
     const [openDeleteBook, setOpenDeleteBook] = useState(false);
     const [deleteBookUUID, setDeleteBookUUID] = useState('');
+    const [uuid, setUUID] = useState(uuidv4());
 
     const handleCloseDialog = () => {
         setDialogInfo(initialDialogInfo);
@@ -61,7 +69,7 @@ export default function BookCardList(props: BookCardListProps) {
         <div style={{ paddingLeft: 5 }}>
             <div style={{ height: '100%', overflow: 'auto' }}>
                 <AntList<any>
-                    style={{ width: '99%' }}
+                    style={{ width: '99%', height: `${height}vh` }}
                     rowKey="id"
                     grid={{
                         gutter: 16,
@@ -120,7 +128,7 @@ export default function BookCardList(props: BookCardListProps) {
                                                     setDialogInfo({
                                                         title: '修改标签',
                                                         oldValue: item.subjects,
-                                                        allowEmptyStr: false,
+                                                        allowEmptyStr: true,
                                                         handleOK: (newValue: any) => {
                                                             updateBookMeta(
                                                                 item.uuid,
@@ -139,19 +147,9 @@ export default function BookCardList(props: BookCardListProps) {
                                             <Menu.Item
                                                 key="3"
                                                 onClick={() => {
-                                                    setDialogInfo({
-                                                        title: '修改集合',
-                                                        oldValue: item.collection_names,
-                                                        allowEmptyStr: false,
-                                                        handleOK: (newValue: any) => {
-                                                            updateBookMeta(
-                                                                item.uuid,
-                                                                'collection_names',
-                                                                newValue,
-                                                            ).then(() => {
-                                                                fetchBooks();
-                                                            });
-                                                        },
+                                                    setUUID(uuidv4());
+                                                    setChangeBookCollInfo({
+                                                        book_uuid: item.uuid,
                                                         open: true,
                                                     });
                                                 }}
@@ -164,7 +162,7 @@ export default function BookCardList(props: BookCardListProps) {
                                                     setDialogInfo({
                                                         title: '修改作者',
                                                         oldValue: item.author,
-                                                        allowEmptyStr: false,
+                                                        allowEmptyStr: true,
                                                         handleOK: (newValue: any) => {
                                                             updateBookMeta(
                                                                 item.uuid,
@@ -186,7 +184,7 @@ export default function BookCardList(props: BookCardListProps) {
                                                     setDialogInfo({
                                                         title: '修改出版社',
                                                         oldValue: item.publisher,
-                                                        allowEmptyStr: false,
+                                                        allowEmptyStr: true,
                                                         handleOK: (newValue: any) => {
                                                             updateBookMeta(
                                                                 item.uuid,
@@ -276,7 +274,10 @@ export default function BookCardList(props: BookCardListProps) {
                                                     variant="body2"
                                                     style={{ paddingTop: 1.2, paddingLeft: 15 }}
                                                 >
-                                                    {item.collection_names}
+                                                    {item.coll_names == 'None' ||
+                                                    item.coll_names == null
+                                                        ? '无集合'
+                                                        : item.coll_names}
                                                 </Typography>
                                             </Box>
 
@@ -290,7 +291,9 @@ export default function BookCardList(props: BookCardListProps) {
                                                     variant="body2"
                                                     style={{ paddingTop: 1.2, paddingLeft: 15 }}
                                                 >
-                                                    {item.subjects}
+                                                    {item.subjects == null
+                                                        ? '无标签'
+                                                        : item.subjects}
                                                 </Typography>
                                             </Box>
 
@@ -304,7 +307,7 @@ export default function BookCardList(props: BookCardListProps) {
                                                     variant="body2"
                                                     style={{ paddingTop: 1.2, paddingLeft: 15 }}
                                                 >
-                                                    {item.author}
+                                                    {item.author == null ? '无作者' : item.author}
                                                 </Typography>
                                             </Box>
 
@@ -318,7 +321,9 @@ export default function BookCardList(props: BookCardListProps) {
                                                     variant="body2"
                                                     style={{ paddingTop: 1.2, paddingLeft: 15 }}
                                                 >
-                                                    {item.publisher}
+                                                    {item.publisher == null
+                                                        ? '无出版社'
+                                                        : item.publisher}
                                                 </Typography>
                                             </Box>
                                         </div>
@@ -367,6 +372,19 @@ export default function BookCardList(props: BookCardListProps) {
                     </DialogActions>
                 </Dialog>
             </div>
+
+            <ChangeBookColl
+                key={uuid}
+                book_uuid={changeBookCollInfo['book_uuid']}
+                open={changeBookCollInfo['open']}
+                fetchBooks={fetchBooks}
+                handleClose={() => {
+                    setChangeBookCollInfo({
+                        book_uuid: '',
+                        open: false,
+                    });
+                }}
+            />
         </div>
     );
 }

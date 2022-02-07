@@ -1,10 +1,15 @@
 from flask import request
 import os
 import glob
+import pathlib
 
 from ..util.service_logger import serviceLogger as logger
 from ..service import books
 
+supportedBookFormat = {
+    ".mobi": True,
+    ".azw3": True,
+}
 
 def store_books():
     """
@@ -21,9 +26,12 @@ def store_books():
             glob_dir = os.path.join(book_path, "*")
             bpaths = glob.glob(glob_dir)
             for bpath in bpaths:
-                books.store_book_from_path(bpath)
+                if pathlib.Path(bpath).suffix in supportedBookFormat:
+                    print(bpath)
+                    books.store_book_from_path(bpath)
         else:
-            books.store_book_from_path(book_path)
+            if pathlib.Path(book_path).suffix in supportedBookFormat:
+                books.store_book_from_path(book_path)
     return "success"
 
 

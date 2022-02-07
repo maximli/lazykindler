@@ -2,7 +2,7 @@
   { path: '/welcome', name: '欢迎', icon: 'smile', component: './Welcome' },
   {
     path: '/book_list',
-    icon: 'table',
+    icon: 'ReadOutlined',
     name: '书籍',
     routes: [
       {
@@ -26,13 +26,14 @@
     ],
   },
   {
-    path: '/admin',
-    name: '管理页',
-    icon: 'crown',
+    path: '/kindle',
+    name: 'kindle',
+    icon: 'FireOutlined',
     access: 'canAdmin',
     component: './Admin',
     routes: [
-      { path: '/admin/sub-page', name: '二级管理页', icon: 'smile', component: './Welcome' },
+      { path: '/admin/sub-page1', name: '笔记', icon: 'smile', component: './Welcome' },
+      { path: '/admin/sub-page2', name: '生词', icon: 'smile', component: './Welcome' },
       { component: './404' },
     ],
   },

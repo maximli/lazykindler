@@ -1,5 +1,5 @@
 import { BookMetaDataType, CollectionDataType } from '@/pages/data';
-import { getBooksMeta, getSpecificCollection, updateBookCollection } from '@/services';
+import { getBooksMeta, getMultipleCollections, updateBookCollection } from '@/services';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -71,6 +71,8 @@ export default function AddBooks(props: AddBooksProps) {
     const [data, setData] = useState<any>([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState<any>([]);
 
+    const [collInfo, setCollInfo] = useState<any>({});
+
     const fetchAllBooks = () => {
         getBooksMeta(book_type).then((data) => {
             let d = _.map(data, (item: BookMetaDataType) => {
@@ -84,7 +86,8 @@ export default function AddBooks(props: AddBooksProps) {
         if (collection_uuid == null || book_type == null) {
             return;
         }
-        getSpecificCollection(collection_uuid).then((collectionInfo: CollectionDataType[]) => {
+        getMultipleCollections([collection_uuid]).then((collectionInfo: CollectionDataType[]) => {
+            setCollInfo(collectionInfo[0]);
             let book_uuids = collectionInfo[0].book_uuids;
             if (book_uuids != null) {
                 setSelectedRowKeys(book_uuids.split(';'));
@@ -102,10 +105,17 @@ export default function AddBooks(props: AddBooksProps) {
     const rowSelection = {
         selectedRowKeys,
         onChange: (keys: any) => {
-            if (book_type === "tmp") {
-                // 如果是从临时书籍中添加，那就默为往集合总增加书籍，而不是覆盖
-                let mergedKeys = _.uniq(selectedRowKeys.concat(keys))
-                setSelectedRowKeys(mergedKeys);
+            if (book_type === 'tmp') {
+                if (keys.length == 0) {
+                    setSelectedRowKeys(collInfo.book_uuids.split(';'));
+                } else {
+                    let l = keys;
+                    if (collInfo.book_uuids != null) {
+                        // 如果是从临时书籍中添加，那就默为往集合中增加书籍，而不是覆盖
+                        l = _.uniq(collInfo.book_uuids.split(';').concat(keys));
+                    }
+                    setSelectedRowKeys(l);
+                }
             } else {
                 setSelectedRowKeys(keys);
             }

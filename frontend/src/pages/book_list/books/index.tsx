@@ -1,4 +1,4 @@
-import { getBooksMeta } from '@/services';
+import { getBooksMeta, getMultipleCollections } from '@/services';
 import {
     BankOutlined,
     DatabaseOutlined,
@@ -7,55 +7,36 @@ import {
     TagsOutlined,
     UserOutlined,
 } from '@ant-design/icons';
-import {
-    FormControl,
-    Grid,
-    InputBase,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemText,
-    ListSubheader,
-    MenuItem,
-    Select,
-} from '@mui/material';
-import { styled } from '@mui/material/styles';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { Grid, List, ListItem, ListItemButton, ListItemText, ListSubheader } from '@mui/material';
+import { OutlinedInputProps } from '@mui/material/OutlinedInput';
+import TextField, { TextFieldProps } from '@mui/material/TextField';
+import { alpha, styled } from '@mui/material/styles';
 import { Menu as AntMenu, Dropdown } from 'antd';
 import _ from 'lodash';
 import { FC, useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
-import type { BookMetaDataType } from '../../data';
+import type { BookMetaDataType, CollectionDataType } from '../../data';
 import BookCardList from '../components/BookCardList';
+import ContextMenu from '../components/ContextMenu';
 
-const BootstrapInput = styled(InputBase)(({ theme }) => ({
-    'label + &': {
-        marginTop: theme.spacing(3),
-    },
-    '& .MuiInputBase-input': {
+const RedditTextField = styled((props: TextFieldProps) => (
+    <TextField InputProps={{ disableUnderline: true } as Partial<OutlinedInputProps>} {...props} />
+))(({ theme }) => ({
+    '& .MuiFilledInput-root': {
+        border: '1px solid #e2e2e1',
+        overflow: 'hidden',
         borderRadius: 4,
-        position: 'relative',
-        backgroundColor: theme.palette.background.paper,
-        border: '1px solid #ced4da',
-        fontSize: 16,
-        padding: '10px 26px 10px 12px',
-        transition: theme.transitions.create(['border-color', 'box-shadow']),
-        // Use the system font instead of the default Roboto font.
-        fontFamily: [
-            '-apple-system',
-            'BlinkMacSystemFont',
-            '"Segoe UI"',
-            'Roboto',
-            '"Helvetica Neue"',
-            'Arial',
-            'sans-serif',
-            '"Apple Color Emoji"',
-            '"Segoe UI Emoji"',
-            '"Segoe UI Symbol"',
-        ].join(','),
-        '&:focus': {
-            borderRadius: 4,
-            borderColor: '#80bdff',
-            boxShadow: '0 0 0 0.2rem rgba(0,123,255,.25)',
+        backgroundColor: theme.palette.mode === 'light' ? '#fcfcfb' : '#2b2b2b',
+        transition: theme.transitions.create(['border-color', 'background-color', 'box-shadow']),
+        '&:hover': {
+            backgroundColor: 'transparent',
+        },
+        '&.Mui-focused': {
+            backgroundColor: 'transparent',
+            boxShadow: `${alpha(theme.palette.primary.main, 0.25)} 0 0 0 2px`,
+            borderColor: theme.palette.primary.main,
         },
     },
 }));
@@ -82,8 +63,8 @@ type BooksProps = {
 const Books: FC<BooksProps> = (props: BooksProps) => {
     const { storeType } = props;
 
-    const [allBooksMeta, setAllBooksMeta] = useState([]);
-    const [data, setData] = useState<any>([]);
+    const [allBooksMeta, setAllBooksMeta] = useState<BookMetaDataType[]>([]);
+    const [data, setData] = useState<BookMetaDataType[]>([]);
 
     // 评分或者作者等等大类
     const [firstLevelType, setFirstLevelType] = useState<string>(FilterType.All);
@@ -102,13 +83,45 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
 
     const fetchBooks = () => {
         getBooksMeta(storeType).then((data) => {
-            setAllBooksMeta(data);
-            setData(data);
+            if (data == null) {
+                data = [];
+            }
+
+            let coll_uuids: any = [];
+            let bookCollsInfo = {};
+            _.forEach(data, (item: BookMetaDataType) => {
+                if (item.coll_uuids == null) {
+                    return;
+                }
+                coll_uuids = coll_uuids.concat(item.coll_uuids.split(';'));
+            });
+            coll_uuids = _.uniq(coll_uuids);
+
+            getMultipleCollections(coll_uuids).then((bookCollInfoList: CollectionDataType[]) => {
+                _.forEach(bookCollInfoList, (item: CollectionDataType) => {
+                    bookCollsInfo[item.uuid] = item.name;
+                });
+
+                for (let i = 0; i < data.length; i++) {
+                    if (data[i].coll_uuids == null) {
+                        continue;
+                    }
+                    let names: string[] = [];
+                    _.forEach(data[i].coll_uuids.split(';'), (coll_uuid) => {
+                        names.push(bookCollsInfo[coll_uuid]);
+                    });
+                    data[i].coll_names = names.join(';');
+                }
+
+                setData(data);
+                setAllBooksMeta(data);
+            });
 
             const stars = {};
             const subjects = {};
             const authors = {};
             const publisher = {};
+
             _.forEach(data, (item: BookMetaDataType) => {
                 if (stars[item.stars] == null) {
                     stars[item.stars] = {};
@@ -125,19 +138,34 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                         }
                         subjects[subject][item.uuid] = null;
                     });
+                } else {
+                    if (subjects["无标签"] == null)  {
+                        subjects["无标签"] = {}; 
+                    }
+                    subjects["无标签"][item.uuid] = null;
                 }
 
-                if (authors[item.author] == null) {
-                    authors[item.author] = {};
-                }
-                if (item.author != null) {
+                if (item.author == null) {
+                    if (authors['无作者'] == null) {
+                        authors['无作者'] = {};
+                    }
+                    authors['无作者'][item.uuid] = null;
+                } else {
+                    if (authors[item.author] == null) {
+                        authors[item.author] = {};
+                    }
                     authors[item.author][item.uuid] = null;
                 }
 
-                if (publisher[item.publisher] == null) {
-                    publisher[item.publisher] = {};
-                }
-                if (item.publisher != null) {
+                if (item.publisher == null) {
+                    if (publisher['无出版社'] == null) {
+                        publisher['无出版社'] = {};
+                    }
+                    publisher['无出版社'][item.uuid] = null;
+                } else {
+                    if (publisher[item.publisher] == null) {
+                        publisher[item.publisher] = {};
+                    }
                     publisher[item.publisher][item.uuid] = null;
                 }
             });
@@ -169,7 +197,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                     break;
             }
 
-            filterData(allInfo, selectedSecondLevel);
+            filterData(allInfo, selectedSecondLevel, data);
         });
     };
 
@@ -177,7 +205,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
         fetchBooks();
     }, []);
 
-    const filterData = (data: any, selectedKeyword: any) => {
+    const filterData = (data: any, selectedKeyword: any, allBooksMetaList: BookMetaDataType[]) => {
         let allInfo;
         if (data != null) {
             allInfo = data;
@@ -189,12 +217,15 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
         let filteredBooks;
         let o = {};
         switch (firstLevelType) {
+            case FilterType.All:
+                filteredBooks = allBooksMetaList;
+                break;
             case FilterType.Stars:
                 o = allInfo.Stars[selectedKeyword];
                 if (o == null) {
                     o = {};
                 }
-                filteredBooks = _.filter(allBooksMeta, (v: BookMetaDataType) => {
+                filteredBooks = _.filter(allBooksMetaList, (v: BookMetaDataType) => {
                     if (v.uuid in o) {
                         return true;
                     }
@@ -207,7 +238,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                 if (o == null) {
                     o = {};
                 }
-                filteredBooks = _.filter(allBooksMeta, (v: BookMetaDataType) => {
+                filteredBooks = _.filter(allBooksMetaList, (v: BookMetaDataType) => {
                     if (v.uuid in o) {
                         return true;
                     }
@@ -220,7 +251,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                 if (o == null) {
                     o = {};
                 }
-                filteredBooks = _.filter(allBooksMeta, (v: BookMetaDataType) => {
+                filteredBooks = _.filter(allBooksMetaList, (v: BookMetaDataType) => {
                     if (v.uuid in o) {
                         return true;
                     }
@@ -233,7 +264,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                 if (o == null) {
                     o = {};
                 }
-                filteredBooks = _.filter(allBooksMeta, (v: BookMetaDataType) => {
+                filteredBooks = _.filter(allBooksMetaList, (v: BookMetaDataType) => {
                     if (v.uuid in o) {
                         return true;
                     }
@@ -242,6 +273,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                 setData(filteredBooks);
                 break;
         }
+        return filteredBooks;
     };
 
     const headerDropMenu = () => {
@@ -394,45 +426,37 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
         }
     };
 
+    const onSearchChange = (e: any) => {
+        const keyword = e.target.value;
+        const bookList = filterData(null, selectedSecondLevel, allBooksMeta);
+        setData(
+            _.filter(bookList, (item: BookMetaDataType) => {
+                return (
+                    item.name.includes(keyword) ||
+                    item.author.includes(keyword) ||
+                    item.publisher.includes(keyword) ||
+                    item.subjects.includes(keyword) ||
+                    item.coll_uuids.includes(keyword)
+                );
+            }),
+        );
+    };
+
     return (
         <div>
             <div>
-                <FormControl
-                    sx={{ m: 1 }}
-                    variant="standard"
+                <RedditTextField
+                    label="搜索 书名、作者、出版社、标签、集合"
+                    id="reddit-input"
+                    variant="filled"
                     style={{
-                        width: '7.7vw',
+                        width: '100%',
                         marginBottom: 25,
-                        marginLeft: -14,
-                        marginTop: -14,
-                        position: 'relative',
+                        marginTop: -15,
+                        marginLeft: -13.5,
                     }}
-                >
-                    <Select
-                        labelId="demo-customized-select-label"
-                        id="demo-customized-select"
-                        //   value={age}
-                        //   onChange={handleChange}
-                        input={<BootstrapInput />}
-                    >
-                        <MenuItem value={10}>全部</MenuItem>
-                        <MenuItem value={20}>菜单栏</MenuItem>
-                        <MenuItem value={30}>书籍</MenuItem>
-                    </Select>
-                </FormControl>
-                <FormControl
-                    sx={{ m: 1 }}
-                    variant="standard"
-                    style={{
-                        width: '79.7vw',
-                        marginBottom: 25,
-                        marginLeft: -2,
-                        marginTop: -14,
-                        position: 'absolute',
-                    }}
-                >
-                    <BootstrapInput id="demo-customized-textbox" />
-                </FormControl>
+                    onChange={onSearchChange}
+                />
             </div>
 
             <Grid container spacing={2}>
@@ -442,7 +466,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                             width: '100%',
                             bgcolor: 'background.paper',
                             position: 'relative',
-                            height: '85vh',
+                            height: '83vh',
                             overflow: 'auto',
                             '& ul': { padding: 0 },
                         }}
@@ -451,20 +475,31 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                         {<MenuHeader />}
 
                         {secondLevelMenuList.map((item, index) => (
-                            <ListItem
-                                style={{ padding: 0 }}
+                            <ContextMenu
                                 key={index}
-                                onClick={() => {
-                                    filterData(null, item);
-                                }}
-                            >
-                                <ListItemButton
-                                    style={{ paddingLeft: 10, paddingRight: 10 }}
-                                    selected={item === selectedSecondLevel}
-                                >
-                                    <ListItemText primary={`${index + 1}. ${item}`} />
-                                </ListItemButton>
-                            </ListItem>
+                                Content={
+                                    <ListItem
+                                        style={{ padding: 0 }}
+                                        onClick={() => {
+                                            filterData(null, item, allBooksMeta);
+                                        }}
+                                    >
+                                        <ListItemButton
+                                            style={{ paddingLeft: 10, paddingRight: 10 }}
+                                            selected={item === selectedSecondLevel}
+                                        >
+                                            <ListItemText primary={`${index + 1}. ${item}`} />
+                                        </ListItemButton>
+                                    </ListItem>
+                                }
+                                MenuInfo={[
+                                    {
+                                        name: '删除',
+                                        handler: () => {},
+                                        prefixIcon: <DeleteIcon />,
+                                    },
+                                ]}
+                            />
                         ))}
                     </List>
                 </Grid>
@@ -476,7 +511,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                         paddingLeft: 5,
                     }}
                 >
-                    <BookCardList data={data} fetchBooks={fetchBooks} />
+                    <BookCardList data={data} fetchBooks={fetchBooks} height={83} />
                 </Grid>
             </Grid>
         </div>

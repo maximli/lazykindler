@@ -1,5 +1,5 @@
 import { BookMetaDataType, CollectionDataType } from '@/pages/data';
-import { getBooksMetaByUUIDs, getSpecificCollection } from '@/services';
+import { getBooksMetaByUUIDs, getMultipleCollections } from '@/services';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -45,14 +45,14 @@ export default function CollectionBooks(props: CollectionBooksProps) {
     // allBooksMeta 用于保留所有数据
     const [allBooksMeta, setAllBooksMeta] = useState<BookMetaDataType[]>([]);
     // data 用于显示过滤后的数据
-    const [data, setData] = useState<any>([]);
+    const [data, setData] = useState<BookMetaDataType[]>([]);
     const [collectionInfo, setCollectionInfo] = useState<any>({});
 
     const fetchBooks = () => {
         if (collection_uuid == null) {
             return;
         }
-        getSpecificCollection(collection_uuid).then((collectionInfo: CollectionDataType[]) => {
+        getMultipleCollections([collection_uuid]).then((collectionInfo: CollectionDataType[]) => {
             let coll_info = collectionInfo[0];
             setCollectionInfo(coll_info);
 
@@ -61,11 +61,38 @@ export default function CollectionBooks(props: CollectionBooksProps) {
                 return;
             }
             getBooksMetaByUUIDs(book_uuids).then((data) => {
-                let d = _.map(data, (item: BookMetaDataType) => {
+                let bookCollsInfo = {};
+                let coll_uuids: any = [];
+
+                let book_metas_info = _.map(data, (item: BookMetaDataType) => {
+                    if (item.coll_uuids != null) {
+                        coll_uuids = coll_uuids.concat(item.coll_uuids.split(';'));
+                    }
                     return Object.assign({}, item, { key: item.uuid });
                 });
-                setData(d);
-                setAllBooksMeta(d);
+
+                coll_uuids = _.uniq(coll_uuids);
+
+                getMultipleCollections(coll_uuids).then(
+                    (bookCollInfoList: CollectionDataType[]) => {
+                        _.forEach(bookCollInfoList, (item: CollectionDataType) => {
+                            bookCollsInfo[item.uuid] = item.name;
+                        });
+
+                        for (let i = 0; i < book_metas_info.length; i++) {
+                            let names: string[] = [];
+                            if (book_metas_info[i].coll_uuids != null) {
+                                _.forEach(book_metas_info[i].coll_uuids.split(';'), (coll_uuid) => {
+                                    names.push(bookCollsInfo[coll_uuid]);
+                                });
+                            }
+                            book_metas_info[i].coll_names = names.join(';');
+                        }
+
+                        setData(book_metas_info);
+                        setAllBooksMeta(book_metas_info);
+                    },
+                );
             });
         });
     };
@@ -107,7 +134,7 @@ export default function CollectionBooks(props: CollectionBooksProps) {
                         }}
                         onChange={onSearchChange}
                     />
-                    <BookCardList data={data} fetchBooks={fetchBooks} />
+                    <BookCardList data={data} fetchBooks={fetchBooks} height={60} />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>关闭</Button>

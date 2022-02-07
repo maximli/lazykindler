@@ -25,10 +25,13 @@ export const getCover = (uuid: string) => {
 
 // 修改书籍元数据信息
 export const updateBookMeta = async (uuid: string, key: string, value: any) => {
+    if (value == null) {
+        value = ""
+    }
     const data = await axiosInstance.post(`/api/book/update/book_meta`, {
-        uuid,
-        key,
-        value,
+        uuid: uuid,
+        key: key,
+        value: value,
     });
     return data.data;
 };

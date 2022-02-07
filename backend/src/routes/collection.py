@@ -4,7 +4,7 @@ from ..service import collection
 from ..database.sqlite import db
 
 
-def create_book_collection():
+def create_collection():
     content = request.json
     name = content['name']
 
@@ -13,23 +13,29 @@ def create_book_collection():
     if len(book_collection) > 0:
         return "success"
 
-    description = ""
+    description = None
     if 'description' in content:
-        description = content['description']
+        value = content['description']
+        if value is not None and value is not "":
+            description = value
 
-    subjects = ""
+    subjects = None
     if 'subjects' in content:
-        subjects = content['subjects']
+        value = content['subjects']
+        if value is not None and value is not "":
+            subjects = value
 
     stars = 0
     if 'stars' in content:
         stars = content['stars']
 
-    cover = ""
+    cover = None
     if 'cover' in content:
-        cover = content['cover']
+        value = content['cover']
+        if value is not None and value is not "":
+            cover = value
 
-    collection.create_book_collection(
+    collection.create_collection(
         name, description, subjects, stars, cover)
     return "success"
 
@@ -38,15 +44,19 @@ def get_all_collections():
     return collection.get_all_collections()
 
 
-def get_specific_collection():
-    uuid = request.args.get('uuid')
-    return collection.get_specific_collection(uuid)
+def get_multiple_collections():
+    uuids = request.args.get('uuids')
+    return collection.get_multiple_collections(uuids.split(';'))
 
 
-def delete_book_collection():
+def delete_book_collection_without_books():
     uuid = request.args.get('uuid')
-    name = request.args.get('name')
-    return collection.delete_book_collections(uuid, name)
+    return collection.delete_book_collections_without_books(uuid)
+
+
+def delete_book_collection_with_books():
+    uuid = request.args.get('uuid')
+    return collection.delete_book_collections_with_books(uuid)
 
 
 def update_book_collection():

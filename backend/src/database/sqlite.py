@@ -33,13 +33,22 @@ class DB:
 
     def run_sql(self, sql):
         """
-        执行sql，不返回结果
+        执行sql,不返回结果
         :return:
         """
         cur = self.conn.cursor()
         cur.execute(sql)
         self.conn.commit()
 
+    def run_sql_with_params(self, sql, params):
+        """
+        执行sql,不返回结果
+        :return:
+        """
+        cur = self.conn.cursor()
+        cur.execute(sql, params)
+        self.conn.commit()
+    
     def query(self, sql):
         try:
             cursor = self.conn.cursor()
@@ -54,13 +63,13 @@ class DB:
         except Exception as error:
             print("Failed to get record. ", error)
 
-    def insert_book(self, uuid, title, description, author, subjects,  book_content, book_size, publisher, collection_names, extension, md5, book_path):
+    def insert_book(self, uuid, title, description, author, subjects,  book_content, book_size, publisher, coll_uuids, extension, md5, book_path):
         cursor = self.conn.cursor()
         cursor.execute("begin")
 
         try:
             # 插入书籍元数据信息
-            sql = """INSERT INTO book_meta (uuid, name, description, author, subjects, stars, size, publisher, collection_names, done_dates, md5, create_time) 
+            sql = """INSERT INTO book_meta (uuid, name, description, author, subjects, stars, size, publisher, coll_uuids, done_dates, md5, create_time) 
                                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) """
             cover_info = get_mobi_cover.get_mobi_cover(book_path)
 
@@ -73,7 +82,7 @@ class DB:
                 0,
                 book_size,
                 publisher,
-                collection_names,
+                coll_uuids,
                 "",
                 md5,
                 get_now()

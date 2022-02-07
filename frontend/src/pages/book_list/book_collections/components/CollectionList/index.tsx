@@ -1,5 +1,9 @@
 import { CollectionDataType } from '@/pages/data';
-import { deleteBookCollection, updateBookCollection } from '@/services';
+import {
+    deleteBookCollectionWithBooks,
+    deleteBookCollectionWithoutBooks,
+    updateBookCollection,
+} from '@/services';
 import { preHandleSubjects } from '@/util';
 import { SettingOutlined } from '@ant-design/icons';
 import ArchiveIcon from '@mui/icons-material/Archive';
@@ -52,7 +56,8 @@ const intOpenDialogInfo: OpenDialogType = {
 
 export default function BookCardList(props: BookCardListProps) {
     const { data, fetchBookCollections } = props;
-    const [uuid, setUUID] = useState<any>(uuidv4());
+    const [uuid1, setUUID1] = useState<any>(uuidv4());
+    const [uuid2, setUUID2] = useState<any>(uuidv4());
     const [dialogInfo, setDialogInfo] = useState<any>(initialDialogInfo);
     const [openDeleteBook, setOpenDeleteBook] = useState(false);
     const [deleteBookInfo, setDeleteBookInfo] = useState<any>({});
@@ -60,8 +65,12 @@ export default function BookCardList(props: BookCardListProps) {
     const [checkCollctionBooks, setCheckCollctionBooks] =
         useState<OpenDialogType>(intOpenDialogInfo);
 
-    const handleClickOpen = (uuid: string, name: string) => {
-        setDeleteBookInfo({ uuid, name });
+    // deleteType
+    // 0 初始值
+    // 1 删除集合时不删除书籍
+    // 2 删除集合时删除书籍
+    const handleClickOpen = (uuid: string, deleteType: number) => {
+        setDeleteBookInfo({ uuid, deleteType });
         setOpenDeleteBook(true);
     };
 
@@ -104,7 +113,7 @@ export default function BookCardList(props: BookCardListProps) {
                                         <Menu.Item
                                             key="-2"
                                             onClick={() => {
-                                                setUUID(uuidv4());
+                                                setUUID1(uuidv4());
                                                 setCheckCollctionBooks({
                                                     open: true,
                                                     collection_uuid: item.uuid,
@@ -116,7 +125,7 @@ export default function BookCardList(props: BookCardListProps) {
                                         <Menu.Item
                                             key="-1"
                                             onClick={() => {
-                                                setUUID(uuidv4());
+                                                setUUID2(uuidv4());
                                                 setAddBooksInfo({
                                                     open: true,
                                                     collection_uuid: item.uuid,
@@ -129,7 +138,7 @@ export default function BookCardList(props: BookCardListProps) {
                                         <Menu.Item
                                             key="0"
                                             onClick={() => {
-                                                setUUID(uuidv4());
+                                                setUUID2(uuidv4());
                                                 setAddBooksInfo({
                                                     open: true,
                                                     collection_uuid: item.uuid,
@@ -186,10 +195,18 @@ export default function BookCardList(props: BookCardListProps) {
                                         <Menu.Item
                                             key="6"
                                             onClick={() => {
-                                                handleClickOpen(item.uuid, item.name);
+                                                handleClickOpen(item.uuid, 1);
                                             }}
                                         >
-                                            <span style={{ color: 'red' }}>删除</span>
+                                            <span style={{ color: 'red' }}>删除 (不删书籍)</span>
+                                        </Menu.Item>
+                                        <Menu.Item
+                                            key="7"
+                                            onClick={() => {
+                                                handleClickOpen(item.uuid, 2);
+                                            }}
+                                        >
+                                            <span style={{ color: 'red' }}>删除 (删除书籍)</span>
                                         </Menu.Item>
                                     </SubMenu>
                                 </Menu>,
@@ -294,7 +311,9 @@ export default function BookCardList(props: BookCardListProps) {
                     <DialogTitle id="alert-dialog-title">警告</DialogTitle>
                     <DialogContent>
                         <DialogContentText id="alert-dialog-description">
-                            确定删除这个集合吗？
+                            {deleteBookInfo.deleteType == 1
+                                ? '删除集合将保留书籍,确定删除该集合吗?'
+                                : '删除集合将同时删除关联书籍,确定删除该集合吗?'}
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
@@ -302,11 +321,17 @@ export default function BookCardList(props: BookCardListProps) {
                         <Button
                             onClick={() => {
                                 handleClose();
-                                deleteBookCollection(deleteBookInfo.uuid, deleteBookInfo.name).then(
-                                    () => {
+                                if (deleteBookInfo.deleteType == 1) {
+                                    deleteBookCollectionWithoutBooks(deleteBookInfo.uuid).then(
+                                        () => {
+                                            fetchBookCollections();
+                                        },
+                                    );
+                                } else {
+                                    deleteBookCollectionWithBooks(deleteBookInfo.uuid).then(() => {
                                         fetchBookCollections();
-                                    },
-                                );
+                                    });
+                                }
                             }}
                             autoFocus
                         >
@@ -317,7 +342,7 @@ export default function BookCardList(props: BookCardListProps) {
             </div>
 
             <AddBooks
-                key={uuid}
+                key={uuid2}
                 open={addBooksInfo.open}
                 handleClose={() => {
                     setAddBooksInfo(intOpenDialogInfo);
@@ -327,7 +352,7 @@ export default function BookCardList(props: BookCardListProps) {
             />
 
             <CollectionBooks
-                key={uuid}
+                key={uuid1}
                 open={checkCollctionBooks.open}
                 handleClose={() => {
                     setCheckCollctionBooks(intOpenDialogInfo);

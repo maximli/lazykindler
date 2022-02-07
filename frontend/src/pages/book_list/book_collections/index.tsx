@@ -73,6 +73,9 @@ export default function BookCollections() {
 
     const fetchBookCollections = () => {
         getAllCollections().then((data: BookCollectionDataType[]) => {
+            if (data == null) {
+                data = []
+            }
             setAllBookCollections(data);
             setData(data);
 

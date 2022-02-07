@@ -20,7 +20,9 @@ export interface BookMetaDataType {
     stars: number;
     subjects: string;
     uuid: string;
-    collection_names: string;
+    coll_uuids: string;
+    // 这个参数由客户端定义，与接口没有任何关系，目的是为了方便页面显示
+    coll_names?: string;
 }
 
 export interface CollectionDataType {
