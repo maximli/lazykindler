@@ -58,3 +58,10 @@ export const deleteBookCollectionWithBooks = (uuid: string) => {
             return data.data;
         });
 };
+
+// 根据关键词删除集合
+export const deleteBookCollectionByKeyword = (keyword: string, value: string) => {
+    return axiosInstance.delete(`/api/collection/delete/bykeyword?keyword=${keyword}&value=${value}`).then((data: any) => {
+        return data.data;
+    });
+};

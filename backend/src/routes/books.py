@@ -62,3 +62,9 @@ def update_book_meta():
     key = content['key']
     value = content['value']
     return books.update_book_meta(uuid, key, value)
+
+
+def delete_book_by_keyword():
+    keyword = request.args.get('keyword')
+    value = request.args.get('value')
+    return books.delete_books_by_keyword(keyword, value)

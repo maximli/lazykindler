@@ -1,4 +1,4 @@
-import { getBooksMeta, getMultipleCollections } from '@/services';
+import { deleteBookByKeyword, getBooksMeta, getMultipleCollections } from '@/services';
 import {
     BankOutlined,
     DatabaseOutlined,
@@ -497,7 +497,14 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                                 MenuInfo={[
                                     {
                                         name: '删除',
-                                        handler: () => {},
+                                        handler: () => {
+                                            deleteBookByKeyword(
+                                                firstLevelType,
+                                                selectedSecondLevel,
+                                            ).then(() => {
+                                                fetchBooks();
+                                            });
+                                        },
                                         prefixIcon: <DeleteIcon />,
                                     },
                                 ]}

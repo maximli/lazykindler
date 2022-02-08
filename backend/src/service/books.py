@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-from uuid import uuid1
 from flask import jsonify
 import hashlib
 
@@ -91,10 +90,12 @@ def get_books_meta(storeType):
     data = []
     if storeType == 'noTmp':
         # 查找正式存储的数据
-        data = db.query("select a.* from book_meta a where not exists (select null from tmp_book b where a.uuid = b.uuid);")
+        data = db.query(
+            "select a.* from book_meta a where not exists (select null from tmp_book b where a.uuid = b.uuid);")
     else:
         # 查找临时存储的数据
-        data = db.query("select a.* from book_meta a where exists (select null from tmp_book b where a.uuid = b.uuid); ")
+        data = db.query(
+            "select a.* from book_meta a where exists (select null from tmp_book b where a.uuid = b.uuid); ")
     return jsonify(data)
 
 
@@ -115,9 +116,11 @@ def delete_book(uuid):
         book_uuids = book_collection['book_uuids'].split(';')
         book_uuids.remove(uuid)
         if book_uuids is None or len(book_uuids) == 0:
-            db.run_sql_with_params("update book_collection set book_uuids=? where uuid=?", (None, book_collection['uuid']))
+            db.run_sql_with_params(
+                "update book_collection set book_uuids=? where uuid=?", (None, book_collection['uuid']))
         else:
-            update_book_collection(';'.join(book_uuids), book_collection['uuid'])
+            update_book_collection(';'.join(book_uuids),
+                                   book_collection['uuid'])
     return "success"
 
 
@@ -127,11 +130,12 @@ def update_book_meta(uuid, key, value):
     if key == "coll_uuids":
         db.run_sql("delete from tmp_book where uuid='{}'".format(uuid))
 
-        book_meta = db.query("select coll_uuids from book_meta where uuid='{}';".format(uuid))[0]
+        book_meta = db.query(
+            "select coll_uuids from book_meta where uuid='{}';".format(uuid))[0]
         old_coll_uuids = []
         if book_meta["coll_uuids"] is not None:
             old_coll_uuids = book_meta["coll_uuids"].split(";")
-        
+
         new_coll_uuids = []
         if value is not None:
             new_coll_uuids = value.split(";")
@@ -140,7 +144,8 @@ def update_book_meta(uuid, key, value):
 
         # 处理删掉的集合，从集合中删掉书籍
         for coll_uuid in difference(old_coll_uuids, new_coll_uuids):
-            coll_info = db.query("select book_uuids from book_collection where uuid='{}';".format(coll_uuid))[0]
+            coll_info = db.query(
+                "select book_uuids from book_collection where uuid='{}';".format(coll_uuid))[0]
             coll_book_uuids = []
             if coll_info["book_uuids"] is not None:
                 l = coll_info["book_uuids"].split(";")
@@ -148,14 +153,16 @@ def update_book_meta(uuid, key, value):
                 if l is not None and len(l) > 0:
                     coll_book_uuids = l
             if len(coll_book_uuids) == 0:
-                db.run_sql_with_params("update book_collection set book_uuids=? where uuid=?", (None, coll_uuid))
+                db.run_sql_with_params(
+                    "update book_collection set book_uuids=? where uuid=?", (None, coll_uuid))
             else:
                 db.run_sql("update book_collection set book_uuids='{}' where uuid='{}'".format(
                     ";".join(coll_book_uuids), coll_uuid))
 
         # 处理新增书籍的集合
         for coll_uuid in difference(new_coll_uuids, old_coll_uuids):
-            coll_info = db.query("select book_uuids from book_collection where uuid='{}';".format(coll_uuid))[0]
+            coll_info = db.query(
+                "select book_uuids from book_collection where uuid='{}';".format(coll_uuid))[0]
             coll_book_uuids = []
             if coll_info["book_uuids"] is not None:
                 l = coll_info["book_uuids"].split(";")
@@ -167,7 +174,8 @@ def update_book_meta(uuid, key, value):
                 ";".join(coll_book_uuids), coll_uuid))
 
     if value is None or value is "":
-        db.run_sql_with_params("update book_meta set {}=? where uuid=?".format(key), (None, uuid))
+        db.run_sql_with_params(
+            "update book_meta set {}=? where uuid=?".format(key), (None, uuid))
         return "success"
     else:
         db.run_sql("update book_meta set '{}'='{}' where uuid='{}'".format(
@@ -178,12 +186,14 @@ def update_book_meta(uuid, key, value):
 def get_books_meta_by_uuids(uuids):
     result = []
     for uuid in uuids:
-        book_meta_list = db.query("select * from book_meta where uuid='{}'".format(uuid))
+        book_meta_list = db.query(
+            "select * from book_meta where uuid='{}'".format(uuid))
         result = result + book_meta_list
     return jsonify(result)
 
 
 def delete_books_by_keyword(keyword, value):
+    value = value.strip()
     uuids = []
     if keyword == "评分":
         books = db.query(
@@ -192,13 +202,19 @@ def delete_books_by_keyword(keyword, value):
             uuids.append(book['uuid'])
     elif keyword == "标签":
         books = db.query(
-            "select uuid from book_meta where subjects like '%{}%'".format(value))
+            "select uuid from book_meta where subjects like '^{};%' or subjects like '%;{}$' or subjects like '%;{};%' or subjects='{}'".format(value, value, value, value))
         for book in books:
             uuids.append(book['uuid'])
     elif keyword == "作者":
-        pass
+        books = db.query(
+            "select uuid from book_meta where author='{}'".format(value))
+        for book in books:
+            uuids.append(book['uuid'])
     elif keyword == "出版社":
-        pass
+        books = db.query(
+            "select uuid from book_meta where publisher='{}'".format(value))
+        for book in books:
+            uuids.append(book['uuid'])
 
     for uuid in uuids:
         delete_book(uuid)

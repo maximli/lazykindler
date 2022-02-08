@@ -20,10 +20,12 @@ app.add_url_rule('/api/book/get/uuids', view_func=books.get_books_meta_by_uuids,
 app.add_url_rule('/api/book/update/book_meta', view_func=books.update_book_meta, methods=['POST'])
 app.add_url_rule('/api/book/cover', view_func=books.get_book_cover, methods=['GET'])
 app.add_url_rule('/api/book/delete', view_func=books.delete_book, methods=['DELETE'])
+app.add_url_rule('/api/book/delete/bykeyword', view_func=books.delete_book_by_keyword, methods=['DELETE'])
 
 app.add_url_rule('/api/collection/create', view_func=collection.create_collection, methods=['POST'])
 app.add_url_rule('/api/collection/get/all', view_func=collection.get_all_collections, methods=['GET'])
 app.add_url_rule('/api/collection/get/multiple', view_func=collection.get_multiple_collections, methods=['GET'])
 app.add_url_rule('/api/collection/delete/withoutbooks', view_func=collection.delete_book_collection_without_books, methods=['DELETE'])
 app.add_url_rule('/api/collection/delete/withbooks', view_func=collection.delete_book_collection_with_books, methods=['DELETE'])
+app.add_url_rule('/api/collection/delete/bykeyword', view_func=collection.delete_book_collection_by_keyword, methods=['DELETE'])
 app.add_url_rule('/api/collection/update', view_func=collection.update_book_collection, methods=['POST'])

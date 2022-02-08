@@ -42,3 +42,10 @@ export const deleteBook = (uuid: string) => {
         return data.data;
     });
 };
+
+// 根据关键词删除书籍
+export const deleteBookByKeyword = (keyword: string, value: string) => {
+    return axiosInstance.delete(`/api/book/delete/bykeyword?keyword=${keyword}&value=${value}`).then((data: any) => {
+        return data.data;
+    });
+};

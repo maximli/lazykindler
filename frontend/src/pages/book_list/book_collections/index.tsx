@@ -1,33 +1,35 @@
+import { createBookCollection, deleteBookCollectionByKeyword, getAllCollections } from '@/services';
+import { preHandleSubjects, toBase64, useWindowDimensions } from '@/util';
+import { DatabaseOutlined, DownOutlined, StarOutlined, TagsOutlined } from '@ant-design/icons';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 import {
-    List,
-    ListItem,
-    ListItemText,
-    ListItemButton,
-    ListSubheader,
-    Grid,
     Box,
+    Button,
+    Chip,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
-    Button,
-    Input,
-    Chip,
-    Typography,
     FormControl,
     FormHelperText,
+    Grid,
+    Input,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemText,
+    ListSubheader,
+    Typography,
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import { Menu, Dropdown } from 'antd';
-import { DownOutlined, StarOutlined, TagsOutlined, DatabaseOutlined } from '@ant-design/icons';
-import Dropzone from 'react-dropzone';
-import AddIcon from '@mui/icons-material/Add';
+import { Dropdown, Menu } from 'antd';
 import _ from 'lodash';
-import BookCardList from './components/CollectionList';
 import { useEffect, useState } from 'react';
-import { createBookCollection, getAllCollections } from '@/services';
-import { useWindowDimensions, toBase64, preHandleSubjects } from '@/util';
+import Dropzone from 'react-dropzone';
+
+import ContextMenu from '../components/ContextMenu';
+import BookCardList from './components/CollectionList';
 import { BookCollectionDataType } from './data';
 
 enum FilterType {
@@ -58,7 +60,6 @@ export default function BookCollections() {
         Subjects: {},
     });
 
-
     const [formData, setFormData] = useState<any>({});
 
     const [open, setOpen] = useState(false);
@@ -74,7 +75,7 @@ export default function BookCollections() {
     const fetchBookCollections = () => {
         getAllCollections().then((data: BookCollectionDataType[]) => {
             if (data == null) {
-                data = []
+                data = [];
             }
             setAllBookCollections(data);
             setData(data);
@@ -158,9 +159,11 @@ export default function BookCollections() {
         stars = Number(stars.trim());
         cover = cover.trim();
 
-        createBookCollection(name, description, preHandleSubjects(subjects), stars, cover).then(() => {
-            fetchBookCollections();
-        });
+        createBookCollection(name, description, preHandleSubjects(subjects), stars, cover).then(
+            () => {
+                fetchBookCollections();
+            },
+        );
         return true;
     };
 
@@ -282,20 +285,39 @@ export default function BookCollections() {
                                 </Dropdown>
                             </ListSubheader>
                             {selectedSubType.map((item, index) => (
-                                <ListItem
-                                    style={{ padding: 0 }}
+                                <ContextMenu
                                     key={index}
-                                    onClick={() => {
-                                        filterData(null, item);
-                                    }}
-                                >
-                                    <ListItemButton
-                                        style={{ paddingLeft: 10, paddingRight: 10 }}
-                                        selected={item === selectedItemName}
-                                    >
-                                        <ListItemText primary={`${index + 1}. ${item}`} />
-                                    </ListItemButton>
-                                </ListItem>
+                                    Content={
+                                        <ListItem
+                                            style={{ padding: 0 }}
+                                            key={index}
+                                            onClick={() => {
+                                                filterData(null, item);
+                                            }}
+                                        >
+                                            <ListItemButton
+                                                style={{ paddingLeft: 10, paddingRight: 10 }}
+                                                selected={item === selectedItemName}
+                                            >
+                                                <ListItemText primary={`${index + 1}. ${item}`} />
+                                            </ListItemButton>
+                                        </ListItem>
+                                    }
+                                    MenuInfo={[
+                                        {
+                                            name: '删除',
+                                            handler: () => {
+                                                deleteBookCollectionByKeyword(
+                                                    selectedType,
+                                                    selectedItemName,
+                                                ).then(() => {
+                                                    fetchBookCollections();
+                                                });
+                                            },
+                                            prefixIcon: <DeleteIcon />,
+                                        },
+                                    ]}
+                                />
                             ))}
                             <ListItemButton onClick={handleClickOpen}>
                                 <ListItemIcon style={{ paddingLeft: 70 }}>
@@ -434,7 +456,7 @@ export default function BookCollections() {
                                     }}
                                 />
                                 <FormHelperText id="standard-weight-helper-text">
-                                    整数，建议最高9分。不能为空
+                                    整数,建议最高9分。不能为空
                                 </FormHelperText>
                             </div>
                         </FormControl>
@@ -499,7 +521,6 @@ export default function BookCollections() {
                     </Button>
                 </DialogActions>
             </Dialog>
-
         </div>
     );
 }

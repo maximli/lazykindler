@@ -65,3 +65,9 @@ def update_book_collection():
     key = content['key']
     value = content['value']
     return collection.update_collection(uuid, key, value)
+
+
+def delete_book_collection_by_keyword():
+    keyword = request.args.get('keyword')
+    value = request.args.get('value')
+    return collection.delete_colls_by_keyword(keyword, value)

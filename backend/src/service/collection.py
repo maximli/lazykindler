@@ -1,16 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
-from re import I
-from uuid import uuid1
 from flask import jsonify
 import hashlib
 
 from .common import update_book_meta
 
 from ..database.sqlite import db
-from ..util.util import convert_to_binary_data, generate_uuid, get_md5, get_now, is_all_chinese, difference
+from ..util.util import generate_uuid, difference
 
 
 md5_hash = hashlib.md5()
@@ -48,8 +45,29 @@ def get_multiple_collections(uuids):
     return jsonify(data)
 
 
+def delete_book(uuid):
+    db.run_sql("delete from book where uuid='{}'".format(uuid))
+    db.run_sql("delete from book_meta where uuid='{}'".format(uuid))
+    db.run_sql("delete from cover where uuid='{}'".format(uuid))
+    db.run_sql("delete from tmp_book where uuid='{}'".format(uuid))
+
+    book_collections = db.query(
+        "select uuid, book_uuids from book_collection where book_uuids like '%{}%'".format(uuid))
+    for book_collection in book_collections:
+        book_uuids = book_collection['book_uuids'].split(';')
+        book_uuids.remove(uuid)
+        if book_uuids is None or len(book_uuids) == 0:
+            db.run_sql_with_params(
+                "update book_collection set book_uuids=? where uuid=?", (None, book_collection['uuid']))
+        else:
+            update_book_collection(';'.join(book_uuids),
+                                   book_collection['uuid'])
+    return "success"
+
+
 def delete_book_collections_without_books(coll_uuid):
     db.run_sql("delete from cover where uuid='{}'".format(coll_uuid))
+
     book_metas = db.query(
         "select uuid, coll_uuids from book_meta where coll_uuids like '%{}%'".format(coll_uuid))
     for book_meta in book_metas:
@@ -66,35 +84,16 @@ def delete_book_collections_without_books(coll_uuid):
     return "success"
 
 
-def delete_book(uuid):
-    db.run_sql("delete from book where uuid='{}'".format(uuid))
-    db.run_sql("delete from book_meta where uuid='{}'".format(uuid))
-    db.run_sql("delete from cover where uuid='{}'".format(uuid))
-    db.run_sql("delete from tmp_book where uuid='{}'".format(uuid))
-
-    book_collections = db.query(
-        "select uuid, book_uuids from book_collection where book_uuids like '%{}%'".format(uuid))
-    for book_collection in book_collections:
-        book_uuids = book_collection['book_uuids'].split(';')
-        book_uuids.remove(uuid)
-        if book_uuids is None or len(book_uuids) == 0:
-            db.run_sql_with_params("update book_collection set book_uuids=? where uuid=?", (None, book_collection['uuid']))
-        else:
-            update_book_collection(';'.join(book_uuids), book_collection['uuid'])
-    return "success"
-
-
 def delete_book_collections_with_books(coll_uuid):
     db.run_sql("delete from cover where uuid='{}'".format(coll_uuid))
+
     coll_info = db.query(
         "select book_uuids from book_collection where uuid='{}';".format(coll_uuid))[0]
-    if coll_info['book_uuids'] is None:
-        return "success"
-    else:
+    if coll_info['book_uuids'] is not None:
         for book_uuid in coll_info['book_uuids'].split(";"):
             delete_book(book_uuid)
-        db.run_sql(
-            "delete from book_collection where uuid='{}';".format(coll_uuid))
+    db.run_sql(
+        "delete from book_collection where uuid='{}';".format(coll_uuid))
     return "success"
 
 
@@ -155,4 +154,24 @@ def update_collection(uuid, key, value):
     else:
         db.run_sql("update book_collection set '{}'='{}' where uuid='{}'".format(
             key, value, uuid))
+    return "success"
+
+
+def delete_colls_by_keyword(keyword, value):
+    value = value.strip()
+    uuids = []
+    if keyword == "评分":
+        colls = db.query(
+            "select uuid from book_collection where stars='{}'".format(int(value)))
+        for coll in colls:
+            uuids.append(coll['uuid'])
+    elif keyword == "标签":
+        colls = db.query(
+            "select uuid from book_collection where subjects like '^{};%' or subjects like '%;{}$' or subjects like '%;{};%' or subjects='{}'".format(value, value, value, value))
+        for coll in colls:
+            uuids.append(coll['uuid'])
+
+    for uuid in uuids:
+        delete_book_collections_with_books(uuid)
+
     return "success"
