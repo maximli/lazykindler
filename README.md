@@ -3,9 +3,9 @@
 
 <img src="./header.svg" width="800" height="400" alt="Click to see the source">
 
-自制kindle工具
+# Lazy Kindler
 
-用于管理大量电子书，方便从多个维度查找和整理电子书
+用于管理大量电子书，方便从多个维度整理和查找电子书
 
 目前正在抽空开发，如果您也喜欢看电子书，并且对管理电子书有功能建议，不妨提一下issue，谢谢
 
