@@ -54,3 +54,34 @@ CREATE TABLE book_collection (
 	stars               INTEGER,        -- 评分。满分10分
     create_time         TEXT
 );
+
+-- Clippings文件的md5。后台服务启动后，会每隔短暂的时间判断 /Volumes/Kindle/documents/My\ Clippings.txt是否存在
+-- 并且md5是否和表中所存一致，如果不一致说明有新增，自动把kindle笔记导入数据库
+CREATE TABLE clippings_md5 (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+    md5                 TEXT
+);
+
+-- 存放剪切文字
+CREATE TABLE clipping (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	uuid                TEXT,
+	book_name           TEXT,         -- 书名
+    author              TEXT,         -- 作者
+    content             TEXT,         -- 剪切内容
+	addDate             TEXT,         -- 添加时间
+	subjects            TEXT,         -- 标签
+	coll_uuids          TEXT,         -- clipping_collections uuids列表，分号相隔
+	md5                 TEXT,         -- md5
+	create_time         TEXT          -- 创建时间
+);
+
+-- 存放剪切文字
+CREATE TABLE clippings_coll (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	uuid                TEXT,
+	name                TEXT,
+	subjects            TEXT,         -- 标签
+	clipping_uuids      TEXT,         -- clipping uuids列表，分号相隔
+	create_time         TEXT          -- 创建时间
+);

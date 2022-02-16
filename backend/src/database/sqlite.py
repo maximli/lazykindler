@@ -161,6 +161,50 @@ class DB:
 
         self.conn.commit()
         cursor.close()
+    
+
+    def insert_clippings_md5(self, md5):
+        cursor = self.conn.cursor()
+        cursor.execute("begin")
+        try:
+            sql = """INSERT INTO clippings_md5 (md5) 
+                                        VALUES (?) """
+            data_tuple = (
+                md5,
+            )
+            cursor.execute(sql, data_tuple)
+
+        except Exception as error:
+            self.conn.execute("rollback")
+            print("Failed to insert clippings_md5. ", error)
+
+        self.conn.commit()
+        cursor.close()
+
+
+    def insert_clipping(self, uuid, book_name, author, content, addDate, md5):
+        cursor = self.conn.cursor()
+        cursor.execute("begin")
+        try:
+            sql = """INSERT INTO clipping (uuid, book_name, author, content, addDate, md5, create_time) 
+                                        VALUES (?, ?, ?, ?, ?, ?, ?) """
+            data_tuple = (
+                uuid,
+                book_name,
+                author,
+                content,
+                addDate,
+                md5,
+                get_now()
+            )
+            cursor.execute(sql, data_tuple)
+
+        except Exception as error:
+            self.conn.execute("rollback")
+            print("Failed to insert clipping. ", error)
+
+        self.conn.commit()
+        cursor.close()
 
 
 db = DB()

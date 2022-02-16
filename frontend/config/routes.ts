@@ -29,11 +29,8 @@
     path: '/kindle',
     name: 'kindle',
     icon: 'FireOutlined',
-    access: 'canAdmin',
-    component: './Admin',
     routes: [
-      { path: '/admin/sub-page1', name: '笔记', icon: 'smile', component: './Welcome' },
-      { path: '/admin/sub-page2', name: '生词', icon: 'smile', component: './Welcome' },
+      { path: '/kindle/notes', name: '笔记', icon: 'smile', component: './Welcome' },
       { component: './404' },
     ],
   },

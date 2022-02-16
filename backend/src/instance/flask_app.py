@@ -3,6 +3,10 @@
 # third-party imports
 from flask import Flask
 from flask_cors import CORS
+import os
+import time
+
+from ..service.clippings import ClippingHelper
 
 from ..routes import books, collection
 
@@ -13,6 +17,13 @@ app = Flask(__name__)
 # cross origin resource sharing
 # CORS(app)
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+pid = os.fork()
+if pid == 0:
+    while True:
+        time.sleep(10)
+        clippintHelper = ClippingHelper()
+        clippintHelper.import_clippings()
 
 app.add_url_rule('/api/book/upload', view_func=books.store_books, methods=['POST'])
 app.add_url_rule('/api/book/all_meta', view_func=books.get_books_meta, methods=['GET'])
