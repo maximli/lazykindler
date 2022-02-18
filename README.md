@@ -49,6 +49,10 @@ python3 app.py
 ```
 yarn start
 ```
+然后浏览器访问 http://localhost:8000
+
+### 注意
+1. 平台并没有登陆注册等功能，仅为个人需求设计
 
 # 平台展示
 
