@@ -6,6 +6,7 @@ import time
 import numpy as np
 import datetime
 import hashlib
+from flask import jsonify
 
 from ..util.util import generate_uuid, get_md5
 from ..database.sqlite import db
@@ -82,3 +83,8 @@ class ClippingHelper(object):
 def update_clippings_md5(new_md5):
     db.run_sql("update clippings_md5 set md5='{}'".format(
         new_md5))
+
+
+def get_all_clippings():
+    data = db.query("select * from clipping;")
+    return jsonify(data)

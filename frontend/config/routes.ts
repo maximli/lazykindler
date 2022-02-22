@@ -30,7 +30,7 @@
     name: 'kindle',
     icon: 'FireOutlined',
     routes: [
-      { path: '/kindle/notes', name: '笔记', icon: 'smile', component: './Welcome' },
+      { path: '/kindle/clippings', name: '摘抄', icon: 'smile', component: './kindle/clippings' },
       { component: './404' },
     ],
   },

@@ -8,7 +8,7 @@ import time
 
 from ..service.clippings import ClippingHelper
 
-from ..routes import books, collection
+from ..routes import books, collection, clippings
 
 
 # flask application initialization
@@ -40,3 +40,5 @@ app.add_url_rule('/api/collection/delete/withoutbooks', view_func=collection.del
 app.add_url_rule('/api/collection/delete/withbooks', view_func=collection.delete_book_collection_with_books, methods=['DELETE'])
 app.add_url_rule('/api/collection/delete/bykeyword', view_func=collection.delete_book_collection_by_keyword, methods=['DELETE'])
 app.add_url_rule('/api/collection/update', view_func=collection.update_book_collection, methods=['POST'])
+
+app.add_url_rule('/api/clippings/get/all', view_func=clippings.get_all_clippings, methods=['GET'])

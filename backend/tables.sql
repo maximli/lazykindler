@@ -71,6 +71,7 @@ CREATE TABLE clipping (
     content             TEXT,         -- 剪切内容
 	addDate             TEXT,         -- 添加时间
 	subjects            TEXT,         -- 标签
+	stars               INTEGER,      -- 评分。满分10分
 	coll_uuids          TEXT,         -- clipping_collections uuids列表，分号相隔
 	md5                 TEXT,         -- md5
 	create_time         TEXT          -- 创建时间

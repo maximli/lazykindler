@@ -35,3 +35,15 @@ export interface CollectionDataType {
     stars: number;
     create_time: string;
 }
+
+export interface ClippingDataType {
+    uuid: string;
+    book_name: string;
+    author: string;
+    content: string;
+    addDate: string;
+    subjects: string;
+    stars: number;
+    coll_uuids: string;
+    create_time: string;
+}

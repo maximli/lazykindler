@@ -186,8 +186,8 @@ class DB:
         cursor = self.conn.cursor()
         cursor.execute("begin")
         try:
-            sql = """INSERT INTO clipping (uuid, book_name, author, content, addDate, md5, create_time) 
-                                        VALUES (?, ?, ?, ?, ?, ?, ?) """
+            sql = """INSERT INTO clipping (uuid, book_name, author, content, addDate, md5, stars, create_time) 
+                                        VALUES (?, ?, ?, ?, ?, ?, ?, ?) """
             data_tuple = (
                 uuid,
                 book_name,
@@ -195,6 +195,7 @@ class DB:
                 content,
                 addDate,
                 md5,
+                0,
                 get_now()
             )
             cursor.execute(sql, data_tuple)
