@@ -47,3 +47,14 @@ export interface ClippingDataType {
     coll_uuids: string;
     create_time: string;
 }
+
+// 摘抄的集合
+export interface ClippingCollectionDataType {
+    id: number;
+    uuid: string;
+    name: string;
+    clipping_uuids: string;
+    subjects: string;
+    stars: number;
+    create_time: string;
+}

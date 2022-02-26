@@ -1,3 +1,3 @@
 export * from './book';
-export * from './collections';
+export * from './book_collections';
 export * from './clippings';
