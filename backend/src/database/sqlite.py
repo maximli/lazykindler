@@ -131,16 +131,17 @@ class DB:
         except Exception as error:
             print("Failed to get book record. ", error)
 
-    def insert_book_collection(self, uuid, name, description, subjects, stars, cover_content):
+    def insert_coll(self, uuid, name, coll_type, description, subjects, stars, cover_content):
         cursor = self.conn.cursor()
         cursor.execute("begin")
         try:
 
-            sql = """INSERT INTO book_collection (uuid, name, description, subjects, stars, create_time) 
-                                        VALUES (?, ?, ?, ?, ?, ?) """
+            sql = """INSERT INTO coll (uuid, name, coll_type, description, subjects, stars, create_time) 
+                                        VALUES (?, ?, ?, ?, ?, ?, ?) """
             data_tuple = (
                 uuid,
                 name,
+                coll_type,
                 description,
                 subjects,
                 stars,
@@ -157,7 +158,7 @@ class DB:
 
         except Exception as error:
             self.conn.execute("rollback")
-            print("Failed to insert book_collection. ", error)
+            print("Failed to insert coll. ", error)
 
         self.conn.commit()
         cursor.close()

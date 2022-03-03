@@ -1,26 +1,22 @@
+import { getAllClippings, getMultipleCollections } from '@/services';
 import {
-    getAllClippings,
-} from '@/services';
-import {
+    BookOutlined,
     DatabaseOutlined,
     DownOutlined,
     StarOutlined,
     TagsOutlined,
     UserOutlined,
-    BookOutlined,
 } from '@ant-design/icons';
+import { Grid, List, ListItem, ListItemButton, ListItemText, ListSubheader } from '@mui/material';
 import { OutlinedInputProps } from '@mui/material/OutlinedInput';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import { alpha, styled } from '@mui/material/styles';
 import { Menu as AntMenu, Dropdown } from 'antd';
 import _ from 'lodash';
 import { FC, useEffect, useState } from 'react';
-import { Grid, List, ListItem, ListItemButton, ListItemText, ListSubheader } from '@mui/material';
 
-import type { ClippingCollectionDataType, ClippingDataType} from '../../data';
+import type { ClippingCollectionDataType, ClippingDataType } from '../../data';
 import ClippingCardList from '../components/ClippingCardList';
-import { getMultipleClippingsCollections } from '@/services/clippings_collections';
-
 
 const RedditTextField = styled((props: TextFieldProps) => (
     <TextField InputProps={{ disableUnderline: true } as Partial<OutlinedInputProps>} {...props} />
@@ -92,25 +88,27 @@ const Clippings: FC = () => {
             });
             coll_uuids = _.uniq(coll_uuids);
 
-            getMultipleClippingsCollections(coll_uuids).then((collInfoList: ClippingCollectionDataType[]) => {
-                _.forEach(collInfoList, (item: ClippingCollectionDataType) => {
-                    clippingsCollsInfo[item.uuid] = item.name;
-                });
-
-                for (let i = 0; i < data.length; i++) {
-                    if (data[i].coll_uuids == null) {
-                        continue;
-                    }
-                    let names: string[] = [];
-                    _.forEach(data[i].coll_uuids.split(';'), (coll_uuid) => {
-                        names.push(clippingsCollsInfo[coll_uuid]);
+            getMultipleCollections(coll_uuids).then(
+                (collInfoList: ClippingCollectionDataType[]) => {
+                    _.forEach(collInfoList, (item: ClippingCollectionDataType) => {
+                        clippingsCollsInfo[item.uuid] = item.name;
                     });
-                    data[i].coll_names = names.join(';');
-                }
 
-                setData(data);
-                setAllClippings(data);
-            });
+                    for (let i = 0; i < data.length; i++) {
+                        if (data[i].coll_uuids == null) {
+                            continue;
+                        }
+                        let names: string[] = [];
+                        _.forEach(data[i].coll_uuids.split(';'), (coll_uuid) => {
+                            names.push(clippingsCollsInfo[coll_uuid]);
+                        });
+                        data[i].coll_names = names.join(';');
+                    }
+
+                    setData(data);
+                    setAllClippings(data);
+                },
+            );
 
             const stars = {};
             const subjects = {};
@@ -256,18 +254,18 @@ const Clippings: FC = () => {
                 break;
 
             case FilterType.Book:
-                    o = allInfo.Book[selectedKeyword];
-                    if (o == null) {
-                        o = {};
+                o = allInfo.Book[selectedKeyword];
+                if (o == null) {
+                    o = {};
+                }
+                filteredClippings = _.filter(allClippingsList, (v: ClippingDataType) => {
+                    if (v.uuid in o) {
+                        return true;
                     }
-                    filteredClippings = _.filter(allClippingsList, (v: ClippingDataType) => {
-                        if (v.uuid in o) {
-                            return true;
-                        }
-                        return false;
-                    });
-                    setData(filteredClippings);
-                    break;
+                    return false;
+                });
+                setData(filteredClippings);
+                break;
         }
         return filteredClippings;
     };
@@ -374,7 +372,7 @@ const Clippings: FC = () => {
                     </ListSubheader>
                 );
                 break;
-            
+
             case FilterType.Book:
                 return (
                     <ListSubheader>
@@ -474,19 +472,19 @@ const Clippings: FC = () => {
                         {<MenuHeader />}
 
                         {secondLevelMenuList.map((item, index) => (
-                                    <ListItem
-                                        style={{ padding: 0 }}
-                                        onClick={() => {
-                                            filterData(null, item, allClippings);
-                                        }}
-                                    >
-                                        <ListItemButton
-                                            style={{ paddingLeft: 10, paddingRight: 10 }}
-                                            selected={item === selectedSecondLevel}
-                                        >
-                                            <ListItemText primary={`${index + 1}. ${item}`} />
-                                        </ListItemButton>
-                                    </ListItem>
+                            <ListItem
+                                style={{ padding: 0 }}
+                                onClick={() => {
+                                    filterData(null, item, allClippings);
+                                }}
+                            >
+                                <ListItemButton
+                                    style={{ paddingLeft: 10, paddingRight: 10 }}
+                                    selected={item === selectedSecondLevel}
+                                >
+                                    <ListItemText primary={`${index + 1}. ${item}`} />
+                                </ListItemButton>
+                            </ListItem>
                         ))}
                     </List>
                 </Grid>

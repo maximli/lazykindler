@@ -5,7 +5,7 @@ import os
 from flask import jsonify
 import hashlib
 
-from ..service.collection import update_book_collection
+from ..service.collection import update_coll
 
 from ..database.sqlite import db
 from ..core.kindle.meta.metadata import get_metadata
@@ -110,17 +110,17 @@ def delete_book(uuid):
     db.run_sql("delete from cover where uuid='{}'".format(uuid))
     db.run_sql("delete from tmp_book where uuid='{}'".format(uuid))
 
-    book_collections = db.query(
-        "select uuid, book_uuids from book_collection where book_uuids like '%{}%'".format(uuid))
-    for book_collection in book_collections:
-        book_uuids = book_collection['book_uuids'].split(';')
-        book_uuids.remove(uuid)
-        if book_uuids is None or len(book_uuids) == 0:
+    colls = db.query(
+        "select uuid, item_uuids from coll where item_uuids like '%{}%'".format(uuid))
+    for coll in colls:
+        item_uuids = coll['item_uuids'].split(';')
+        item_uuids.remove(uuid)
+        if item_uuids is None or len(item_uuids) == 0:
             db.run_sql_with_params(
-                "update book_collection set book_uuids=? where uuid=?", (None, book_collection['uuid']))
+                "update coll set item_uuids=? where uuid=?", (None, coll['uuid']))
         else:
-            update_book_collection(';'.join(book_uuids),
-                                   book_collection['uuid'])
+            update_coll(';'.join(item_uuids),
+                                   coll['uuid'])
     return "success"
 
 
@@ -145,35 +145,35 @@ def update_book_meta(uuid, key, value):
         # 处理删掉的集合，从集合中删掉书籍
         for coll_uuid in difference(old_coll_uuids, new_coll_uuids):
             coll_info = db.query(
-                "select book_uuids from book_collection where uuid='{}';".format(coll_uuid))[0]
-            coll_book_uuids = []
-            if coll_info["book_uuids"] is not None:
-                l = coll_info["book_uuids"].split(";")
+                "select item_uuids from coll where uuid='{}';".format(coll_uuid))[0]
+            coll_item_uuids = []
+            if coll_info["item_uuids"] is not None:
+                l = coll_info["item_uuids"].split(";")
                 l.remove(uuid)
                 if l is not None and len(l) > 0:
-                    coll_book_uuids = l
-            if len(coll_book_uuids) == 0:
+                    coll_item_uuids = l
+            if len(coll_item_uuids) == 0:
                 db.run_sql_with_params(
-                    "update book_collection set book_uuids=? where uuid=?", (None, coll_uuid))
+                    "update coll set item_uuids=? where uuid=?", (None, coll_uuid))
             else:
-                db.run_sql("update book_collection set book_uuids='{}' where uuid='{}'".format(
-                    ";".join(coll_book_uuids), coll_uuid))
+                db.run_sql("update coll set item_uuids='{}' where uuid='{}'".format(
+                    ";".join(coll_item_uuids), coll_uuid))
 
         # 处理新增书籍的集合
         for coll_uuid in difference(new_coll_uuids, old_coll_uuids):
             coll_info = db.query(
-                "select book_uuids from book_collection where uuid='{}';".format(coll_uuid))[0]
-            coll_book_uuids = []
-            if coll_info["book_uuids"] is not None:
-                l = coll_info["book_uuids"].split(";")
-                coll_book_uuids = l.append(uuid)
-                coll_book_uuids = l
+                "select item_uuids from coll where uuid='{}';".format(coll_uuid))[0]
+            coll_item_uuids = []
+            if coll_info["item_uuids"] is not None:
+                l = coll_info["item_uuids"].split(";")
+                coll_item_uuids = l.append(uuid)
+                coll_item_uuids = l
             else:
-                coll_book_uuids.append(uuid)
-            db.run_sql("update book_collection set book_uuids='{}' where uuid='{}'".format(
-                ";".join(coll_book_uuids), coll_uuid))
+                coll_item_uuids.append(uuid)
+            db.run_sql("update coll set item_uuids='{}' where uuid='{}'".format(
+                ";".join(coll_item_uuids), coll_uuid))
 
-    if value is None or value is "":
+    if value is None or value == "":
         db.run_sql_with_params(
             "update book_meta set {}=? where uuid=?".format(key), (None, uuid))
         return "success"

@@ -8,21 +8,23 @@ def create_collection():
     content = request.json
     name = content['name']
 
-    book_collection = db.query(
-        "select uuid from book_collection where name='{}'".format(name))
-    if len(book_collection) > 0:
+    coll = db.query(
+        "select uuid from coll where name='{}'".format(name))
+    if len(coll) > 0:
         return "success"
+
+    coll_type = content['coll_type']
 
     description = None
     if 'description' in content:
         value = content['description']
-        if value is not None and value is not "":
+        if value is not None and value != "":
             description = value
 
     subjects = None
     if 'subjects' in content:
         value = content['subjects']
-        if value is not None and value is not "":
+        if value is not None and value != "":
             subjects = value
 
     stars = 0
@@ -32,16 +34,17 @@ def create_collection():
     cover = None
     if 'cover' in content:
         value = content['cover']
-        if value is not None and value is not "":
+        if value is not None and value != "":
             cover = value
 
     collection.create_collection(
-        name, description, subjects, stars, cover)
+        name, coll_type, description, subjects, stars, cover)
     return "success"
 
 
 def get_all_collections():
-    return collection.get_all_collections()
+    coll_type = request.args.get('coll_type')
+    return collection.get_all_collections(coll_type)
 
 
 def get_multiple_collections():
@@ -49,17 +52,17 @@ def get_multiple_collections():
     return collection.get_multiple_collections(uuids.split(';'))
 
 
-def delete_book_collection_without_books():
+def delete_coll_without_items():
     uuid = request.args.get('uuid')
-    return collection.delete_book_collections_without_books(uuid)
+    return collection.delete_colls_without_items(uuid)
 
 
-def delete_book_collection_with_books():
+def delete_coll_with_items():
     uuid = request.args.get('uuid')
-    return collection.delete_book_collections_with_books(uuid)
+    return collection.delete_colls_with_items(uuid)
 
 
-def update_book_collection():
+def update_coll():
     content = request.json
     uuid = content['uuid']
     key = content['key']
@@ -67,7 +70,7 @@ def update_book_collection():
     return collection.update_collection(uuid, key, value)
 
 
-def delete_book_collection_by_keyword():
+def delete_coll_by_keyword():
     keyword = request.args.get('keyword')
     value = request.args.get('value')
     return collection.delete_colls_by_keyword(keyword, value)

@@ -9,7 +9,7 @@ CREATE TABLE book_meta (
 	stars               INTEGER,      -- 评分。满分10分
     size                INTEGER,      -- 图书大小
     publisher           TEXT,         -- 出版商
-	coll_uuids          TEXT,         -- book_collections uuids列表，分号相隔
+	coll_uuids          TEXT,         -- colls uuids列表，分号相隔
 	done_dates          TEXT,         -- 读完日期
 	md5                 TEXT,         -- md5
 	create_time         TEXT          -- 创建时间
@@ -43,13 +43,14 @@ CREATE TABLE tmp_book (
     create_time         TEXT
 );
 
--- 书籍集合
-CREATE TABLE book_collection (
+-- 集合
+CREATE TABLE coll (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
     uuid                TEXT,
 	name                TEXT,           -- 集合名
-    description         TEXT,           -- 描述
-    book_uuids          TEXT,           -- book uuid集合
+	coll_type           TEXT,           -- 类型，取值 book clipping
+	description         TEXT,           -- 描述
+    item_uuids          TEXT,           -- item uuid集合
 	subjects            TEXT,           -- 标签
 	stars               INTEGER,        -- 评分。满分10分
     create_time         TEXT

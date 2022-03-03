@@ -8,7 +8,7 @@
       {
         name: '集合',
         icon: 'smile',
-        path: '/book_list/book_collections',
+        path: '/book_list/colls',
         component: './book_list/book_collections',
       },
       {

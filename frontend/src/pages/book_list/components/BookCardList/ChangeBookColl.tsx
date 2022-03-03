@@ -13,8 +13,8 @@ import MenuItem from '@mui/material/MenuItem';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Select from '@mui/material/Select';
 import { useEffect, useState } from 'react';
-
 import { BookCollectionDataType } from '../../book_collections/data';
+
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -28,14 +28,14 @@ const MenuProps = {
 };
 
 type ChangeBookCollProps = {
-    book_uuid: string;
+    item_uuid: string;
     open: boolean;
     handleClose: any;
     fetchBooks: any;
 };
 
 export default function ChangeBookColl(props: ChangeBookCollProps) {
-    const { book_uuid, open, handleClose, fetchBooks } = props;
+    const { item_uuid, open, handleClose, fetchBooks } = props;
 
     const [allColls, setAllColls] = useState<BookCollectionDataType[]>([]);
     const [selectedBookUUIDs, setSelectedBookUUIDs] = useState<any>([]);
@@ -48,16 +48,16 @@ export default function ChangeBookColl(props: ChangeBookCollProps) {
     };
 
     useEffect(() => {
-        if (book_uuid == null || book_uuid == '') {
+        if (item_uuid == null || item_uuid == '') {
             return;
         }
-        getBooksMetaByUUIDs(book_uuid).then((l: BookMetaDataType[]) => {
+        getBooksMetaByUUIDs(item_uuid).then((l: BookMetaDataType[]) => {
             const coll_uuids = l[0].coll_uuids;
             if (coll_uuids != null) {
                 setSelectedBookUUIDs(coll_uuids.split(';'));
             }
         });
-        getAllCollections().then((data: BookCollectionDataType[]) => {
+        getAllCollections("book").then((data: BookCollectionDataType[]) => {
             setAllColls(data);
         });
     }, []);
@@ -103,7 +103,7 @@ export default function ChangeBookColl(props: ChangeBookCollProps) {
                         onClick={() => {
                             handleClose();
                             updateBookMeta(
-                                book_uuid,
+                                item_uuid,
                                 'coll_uuids',
                                 selectedBookUUIDs.join(';'),
                             ).then(() => {

@@ -8,7 +8,7 @@ import time
 
 from ..service.clippings import ClippingHelper
 
-from ..routes import books, collection, clippings, clippings_collection
+from ..routes import books, collection, clippings
 
 
 # flask application initialization
@@ -36,11 +36,9 @@ app.add_url_rule('/api/book/delete/bykeyword', view_func=books.delete_book_by_ke
 app.add_url_rule('/api/collection/create', view_func=collection.create_collection, methods=['POST'])
 app.add_url_rule('/api/collection/get/all', view_func=collection.get_all_collections, methods=['GET'])
 app.add_url_rule('/api/collection/get/multiple', view_func=collection.get_multiple_collections, methods=['GET'])
-app.add_url_rule('/api/collection/delete/withoutbooks', view_func=collection.delete_book_collection_without_books, methods=['DELETE'])
-app.add_url_rule('/api/collection/delete/withbooks', view_func=collection.delete_book_collection_with_books, methods=['DELETE'])
-app.add_url_rule('/api/collection/delete/bykeyword', view_func=collection.delete_book_collection_by_keyword, methods=['DELETE'])
-app.add_url_rule('/api/collection/update', view_func=collection.update_book_collection, methods=['POST'])
+app.add_url_rule('/api/collection/delete/withoutitems', view_func=collection.delete_coll_without_items, methods=['DELETE'])
+app.add_url_rule('/api/collection/delete/withitems', view_func=collection.delete_coll_with_items, methods=['DELETE'])
+app.add_url_rule('/api/collection/delete/bykeyword', view_func=collection.delete_coll_by_keyword, methods=['DELETE'])
+app.add_url_rule('/api/collection/update', view_func=collection.update_coll, methods=['POST'])
 
 app.add_url_rule('/api/clippings/get/all', view_func=clippings.get_all_clippings, methods=['GET'])
-
-app.add_url_rule('/api/clippings_collection/get/multiple', view_func=clippings_collection.get_multiple_clippings_collections, methods=['GET'])

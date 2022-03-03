@@ -73,7 +73,7 @@ export default function BookCollections() {
     };
 
     const fetchBookCollections = () => {
-        getAllCollections().then((data: BookCollectionDataType[]) => {
+        getAllCollections("book").then((data: BookCollectionDataType[]) => {
             if (data == null) {
                 data = [];
             }
@@ -159,7 +159,7 @@ export default function BookCollections() {
         stars = Number(stars.trim());
         cover = cover.trim();
 
-        createBookCollection(name, description, preHandleSubjects(subjects), stars, cover).then(
+        createBookCollection(name, "book", description, preHandleSubjects(subjects), stars, cover).then(
             () => {
                 fetchBookCollections();
             },

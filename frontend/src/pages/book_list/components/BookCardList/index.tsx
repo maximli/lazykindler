@@ -45,7 +45,7 @@ export default function BookCardList(props: BookCardListProps) {
 
     const [dialogInfo, setDialogInfo] = useState<any>(initialDialogInfo);
     const [changeBookCollInfo, setChangeBookCollInfo] = useState<any>({
-        book_uuid: '',
+        item_uuid: '',
         open: false,
     });
     const [openDeleteBook, setOpenDeleteBook] = useState(false);
@@ -149,7 +149,7 @@ export default function BookCardList(props: BookCardListProps) {
                                                 onClick={() => {
                                                     setUUID(uuidv4());
                                                     setChangeBookCollInfo({
-                                                        book_uuid: item.uuid,
+                                                        item_uuid: item.uuid,
                                                         open: true,
                                                     });
                                                 }}
@@ -375,12 +375,12 @@ export default function BookCardList(props: BookCardListProps) {
 
             <ChangeBookColl
                 key={uuid}
-                book_uuid={changeBookCollInfo['book_uuid']}
+                item_uuid={changeBookCollInfo['item_uuid']}
                 open={changeBookCollInfo['open']}
                 fetchBooks={fetchBooks}
                 handleClose={() => {
                     setChangeBookCollInfo({
-                        book_uuid: '',
+                        item_uuid: '',
                         open: false,
                     });
                 }}

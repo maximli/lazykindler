@@ -56,11 +56,11 @@ export default function CollectionBooks(props: CollectionBooksProps) {
             let coll_info = collectionInfo[0];
             setCollectionInfo(coll_info);
 
-            let book_uuids = coll_info.book_uuids;
-            if (book_uuids == null) {
+            let item_uuids = coll_info.item_uuids;
+            if (item_uuids == null) {
                 return;
             }
-            getBooksMetaByUUIDs(book_uuids).then((data) => {
+            getBooksMetaByUUIDs(item_uuids).then((data) => {
                 let bookCollsInfo = {};
                 let coll_uuids: any = [];
 

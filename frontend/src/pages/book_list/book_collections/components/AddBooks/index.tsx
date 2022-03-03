@@ -88,9 +88,9 @@ export default function AddBooks(props: AddBooksProps) {
         }
         getMultipleCollections([collection_uuid]).then((collectionInfo: CollectionDataType[]) => {
             setCollInfo(collectionInfo[0]);
-            let book_uuids = collectionInfo[0].book_uuids;
-            if (book_uuids != null) {
-                setSelectedRowKeys(book_uuids.split(';'));
+            let item_uuids = collectionInfo[0].item_uuids;
+            if (item_uuids != null) {
+                setSelectedRowKeys(item_uuids.split(';'));
             }
         });
         getBooksMeta(book_type).then((data) => {
@@ -107,12 +107,12 @@ export default function AddBooks(props: AddBooksProps) {
         onChange: (keys: any) => {
             if (book_type === 'tmp') {
                 if (keys.length == 0) {
-                    setSelectedRowKeys(collInfo.book_uuids.split(';'));
+                    setSelectedRowKeys(collInfo.item_uuids.split(';'));
                 } else {
                     let l = keys;
-                    if (collInfo.book_uuids != null) {
+                    if (collInfo.item_uuids != null) {
                         // 如果是从临时书籍中添加，那就默为往集合中增加书籍，而不是覆盖
-                        l = _.uniq(collInfo.book_uuids.split(';').concat(keys));
+                        l = _.uniq(collInfo.item_uuids.split(';').concat(keys));
                     }
                     setSelectedRowKeys(l);
                 }
@@ -129,7 +129,7 @@ export default function AddBooks(props: AddBooksProps) {
 
     const handleOnOk = () => {
         handleClose();
-        updateBookCollection(collection_uuid, 'book_uuids', selectedRowKeys.join(';')).then(() => {
+        updateBookCollection(collection_uuid, 'item_uuids', selectedRowKeys.join(';')).then(() => {
             fetchAllBooks();
         });
     };

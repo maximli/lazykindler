@@ -30,7 +30,7 @@ export interface CollectionDataType {
     uuid: string;
     name: string;
     description: string;
-    book_uuids: string;
+    item_uuids: string;
     subjects: string;
     stars: number;
     create_time: string;
