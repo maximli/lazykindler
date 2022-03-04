@@ -434,8 +434,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                     (item.name != null && item.name.includes(keyword)) ||
                     (item.author != null && item.author.includes(keyword)) ||
                     (item.publisher != null && item.publisher.includes(keyword)) ||
-                    (item.subjects != null && item.subjects.includes(keyword)) ||
-                    (item.coll_uuids != null && item.coll_uuids.includes(keyword))
+                    (item.subjects != null && item.subjects.includes(keyword))
                 ) {
                     return true;
                 }
@@ -448,7 +447,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
         <div>
             <div>
                 <RedditTextField
-                    label="搜索 书名、作者、出版社、标签、集合"
+                    label="搜索 书名、作者、出版社、标签"
                     id="reddit-input"
                     variant="filled"
                     style={{

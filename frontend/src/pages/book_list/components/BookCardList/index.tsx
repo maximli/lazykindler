@@ -276,7 +276,7 @@ export default function BookCardList(props: BookCardListProps) {
                                                 >
                                                     {item.coll_names == 'None' ||
                                                     item.coll_names == null
-                                                        ? '无集合'
+                                                        ? ''
                                                         : item.coll_names}
                                                 </Typography>
                                             </Box>
@@ -292,7 +292,7 @@ export default function BookCardList(props: BookCardListProps) {
                                                     style={{ paddingTop: 1.2, paddingLeft: 15 }}
                                                 >
                                                     {item.subjects == null
-                                                        ? '无标签'
+                                                        ? ''
                                                         : item.subjects}
                                                 </Typography>
                                             </Box>
@@ -307,7 +307,7 @@ export default function BookCardList(props: BookCardListProps) {
                                                     variant="body2"
                                                     style={{ paddingTop: 1.2, paddingLeft: 15 }}
                                                 >
-                                                    {item.author == null ? '无作者' : item.author}
+                                                    {item.author == null ? '' : item.author}
                                                 </Typography>
                                             </Box>
 
@@ -322,7 +322,7 @@ export default function BookCardList(props: BookCardListProps) {
                                                     style={{ paddingTop: 1.2, paddingLeft: 15 }}
                                                 >
                                                     {item.publisher == null
-                                                        ? '无出版社'
+                                                        ? ''
                                                         : item.publisher}
                                                 </Typography>
                                             </Box>

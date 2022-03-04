@@ -28,6 +28,8 @@ const { SubMenu } = Menu;
 type ClippingCardListProps = {
     data: any;
     fetchClippings: any;
+    height: Number;
+    columns: number;
 };
 
 const initialDialogInfo = {
@@ -38,7 +40,7 @@ const initialDialogInfo = {
 };
 
 const ClippingCardList = (props: ClippingCardListProps) => {
-    const { data, fetchClippings } = props;
+    const { data, fetchClippings, height, columns } = props;
 
     const [dialogInfo, setDialogInfo] = useState<any>(initialDialogInfo);
     const [changeClippingCollInfo, setChangeClippingCollInfo] = useState<any>({
@@ -76,8 +78,8 @@ const ClippingCardList = (props: ClippingCardListProps) => {
     return (
         <div>
             <GridContent>
-                <Box sx={{ overflowY: 'scroll' }} style={{ height: '83vh' }}>
-                    <ImageList variant="masonry" cols={4} gap={15}>
+                <Box sx={{ overflowY: 'scroll' }} style={{ height: `${height}vh` }}>
+                    <ImageList variant="masonry" cols={columns} gap={15}>
                         {data
                             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             .map((item: ClippingDataType) => (
@@ -198,6 +200,11 @@ const ClippingCardList = (props: ClippingCardListProps) => {
                                                             .unix(~~item.addDate)
                                                             .format('yyyy-MM-DD HH:mm:ss')}
                                                     </span>
+                                                    <br />
+                                                    标签:{' '}
+                                                    <span style={{ paddingLeft: 30 }}>
+                                                        {item.subjects}
+                                                    </span>
                                                 </div>
                                             }
                                         />
@@ -255,7 +262,7 @@ const ClippingCardList = (props: ClippingCardListProps) => {
                     <DialogTitle id="alert-dialog-title">警告</DialogTitle>
                     <DialogContent>
                         <DialogContentText id="alert-dialog-description">
-                            确定删除这本书吗？
+                            确定删除摘抄吗？
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>

@@ -56,14 +56,7 @@ CREATE TABLE coll (
     create_time         TEXT
 );
 
--- Clippings文件的md5。后台服务启动后，会每隔短暂的时间判断 /Volumes/Kindle/documents/My\ Clippings.txt是否存在
--- 并且md5是否和表中所存一致，如果不一致说明有新增，自动把kindle笔记导入数据库
-CREATE TABLE clippings_md5 (
-	id INTEGER PRIMARY KEY AUTOINCREMENT,
-    md5                 TEXT
-);
-
--- 存放剪切文字
+-- 存放clipping
 CREATE TABLE clipping (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	uuid                TEXT,

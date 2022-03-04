@@ -13,8 +13,8 @@ from ..service.collection import update_coll
 from ..util.util import difference, generate_uuid, get_md5
 from ..database.sqlite import db
 
-#clipping_path = u'/Volumes/Kindle/documents/My Clippings.txt'
-clipping_path = u'/Users/wp/Downloads/My Clippings.txt'
+clipping_path = u'/Volumes/Kindle/documents/My Clippings.txt'
+# clipping_path = u'/Users/wp/Downloads/My Clippings.txt'
 
 class ClippingHelper(object):
     def __init__(self):
@@ -25,16 +25,6 @@ class ClippingHelper(object):
         if not exists:
             return
         
-        file_md5 = get_md5(clipping_path)
-        clippings_md5s = db.query("select md5 from clippings_md5")
-        if clippings_md5s is not None and len(clippings_md5s) > 0:
-            if clippings_md5s[0]['md5'] == file_md5:
-                return
-            else:
-                update_clippings_md5(file_md5)
-        else:
-            db.insert_clippings_md5(file_md5)
-
         file = open(clipping_path, 'r')
         lines = file.readlines()
 
@@ -80,11 +70,6 @@ class ClippingHelper(object):
         index = time_info.find(',')
         str = time_info[index+1:].strip()
         return time.mktime(datetime.datetime.strptime(str, '%d %B %Y %H:%M:%S').timetuple())
-
-
-def update_clippings_md5(new_md5):
-    db.run_sql("update clippings_md5 set md5='{}'".format(
-        new_md5))
 
 
 def get_all_clippings():
@@ -165,11 +150,16 @@ def update_clipping(uuid, key, value):
             db.run_sql("update coll set item_uuids='{}' where uuid='{}'".format(
                 ";".join(coll_item_uuids), coll_uuid))
 
-    if value is None or value == "":
-        db.run_sql_with_params(
-            "update clipping set {}=? where uuid=?".format(key), (None, uuid))
-        return "success"
+    if key == 'author':
+        clipping = db.query(
+            "select author from clipping where uuid='{}'".format(uuid))[0]
+        db.run_sql("update clipping set author='{}' where author='{}'".format(value, clipping['author']))
     else:
-        db.run_sql("update clipping set '{}'='{}' where uuid='{}'".format(
-            key, value, uuid))
+        if value is None or value == "":
+            db.run_sql_with_params(
+                "update clipping set {}=? where uuid=?".format(key), (None, uuid))
+            return "success"
+        else:
+            db.run_sql("update clipping set '{}'='{}' where uuid='{}'".format(
+                key, value, uuid))
     return "success"

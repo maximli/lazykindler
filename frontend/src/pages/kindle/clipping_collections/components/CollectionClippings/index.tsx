@@ -134,7 +134,7 @@ export default function CollectionClippings(props: CollectionClippingsProps) {
                         }}
                         onChange={onSearchChange}
                     />
-                    <ClippingCardList data={data} fetchClippings={fetchClipping} />
+                    <ClippingCardList data={data} fetchClippings={fetchClipping} height={60} columns={3} />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>关闭</Button>

@@ -429,7 +429,6 @@ const Clippings: FC = () => {
                     (item.book_name != null && item.book_name.includes(keyword)) ||
                     (item.author != null && item.author.includes(keyword)) ||
                     (item.subjects != null && item.subjects.includes(keyword)) ||
-                    (item.coll_uuids != null && item.coll_uuids.includes(keyword)) ||
                     (item.content != null && item.content.includes(keyword))
                 ) {
                     return true;
@@ -443,7 +442,7 @@ const Clippings: FC = () => {
         <div>
             <div>
                 <RedditTextField
-                    label="搜索 书名、作者、摘抄、标签、集合"
+                    label="搜索 书名、作者、摘抄、标签"
                     id="reddit-input"
                     variant="filled"
                     style={{
@@ -496,7 +495,7 @@ const Clippings: FC = () => {
                         paddingLeft: 5,
                     }}
                 >
-                    <ClippingCardList data={data} fetchClippings={fetchClippings} />
+                    <ClippingCardList data={data} fetchClippings={fetchClippings} height={83} columns={3} />
                 </Grid>
             </Grid>
         </div>

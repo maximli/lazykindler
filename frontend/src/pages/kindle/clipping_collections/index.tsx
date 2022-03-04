@@ -30,7 +30,7 @@ import { useEffect, useState } from 'react';
 import Dropzone from 'react-dropzone';
 
 import ContextMenu from '../../book_list/components/ContextMenu';
-import ClippingCardList from './components/CollectionList';
+import CollectionList from './components/CollectionList';
 
 enum FilterType {
     All = '未分类',
@@ -337,7 +337,7 @@ export default function BookCollections() {
                         }}
                     >
                         <div style={{ width: width - 530 }}>
-                            <ClippingCardList data={data} fetchClippingCollections={fetchClippingCollections} />
+                            <CollectionList data={data} fetchClippingCollections={fetchClippingCollections} />
                         </div>
                     </Grid>
                 </Grid>

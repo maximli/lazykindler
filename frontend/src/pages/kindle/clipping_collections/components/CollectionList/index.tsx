@@ -5,8 +5,7 @@ import {
     updateCollection,
 } from '@/services';
 import { preHandleSubjects } from '@/util';
-import { SettingOutlined } from '@ant-design/icons';
-import ArchiveIcon from '@mui/icons-material/Archive';
+import { SettingOutlined, TagOutlined } from '@ant-design/icons';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import StarIcon from '@mui/icons-material/Star';
 import Box from '@mui/material/Box';
@@ -29,7 +28,7 @@ import CollectionClippings from '../CollectionClippings';
 
 const { SubMenu } = Menu;
 
-type ClippingCardListProps = {
+type ClippingListProps = {
     data: any;
     fetchClippingCollections: any;
 };
@@ -51,7 +50,7 @@ const intOpenDialogInfo: OpenDialogType = {
     collection_uuid: null,
 };
 
-export default function CollectionList(props: ClippingCardListProps) {
+export default function CollectionList(props: ClippingListProps) {
     const { data, fetchClippingCollections } = props;
     const [uuid1, setUUID1] = useState<any>(uuidv4());
     const [dialogInfo, setDialogInfo] = useState<any>(initialDialogInfo);
@@ -232,7 +231,7 @@ export default function CollectionList(props: ClippingCardListProps) {
                                             alignItems="center"
                                             style={{ marginBottom: 10 }}
                                         >
-                                            <ArchiveIcon style={{ height: 16 }} />
+                                            <TagOutlined style={{ height: 16, paddingLeft: 4.5 }} />
                                             <Typography
                                                 variant="body2"
                                                 style={{ paddingTop: 1.2, paddingLeft: 15 }}
