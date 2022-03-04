@@ -31,6 +31,7 @@
     icon: 'FireOutlined',
     routes: [
       { path: '/kindle/clippings', name: '摘抄', icon: 'smile', component: './kindle/clippings' },
+      { path: '/kindle/colls', name: '集合', icon: 'smile', component: './kindle/clipping_collections' },
       { component: './404' },
     ],
   },

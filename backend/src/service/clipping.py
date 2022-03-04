@@ -1,0 +1,175 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from os import path
+import time
+import numpy as np
+import datetime
+import hashlib
+from flask import jsonify
+
+from ..service.collection import update_coll
+
+from ..util.util import difference, generate_uuid, get_md5
+from ..database.sqlite import db
+
+#clipping_path = u'/Volumes/Kindle/documents/My Clippings.txt'
+clipping_path = u'/Users/wp/Downloads/My Clippings.txt'
+
+class ClippingHelper(object):
+    def __init__(self):
+        pass
+
+    def import_clippings(self):
+        exists = path.exists(clipping_path)
+        if not exists:
+            return
+        
+        file_md5 = get_md5(clipping_path)
+        clippings_md5s = db.query("select md5 from clippings_md5")
+        if clippings_md5s is not None and len(clippings_md5s) > 0:
+            if clippings_md5s[0]['md5'] == file_md5:
+                return
+            else:
+                update_clippings_md5(file_md5)
+        else:
+            db.insert_clippings_md5(file_md5)
+
+        file = open(clipping_path, 'r')
+        lines = file.readlines()
+
+        allLines = []
+        for line in lines:
+            line = line.strip()
+            allLines.append(line)
+
+        arr = np.array(allLines)
+        clippings = np.array_split(arr, len(allLines) / 5)
+
+        for clip in clippings:
+            self.handle_single_clipping(clip[0], clip[1], clip[3])
+        
+
+    def handle_single_clipping(self, title, time_info, clip_content):
+        book_name = self.extract_book_name(title)
+        author = self.extract_author(title)
+        timestamp = self.extract_time(time_info) 
+
+        str_md5 = hashlib.md5(clip_content.encode('utf-8')).hexdigest()
+
+        clips = db.query("select uuid from clipping where md5='{}';".format(str_md5))
+        if clips is not None and len(clips) > 0:
+            return
+        
+        db.insert_clipping(generate_uuid(), book_name, author, clip_content, timestamp, str_md5)
+
+
+    def extract_book_name(self, title):
+        index = title.find('(')
+        if title.find('（') >= 0:
+            index = title.find('（')
+        book_name = title[:index].strip()
+        return book_name
+
+
+    def extract_author(self, title):
+        return title[title.rfind("(")+1:title.rfind(")")]
+
+
+    def extract_time(self, time_info):
+        index = time_info.find(',')
+        str = time_info[index+1:].strip()
+        return time.mktime(datetime.datetime.strptime(str, '%d %B %Y %H:%M:%S').timetuple())
+
+
+def update_clippings_md5(new_md5):
+    db.run_sql("update clippings_md5 set md5='{}'".format(
+        new_md5))
+
+
+def get_all_clippings():
+    data = db.query("select * from clipping;")
+    return jsonify(data)
+
+
+def get_clipping_by_uuids(uuids):
+    result = []
+    for uuid in uuids:
+        clipping_list = db.query(
+            "select * from clipping where uuid='{}'".format(uuid))
+        result = result + clipping_list
+    return jsonify(result)
+
+
+def delete_clipping(uuid):
+    db.run_sql("delete from clipping where uuid='{}'".format(uuid))
+
+    colls = db.query(
+        "select uuid, item_uuids from coll where item_uuids like '%{}%'".format(uuid))
+    for coll in colls:
+        item_uuids = coll['item_uuids'].split(';')
+        item_uuids.remove(uuid)
+        if item_uuids is None or len(item_uuids) == 0:
+            db.run_sql_with_params(
+                "update coll set item_uuids=? where uuid=?", (None, coll['uuid']))
+        else:
+            update_coll(';'.join(item_uuids),
+                                   coll['uuid'])
+    return "success"
+
+
+def update_clipping(uuid, key, value):
+    value = value.strip()
+
+    if key == "coll_uuids":
+        clipping = db.query(
+            "select coll_uuids from clipping where uuid='{}';".format(uuid))[0]
+        old_coll_uuids = []
+        if clipping["coll_uuids"] is not None:
+            old_coll_uuids = clipping["coll_uuids"].split(";")
+
+        new_coll_uuids = []
+        if value is not None:
+            new_coll_uuids = value.split(";")
+            if "" in new_coll_uuids:
+                new_coll_uuids.remove("")
+
+        # 处理删掉的集合，从集合中删掉摘抄
+        for coll_uuid in difference(old_coll_uuids, new_coll_uuids):
+            coll_info = db.query(
+                "select item_uuids from coll where uuid='{}';".format(coll_uuid))[0]
+            coll_item_uuids = []
+            if coll_info["item_uuids"] is not None:
+                l = coll_info["item_uuids"].split(";")
+                l.remove(uuid)
+                if l is not None and len(l) > 0:
+                    coll_item_uuids = l
+            if len(coll_item_uuids) == 0:
+                db.run_sql_with_params(
+                    "update coll set item_uuids=? where uuid=?", (None, coll_uuid))
+            else:
+                db.run_sql("update coll set item_uuids='{}' where uuid='{}'".format(
+                    ";".join(coll_item_uuids), coll_uuid))
+
+        # 处理新增摘抄的集合
+        for coll_uuid in difference(new_coll_uuids, old_coll_uuids):
+            coll_info = db.query(
+                "select item_uuids from coll where uuid='{}';".format(coll_uuid))[0]
+            coll_item_uuids = []
+            if coll_info["item_uuids"] is not None:
+                l = coll_info["item_uuids"].split(";")
+                coll_item_uuids = l.append(uuid)
+                coll_item_uuids = l
+            else:
+                coll_item_uuids.append(uuid)
+            db.run_sql("update coll set item_uuids='{}' where uuid='{}'".format(
+                ";".join(coll_item_uuids), coll_uuid))
+
+    if value is None or value == "":
+        db.run_sql_with_params(
+            "update clipping set {}=? where uuid=?".format(key), (None, uuid))
+        return "success"
+    else:
+        db.run_sql("update clipping set '{}'='{}' where uuid='{}'".format(
+            key, value, uuid))
+    return "success"

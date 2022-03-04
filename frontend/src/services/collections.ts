@@ -34,7 +34,7 @@ export const createBookCollection = (
 };
 
 // 更新集合信息
-export const updateBookCollection = (uuid: string, key: string, value: string) => {
+export const updateCollection = (uuid: string, key: string, value: string) => {
     return axiosInstance.post(`/api/collection/update`, {
         uuid,
         key,
@@ -43,7 +43,7 @@ export const updateBookCollection = (uuid: string, key: string, value: string) =
 };
 
 // 删除集合 (保留集合中的条目)
-export const deleteBookCollectionWithoutBooks = (uuid: string) => {
+export const deleteCollectionWithoutBooks = (uuid: string) => {
     return axiosInstance
         .delete(`/api/collection/delete/withoutitems?uuid=${uuid}`)
         .then((data: any) => {
@@ -53,7 +53,7 @@ export const deleteBookCollectionWithoutBooks = (uuid: string) => {
 
 
 // 删除集合 (不保留集合中的条目)
-export const deleteBookCollectionWithBooks = (uuid: string) => {
+export const deleteCollectionWithBooks = (uuid: string) => {
     return axiosInstance
         .delete(`/api/collection/delete/withitems?uuid=${uuid}`)
         .then((data: any) => {
@@ -62,7 +62,7 @@ export const deleteBookCollectionWithBooks = (uuid: string) => {
 };
 
 // 根据关键词删除集合 (不保留集合中的条目)
-export const deleteBookCollectionByKeyword = (keyword: string, value: string) => {
+export const deleteCollectionByKeyword = (keyword: string, value: string) => {
     return axiosInstance.delete(`/api/collection/delete/bykeyword?keyword=${keyword}&value=${value}`).then((data: any) => {
         return data.data;
     });

@@ -1,5 +1,5 @@
 import { BookMetaDataType, CollectionDataType } from '@/pages/data';
-import { getBooksMeta, getMultipleCollections, updateBookCollection } from '@/services';
+import { getBooksMeta, getMultipleCollections, updateCollection } from '@/services';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -129,7 +129,7 @@ export default function AddBooks(props: AddBooksProps) {
 
     const handleOnOk = () => {
         handleClose();
-        updateBookCollection(collection_uuid, 'item_uuids', selectedRowKeys.join(';')).then(() => {
+        updateCollection(collection_uuid, 'item_uuids', selectedRowKeys.join(';')).then(() => {
             fetchAllBooks();
         });
     };

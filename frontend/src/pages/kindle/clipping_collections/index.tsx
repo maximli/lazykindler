@@ -1,3 +1,4 @@
+import { CollectionDataType } from '@/pages/data';
 import { createBookCollection, deleteCollectionByKeyword, getAllCollections } from '@/services';
 import { preHandleSubjects, toBase64, useWindowDimensions } from '@/util';
 import { DatabaseOutlined, DownOutlined, StarOutlined, TagsOutlined } from '@ant-design/icons';
@@ -28,9 +29,8 @@ import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import Dropzone from 'react-dropzone';
 
-import ContextMenu from '../components/ContextMenu';
-import BookCardList from './components/CollectionList';
-import { CollectionDataType } from './data';
+import ContextMenu from '../../book_list/components/ContextMenu';
+import ClippingCardList from './components/CollectionList';
 
 enum FilterType {
     All = '未分类',
@@ -53,7 +53,7 @@ export default function BookCollections() {
     // 选择的大的分类下面的列表的小条目
     const [selectedItemName, setSelectedItemName] = useState<any>(null);
 
-    const [allBookCollections, setAllBookCollections] = useState<CollectionDataType[]>([]);
+    const [allClippingCollections, setAllClippingCollections] = useState<CollectionDataType[]>([]);
 
     const [classifiedInfo, setClassifiedInfo] = useState<SubHeaerType>({
         Stars: {},
@@ -72,12 +72,12 @@ export default function BookCollections() {
         setOpen(false);
     };
 
-    const fetchBookCollections = () => {
-        getAllCollections("book").then((data: CollectionDataType[]) => {
+    const fetchClippingCollections = () => {
+        getAllCollections("clipping").then((data: CollectionDataType[]) => {
             if (data == null) {
                 data = [];
             }
-            setAllBookCollections(data);
+            setAllClippingCollections(data);
             setData(data);
 
             const stars = {};
@@ -125,7 +125,7 @@ export default function BookCollections() {
     };
 
     useEffect(() => {
-        fetchBookCollections();
+        fetchClippingCollections();
     }, []);
 
     const handleCreate = () => {
@@ -159,9 +159,9 @@ export default function BookCollections() {
         stars = Number(stars.trim());
         cover = cover.trim();
 
-        createBookCollection(name, "book", description, preHandleSubjects(subjects), stars, cover).then(
+        createBookCollection(name, "clipping", description, preHandleSubjects(subjects), stars, cover).then(
             () => {
-                fetchBookCollections();
+                fetchClippingCollections();
             },
         );
         return true;
@@ -178,7 +178,7 @@ export default function BookCollections() {
                             setSelectedType(FilterType.All);
                             setSelectedSubType([]);
 
-                            setData(allBookCollections);
+                            setData(allClippingCollections);
                         }}
                         style={{ paddingLeft: 13 }}
                     >
@@ -232,7 +232,7 @@ export default function BookCollections() {
                 if (o == null) {
                     o = {};
                 }
-                filteredBooks = _.filter(allBookCollections, (v: CollectionDataType) => {
+                filteredBooks = _.filter(allClippingCollections, (v: CollectionDataType) => {
                     if (v.uuid in o) {
                         return true;
                     }
@@ -245,7 +245,7 @@ export default function BookCollections() {
                 if (o == null) {
                     o = {};
                 }
-                filteredBooks = _.filter(allBookCollections, (v: CollectionDataType) => {
+                filteredBooks = _.filter(allClippingCollections, (v: CollectionDataType) => {
                     if (v.uuid in o) {
                         return true;
                     }
@@ -311,7 +311,7 @@ export default function BookCollections() {
                                                     selectedType,
                                                     selectedItemName,
                                                 ).then(() => {
-                                                    fetchBookCollections();
+                                                    fetchClippingCollections();
                                                 });
                                             },
                                             prefixIcon: <DeleteIcon />,
@@ -337,7 +337,7 @@ export default function BookCollections() {
                         }}
                     >
                         <div style={{ width: width - 530 }}>
-                            <BookCardList data={data} fetchBookCollections={fetchBookCollections} />
+                            <ClippingCardList data={data} fetchClippingCollections={fetchClippingCollections} />
                         </div>
                     </Grid>
                 </Grid>
@@ -351,7 +351,7 @@ export default function BookCollections() {
                 fullWidth
                 maxWidth="sm"
             >
-                <DialogTitle id="alert-dialog-title">{'创建书籍集合'}</DialogTitle>
+                <DialogTitle id="alert-dialog-title">{'创建摘抄集合'}</DialogTitle>
                 <DialogContent style={{ margin: '0 auto' }}>
                     <Box
                         sx={{

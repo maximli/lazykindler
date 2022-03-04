@@ -23,16 +23,15 @@ import _ from 'lodash';
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
-import ChangeInfo from '../../../components/ChangeInfoDialog';
-import Cover from '../../../components/Cover';
-import AddBooks from '../AddBooks';
-import CollectionBooks from '../CollectionBooks';
+import ChangeInfo from '../../../../book_list/components/ChangeInfoDialog';
+import Cover from '../../../../book_list/components/Cover';
+import CollectionClippings from '../CollectionClippings';
 
 const { SubMenu } = Menu;
 
-type BookCardListProps = {
+type ClippingCardListProps = {
     data: any;
-    fetchBookCollections: any;
+    fetchClippingCollections: any;
 };
 
 const initialDialogInfo = {
@@ -45,37 +44,33 @@ const initialDialogInfo = {
 interface OpenDialogType {
     open: boolean;
     collection_uuid: any;
-    book_type?: any; // 书籍类型。 tmp  noTmp
 }
 
 const intOpenDialogInfo: OpenDialogType = {
     open: false,
     collection_uuid: null,
-    book_type: null,
 };
 
-export default function BookCardList(props: BookCardListProps) {
-    const { data, fetchBookCollections } = props;
+export default function CollectionList(props: ClippingCardListProps) {
+    const { data, fetchClippingCollections } = props;
     const [uuid1, setUUID1] = useState<any>(uuidv4());
-    const [uuid2, setUUID2] = useState<any>(uuidv4());
     const [dialogInfo, setDialogInfo] = useState<any>(initialDialogInfo);
-    const [openDeleteBook, setOpenDeleteBook] = useState(false);
-    const [deleteBookInfo, setDeleteBookInfo] = useState<any>({});
-    const [addBooksInfo, setAddBooksInfo] = useState<OpenDialogType>(intOpenDialogInfo);
-    const [checkCollctionBooks, setCheckCollctionBooks] =
+    const [openDeleteClipping, setOpenDeleteClipping] = useState(false);
+    const [deleteClippingInfo, setDeleteClippingInfo] = useState<any>({});
+    const [checkCollctionClippings, setCheckCollctionClippings] =
         useState<OpenDialogType>(intOpenDialogInfo);
 
     // deleteType
     // 0 初始值
-    // 1 删除集合时不删除书籍
-    // 2 删除集合时删除书籍
+    // 1 删除集合时不删除摘抄
+    // 2 删除集合时删除摘抄
     const handleClickOpen = (uuid: string, deleteType: number) => {
-        setDeleteBookInfo({ uuid, deleteType });
-        setOpenDeleteBook(true);
+        setDeleteClippingInfo({ uuid, deleteType });
+        setOpenDeleteClipping(true);
     };
 
     const handleClose = () => {
-        setOpenDeleteBook(false);
+        setOpenDeleteClipping(false);
     };
 
     const handleCloseDialog = () => {
@@ -114,39 +109,13 @@ export default function BookCardList(props: BookCardListProps) {
                                             key="-2"
                                             onClick={() => {
                                                 setUUID1(uuidv4());
-                                                setCheckCollctionBooks({
+                                                setCheckCollctionClippings({
                                                     open: true,
                                                     collection_uuid: item.uuid,
                                                 });
                                             }}
                                         >
-                                            查看书籍
-                                        </Menu.Item>
-                                        <Menu.Item
-                                            key="-1"
-                                            onClick={() => {
-                                                setUUID2(uuidv4());
-                                                setAddBooksInfo({
-                                                    open: true,
-                                                    collection_uuid: item.uuid,
-                                                    book_type: 'noTmp',
-                                                });
-                                            }}
-                                        >
-                                            添加正式书籍
-                                        </Menu.Item>
-                                        <Menu.Item
-                                            key="0"
-                                            onClick={() => {
-                                                setUUID2(uuidv4());
-                                                setAddBooksInfo({
-                                                    open: true,
-                                                    collection_uuid: item.uuid,
-                                                    book_type: 'tmp',
-                                                });
-                                            }}
-                                        >
-                                            添加临时书籍
+                                            查看摘抄
                                         </Menu.Item>
                                         <Menu.Item
                                             key="1"
@@ -161,7 +130,7 @@ export default function BookCardList(props: BookCardListProps) {
                                                             'stars',
                                                             newValue,
                                                         ).then(() => {
-                                                            fetchBookCollections();
+                                                            fetchClippingCollections();
                                                         });
                                                     },
                                                     open: true,
@@ -183,7 +152,7 @@ export default function BookCardList(props: BookCardListProps) {
                                                             'subjects',
                                                             preHandleSubjects(newValue),
                                                         ).then(() => {
-                                                            fetchBookCollections();
+                                                            fetchClippingCollections();
                                                         });
                                                     },
                                                     open: true,
@@ -198,7 +167,7 @@ export default function BookCardList(props: BookCardListProps) {
                                                 handleClickOpen(item.uuid, 1);
                                             }}
                                         >
-                                            <span style={{ color: 'red' }}>删除 (不删书籍)</span>
+                                            <span style={{ color: 'red' }}>删除 (不删摘抄)</span>
                                         </Menu.Item>
                                         <Menu.Item
                                             key="7"
@@ -206,7 +175,7 @@ export default function BookCardList(props: BookCardListProps) {
                                                 handleClickOpen(item.uuid, 2);
                                             }}
                                         >
-                                            <span style={{ color: 'red' }}>删除 (删除书籍)</span>
+                                            <span style={{ color: 'red' }}>删除 (删除摘抄)</span>
                                         </Menu.Item>
                                     </SubMenu>
                                 </Menu>,
@@ -303,7 +272,7 @@ export default function BookCardList(props: BookCardListProps) {
 
             <div>
                 <Dialog
-                    open={openDeleteBook}
+                    open={openDeleteClipping}
                     onClose={handleClose}
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
@@ -311,9 +280,9 @@ export default function BookCardList(props: BookCardListProps) {
                     <DialogTitle id="alert-dialog-title">警告</DialogTitle>
                     <DialogContent>
                         <DialogContentText id="alert-dialog-description">
-                            {deleteBookInfo.deleteType == 1
-                                ? '删除集合将保留书籍,确定删除该集合吗?'
-                                : '删除集合将同时删除关联书籍,确定删除该集合吗?'}
+                            {deleteClippingInfo.deleteType == 1
+                                ? '删除集合将保留摘抄,确定删除该集合吗?'
+                                : '删除集合将同时删除关联摘抄,确定删除该集合吗?'}
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
@@ -321,15 +290,15 @@ export default function BookCardList(props: BookCardListProps) {
                         <Button
                             onClick={() => {
                                 handleClose();
-                                if (deleteBookInfo.deleteType == 1) {
-                                    deleteCollectionWithoutBooks(deleteBookInfo.uuid).then(
+                                if (deleteClippingInfo.deleteType == 1) {
+                                    deleteCollectionWithoutBooks(deleteClippingInfo.uuid).then(
                                         () => {
-                                            fetchBookCollections();
+                                            fetchClippingCollections();
                                         },
                                     );
                                 } else {
-                                    deleteCollectionWithBooks(deleteBookInfo.uuid).then(() => {
-                                        fetchBookCollections();
+                                    deleteCollectionWithBooks(deleteClippingInfo.uuid).then(() => {
+                                        fetchClippingCollections();
                                     });
                                 }
                             }}
@@ -341,23 +310,13 @@ export default function BookCardList(props: BookCardListProps) {
                 </Dialog>
             </div>
 
-            <AddBooks
-                key={uuid2}
-                open={addBooksInfo.open}
-                handleClose={() => {
-                    setAddBooksInfo(intOpenDialogInfo);
-                }}
-                collection_uuid={addBooksInfo.collection_uuid}
-                book_type={addBooksInfo.book_type}
-            />
-
-            <CollectionBooks
+            <CollectionClippings
                 key={uuid1}
-                open={checkCollctionBooks.open}
+                open={checkCollctionClippings.open}
                 handleClose={() => {
-                    setCheckCollctionBooks(intOpenDialogInfo);
+                    setCheckCollctionClippings(intOpenDialogInfo);
                 }}
-                collection_uuid={checkCollctionBooks.collection_uuid}
+                collection_uuid={checkCollctionClippings.collection_uuid}
             />
         </div>
     );

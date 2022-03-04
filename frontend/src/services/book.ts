@@ -28,7 +28,7 @@ export const updateBookMeta = async (uuid: string, key: string, value: any) => {
     if (value == null) {
         value = ""
     }
-    const data = await axiosInstance.post(`/api/book/update/book_meta`, {
+    const data = await axiosInstance.post(`/api/book/update`, {
         uuid: uuid,
         key: key,
         value: value,
