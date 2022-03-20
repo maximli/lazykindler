@@ -3,7 +3,6 @@ import os
 import glob
 import pathlib
 
-from ..util.service_logger import serviceLogger as logger
 from ..service import books
 
 supportedBookFormat = {

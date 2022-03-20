@@ -1,7 +1,6 @@
 from flask import request
-from ..util.service_logger import serviceLogger as logger
 from ..service import clipping
-from ..database.sqlite import db
+from ..database.database import db
 
 
 def get_all_clippings():

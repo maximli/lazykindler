@@ -1,4 +1,4 @@
-from ..database.sqlite import db
+from ..database.database import db
 
 def update_book_meta(uuid, key, value):
     db.run_sql("update book_meta set '{}'='{}' where uuid='{}'".format(

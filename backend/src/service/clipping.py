@@ -11,7 +11,7 @@ from flask import jsonify
 from ..service.collection import update_coll
 
 from ..util.util import difference, generate_uuid, get_md5
-from ..database.sqlite import db
+from ..database.database import db
 
 clipping_path = u'/Volumes/Kindle/documents/My Clippings.txt'
 # clipping_path = u'/Users/wp/Downloads/My Clippings.txt'

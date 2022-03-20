@@ -6,7 +6,7 @@ import hashlib
 
 from .common import update_book_meta, update_clipping
 
-from ..database.sqlite import db
+from ..database.database import db
 from ..util.util import generate_uuid, difference
 
 

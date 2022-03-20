@@ -7,7 +7,7 @@ import hashlib
 
 from ..service.collection import update_coll
 
-from ..database.sqlite import db
+from ..database.database import db
 from ..core.kindle.meta.metadata import get_metadata
 from ..util.util import convert_to_binary_data, generate_uuid, get_md5, get_now, is_all_chinese, difference
 
@@ -19,10 +19,12 @@ def store_book_from_path(book_path):
     uuid = generate_uuid()
 
     book_content = convert_to_binary_data(book_path)
+    # book_content = None
+
     md5 = get_md5(book_path)
     book_meta_record = db.query(
         "select uuid from book_meta where md5='{}'".format(md5))
-    if len(book_meta_record) > 0:
+    if book_meta_record is not None and len(book_meta_record) > 0:
         uuid = book_meta_record[0]["uuid"]
         db.run_sql(
             "update tmp_book set create_time='{}' where uuid='{}'".format(get_now(), uuid))
