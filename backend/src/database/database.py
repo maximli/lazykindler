@@ -5,6 +5,7 @@ from contextlib import closing
 from ..util.util import get_now
 from ..core.kindle.cover import get_mobi_cover
 from mysql.connector import pooling
+from src.instance.config import config
 
 
 def write_to_file(data, filename):
@@ -22,12 +23,12 @@ class DB:
             :return: Connection object or None
             """
         self.connection_pool = pooling.MySQLConnectionPool(pool_name="lazykindler",
-                                                  pool_size=10,
+                                                  pool_size=int(config['db']['pool_size']),
                                                   pool_reset_session=True,
-                                                  host='localhost',
-                                                  database='lazykindler',
-                                                  user='root',
-                                                  password='')
+                                                  host=config['db']['host'],
+                                                  database=config['db']['database'],
+                                                  user=config['db']['user'],
+                                                  password=config['db']['password'])
 
     def run_sql(self, sql):
         """
