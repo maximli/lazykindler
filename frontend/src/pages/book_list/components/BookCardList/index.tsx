@@ -1,10 +1,12 @@
 import { deleteBook, updateBookMeta } from '@/services';
-import { SettingOutlined } from '@ant-design/icons';
+import { humanFileSize } from '@/util';
+import { CoffeeOutlined, SettingOutlined } from '@ant-design/icons';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import StarIcon from '@mui/icons-material/Star';
+import StraightenIcon from '@mui/icons-material/Straighten';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -261,6 +263,20 @@ export default function BookCardList(props: BookCardListProps) {
                                                     style={{ paddingTop: 1.2, paddingLeft: 15 }}
                                                 >
                                                     {item.stars}
+                                                </Typography>
+                                            </Box>
+
+                                            <Box
+                                                display="flex"
+                                                alignItems="center"
+                                                style={{ marginBottom: 10 }}
+                                            >
+                                                <StraightenIcon style={{ height: 20 }} />
+                                                <Typography
+                                                    variant="body2"
+                                                    style={{ paddingTop: 1.2, paddingLeft: 15 }}
+                                                >
+                                                    {humanFileSize(item.size, true)}
                                                 </Typography>
                                             </Box>
 
