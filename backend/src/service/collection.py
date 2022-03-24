@@ -214,12 +214,12 @@ def update_collection(uuid, key, value):
                     db.run_sql("update clipping set coll_uuids='{}' where uuid='{}'".format(
                         ";".join(coll_item_uuids), clipping_uuid))
 
-    if value is None or value == "":
+    if key == "item_uuids" and (value is None or value == ""):
         db.run_sql_with_params(
             "update coll set item_uuids=? where uuid=?", (None, uuid))
         return "success"
     else:
-        db.run_sql("update coll set '{}'='{}' where uuid='{}'".format(
+        db.run_sql("update coll set {}='{}' where uuid='{}'".format(
             key, value, uuid))
     return "success"
 

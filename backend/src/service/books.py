@@ -180,7 +180,7 @@ def update_book_meta(uuid, key, value):
             "update book_meta set {}=? where uuid=?".format(key), (None, uuid))
         return "success"
     else:
-        db.run_sql("update book_meta set '{}'='{}' where uuid='{}'".format(
+        db.run_sql("update book_meta set {}='{}' where uuid='{}'".format(
             key, value, uuid))
     return "success"
 

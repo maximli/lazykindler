@@ -120,6 +120,28 @@ export default function CollectionList(props: ClippingListProps) {
                                             key="1"
                                             onClick={() => {
                                                 setDialogInfo({
+                                                    title: '修改名称',
+                                                    oldValue: item.name,
+                                                    allowEmptyStr: false,
+                                                    handleOK: (newValue: any) => {
+                                                        updateCollection(
+                                                            item.uuid,
+                                                            'name',
+                                                            newValue,
+                                                        ).then(() => {
+                                                            fetchClippingCollections();
+                                                        });
+                                                    },
+                                                    open: true,
+                                                });
+                                            }}
+                                        >
+                                            修改名称
+                                        </Menu.Item>
+                                        <Menu.Item
+                                            key="1"
+                                            onClick={() => {
+                                                setDialogInfo({
                                                     title: '修改评分',
                                                     oldValue: item.stars,
                                                     allowEmptyStr: false,

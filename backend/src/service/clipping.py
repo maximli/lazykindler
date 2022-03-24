@@ -160,6 +160,6 @@ def update_clipping(uuid, key, value):
                 "update clipping set {}=? where uuid=?".format(key), (None, uuid))
             return "success"
         else:
-            db.run_sql("update clipping set '{}'='{}' where uuid='{}'".format(
+            db.run_sql("update clipping set {}='{}' where uuid='{}'".format(
                 key, value, uuid))
     return "success"
