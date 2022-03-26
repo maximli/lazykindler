@@ -67,3 +67,12 @@ export const deleteCollectionByKeyword = (keyword: string, value: string) => {
         return data.data;
     });
 };
+
+
+// 更新集合封面
+export const updateCollectionCover = (uuid: string, cover: string) => {
+    return axiosInstance.post(`/api/collection/update/cover`, {
+        coll_uuid: uuid,
+        cover,
+    });
+};

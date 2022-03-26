@@ -18,7 +18,7 @@ def handle_error(err_msg):
 
 
 def generate_uuid():
-    return str(uuid.uuid4())[:8]
+    return str(uuid.uuid4())
 
 def convert_to_binary_data(filename):
     # Convert digital data to binary format

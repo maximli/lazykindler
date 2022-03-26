@@ -3,24 +3,32 @@ import {
     deleteCollectionWithBooks,
     deleteCollectionWithoutBooks,
     updateCollection,
+    updateCollectionCover,
 } from '@/services';
-import { preHandleSubjects } from '@/util';
+import { preHandleSubjects, toBase64 } from '@/util';
 import { SettingOutlined } from '@ant-design/icons';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import DateRangeIcon from '@mui/icons-material/DateRange';
+import DeleteIcon from '@mui/icons-material/Delete';
 import StarIcon from '@mui/icons-material/Star';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
+import {
+    Box,
+    Button,
+    Chip,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    FormControl,
+    FormHelperText,
+    Typography,
+} from '@mui/material';
 import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 import Divider from '@mui/material/Divider';
-import Typography from '@mui/material/Typography';
 import { List as AntList, Card, Menu } from 'antd';
 import _ from 'lodash';
 import { useState } from 'react';
+import Dropzone from 'react-dropzone';
 import { v4 as uuidv4 } from 'uuid';
 
 import ChangeInfo from '../../../components/ChangeInfoDialog';
@@ -65,6 +73,19 @@ export default function BookCardList(props: BookCardListProps) {
     const [checkCollctionBooks, setCheckCollctionBooks] =
         useState<OpenDialogType>(intOpenDialogInfo);
 
+    const [formData, setFormData] = useState<any>({});
+
+    const [uuidForEditCover, setUUIDForEditCover] = useState<any>();
+    const [openForEditCover, setOpenForEditCover] = useState(false);
+
+    const handleOpenForEditCover = () => {
+        setOpenForEditCover(true);
+    };
+
+    const handleCloseForEditCover = () => {
+        setOpenForEditCover(false);
+    };
+
     // deleteType
     // 0 初始值
     // 1 删除集合时不删除书籍
@@ -76,10 +97,26 @@ export default function BookCardList(props: BookCardListProps) {
 
     const handleClose = () => {
         setOpenDeleteBook(false);
+        setDialogInfo(initialDialogInfo);
     };
 
     const handleCloseDialog = () => {
         setDialogInfo(initialDialogInfo);
+    };
+
+    const handleEditCollCover = () => {
+        let cover = formData['cover'];
+
+        if (cover == null || cover.trim() == '') {
+            return false;
+        }
+
+        cover = cover.trim();
+
+        updateCollectionCover(uuidForEditCover, cover).then(() => {
+            fetchBookCollections();
+        });
+        return true;
     };
 
     return (
@@ -111,7 +148,7 @@ export default function BookCardList(props: BookCardListProps) {
                                 <Menu mode="vertical" selectable={false}>
                                     <SubMenu key="sub4" icon={<SettingOutlined />} title="操作">
                                         <Menu.Item
-                                            key="-2"
+                                            key="1"
                                             onClick={() => {
                                                 setUUID1(uuidv4());
                                                 setCheckCollctionBooks({
@@ -123,7 +160,7 @@ export default function BookCardList(props: BookCardListProps) {
                                             查看书籍
                                         </Menu.Item>
                                         <Menu.Item
-                                            key="-1"
+                                            key="2"
                                             onClick={() => {
                                                 setUUID2(uuidv4());
                                                 setAddBooksInfo({
@@ -136,7 +173,7 @@ export default function BookCardList(props: BookCardListProps) {
                                             添加正式书籍
                                         </Menu.Item>
                                         <Menu.Item
-                                            key="0"
+                                            key="3"
                                             onClick={() => {
                                                 setUUID2(uuidv4());
                                                 setAddBooksInfo({
@@ -149,7 +186,7 @@ export default function BookCardList(props: BookCardListProps) {
                                             添加临时书籍
                                         </Menu.Item>
                                         <Menu.Item
-                                            key="1"
+                                            key="4"
                                             onClick={() => {
                                                 setDialogInfo({
                                                     title: '修改名称',
@@ -171,7 +208,7 @@ export default function BookCardList(props: BookCardListProps) {
                                             修改名称
                                         </Menu.Item>
                                         <Menu.Item
-                                            key="1"
+                                            key="5"
                                             onClick={() => {
                                                 setDialogInfo({
                                                     title: '修改评分',
@@ -193,7 +230,7 @@ export default function BookCardList(props: BookCardListProps) {
                                             修改评分
                                         </Menu.Item>
                                         <Menu.Item
-                                            key="2"
+                                            key="6"
                                             onClick={() => {
                                                 setDialogInfo({
                                                     title: '修改标签',
@@ -215,7 +252,16 @@ export default function BookCardList(props: BookCardListProps) {
                                             修改标签
                                         </Menu.Item>
                                         <Menu.Item
-                                            key="6"
+                                            key="7"
+                                            onClick={() => {
+                                                handleOpenForEditCover();
+                                                setUUIDForEditCover(item.uuid);
+                                            }}
+                                        >
+                                            修改封面
+                                        </Menu.Item>
+                                        <Menu.Item
+                                            key="8"
                                             onClick={() => {
                                                 handleClickOpen(item.uuid, 1);
                                             }}
@@ -223,7 +269,7 @@ export default function BookCardList(props: BookCardListProps) {
                                             <span style={{ color: 'red' }}>删除 (不删书籍)</span>
                                         </Menu.Item>
                                         <Menu.Item
-                                            key="7"
+                                            key="9"
                                             onClick={() => {
                                                 handleClickOpen(item.uuid, 2);
                                             }}
@@ -344,11 +390,9 @@ export default function BookCardList(props: BookCardListProps) {
                             onClick={() => {
                                 handleClose();
                                 if (deleteBookInfo.deleteType == 1) {
-                                    deleteCollectionWithoutBooks(deleteBookInfo.uuid).then(
-                                        () => {
-                                            fetchBookCollections();
-                                        },
-                                    );
+                                    deleteCollectionWithoutBooks(deleteBookInfo.uuid).then(() => {
+                                        fetchBookCollections();
+                                    });
                                 } else {
                                     deleteCollectionWithBooks(deleteBookInfo.uuid).then(() => {
                                         fetchBookCollections();
@@ -362,6 +406,85 @@ export default function BookCardList(props: BookCardListProps) {
                     </DialogActions>
                 </Dialog>
             </div>
+
+            <Dialog
+                open={openForEditCover}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+                fullWidth
+                maxWidth="sm"
+            >
+                <DialogTitle id="alert-dialog-title">{'修改集合封面'}</DialogTitle>
+                <DialogContent style={{ margin: '0 auto' }}>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            '& .MuiTextField-root': { width: '25ch' },
+                        }}
+                    >
+                        <FormControl variant="standard" sx={{ m: 1, mt: 3, width: '25ch' }}>
+                            <Typography
+                                style={{ position: 'relative', paddingTop: 5 }}
+                                variant="subtitle1"
+                                gutterBottom
+                                component="div"
+                            >
+                                封面:
+                            </Typography>
+                            <div style={{ position: 'absolute', paddingLeft: 45 }}>
+                                <Dropzone
+                                    onDrop={async (acceptedFiles) => {
+                                        let base64Str = await toBase64(acceptedFiles[0]);
+                                        setFormData({ ...formData, cover: base64Str });
+                                    }}
+                                >
+                                    {({ getRootProps, getInputProps }) => (
+                                        <section>
+                                            <div {...getRootProps()}>
+                                                <input {...getInputProps()} />
+                                                {formData.cover == null ? (
+                                                    <Button variant="contained">上传</Button>
+                                                ) : (
+                                                    <Chip
+                                                        label="封面"
+                                                        onDelete={() => {
+                                                            setFormData({
+                                                                ...formData,
+                                                                cover: null,
+                                                            });
+                                                        }}
+                                                        deleteIcon={<DeleteIcon />}
+                                                        variant="outlined"
+                                                    />
+                                                )}
+                                            </div>
+                                        </section>
+                                    )}
+                                </Dropzone>
+                                <FormHelperText id="standard-weight-helper-text">
+                                    不能为空
+                                </FormHelperText>
+                            </div>
+                        </FormControl>
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseForEditCover}>取消</Button>
+                    <Button
+                        onClick={() => {
+                            let ok = handleEditCollCover();
+                            if (ok) {
+                                handleCloseForEditCover();
+                            }
+                        }}
+                        autoFocus
+                    >
+                        确认
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
             <AddBooks
                 key={uuid2}

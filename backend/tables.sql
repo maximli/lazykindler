@@ -9,7 +9,7 @@ CREATE TABLE book_meta (
 	stars               INTEGER,      -- 评分。满分10分
     size                INTEGER,      -- 图书大小
     publisher           TEXT,         -- 出版商
-	coll_uuids          TEXT,         -- colls uuids列表，分号相隔
+	coll_uuids          LONGTEXT,         -- colls uuids列表，分号相隔
 	done_dates          TEXT,         -- 读完日期
 	md5                 TEXT,         -- md5
 	create_time         TEXT          -- 创建时间
@@ -22,7 +22,7 @@ CREATE TABLE book (
     name           TEXT,         -- 书名
     format         TEXT,         -- 格式
     size           INTEGER,      -- 文件大小
-	content        BLOB,         -- 内容
+	content        LONGBLOB,     -- 内容
 	create_time    TEXT          -- 创建时间
 );
 
@@ -32,7 +32,7 @@ CREATE TABLE cover (
 	uuid           TEXT,
     name           TEXT,         -- 书名
     size           INTEGER,      -- 文件大小
-	content        TEXT,         -- 内容
+	content        LONGTEXT,     -- 内容
 	create_time    TEXT          -- 创建时间
 );
 
@@ -50,7 +50,7 @@ CREATE TABLE coll (
 	name                TEXT,           -- 集合名
 	coll_type           TEXT,           -- 类型，取值 book clipping
 	description         TEXT,           -- 描述
-    item_uuids          TEXT,           -- item uuid集合
+    item_uuids          LONGTEXT,       -- item uuid集合
 	subjects            TEXT,           -- 标签
 	stars               INTEGER,        -- 评分。满分10分
     create_time         TEXT
@@ -66,17 +66,7 @@ CREATE TABLE clipping (
 	addDate             TEXT,         -- 添加时间
 	subjects            TEXT,         -- 标签
 	stars               INTEGER,      -- 评分。满分10分
-	coll_uuids          TEXT,         -- clipping_collections uuids列表，分号相隔
+	coll_uuids          LONGTEXT,     -- clipping_collections uuids列表，分号相隔
 	md5                 TEXT,         -- md5
-	create_time         TEXT          -- 创建时间
-);
-
--- 存放剪切文字
-CREATE TABLE clippings_coll (
-	id INTEGER PRIMARY KEY AUTO_INCREMENT,
-	uuid                TEXT,
-	name                TEXT,
-	subjects            TEXT,         -- 标签
-	clipping_uuids      TEXT,         -- clipping uuids列表，分号相隔
 	create_time         TEXT          -- 创建时间
 );

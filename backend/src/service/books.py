@@ -19,7 +19,6 @@ def store_book_from_path(book_path):
     uuid = generate_uuid()
 
     book_content = convert_to_binary_data(book_path)
-    # book_content = None
 
     md5 = get_md5(book_path)
     book_meta_record = db.query(

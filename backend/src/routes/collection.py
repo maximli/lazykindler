@@ -1,5 +1,6 @@
 from flask import request
 from ..service import collection
+from ..service import cover
 from ..database.database import db
 
 
@@ -73,3 +74,10 @@ def delete_coll_by_keyword():
     keyword = request.args.get('keyword')
     value = request.args.get('value')
     return collection.delete_colls_by_keyword(keyword, value)
+
+
+def update_coll_cover():
+    content = request.json
+    coll_uuid = content['coll_uuid']
+    cover_str = content['cover']
+    return cover.update_coll_cover(coll_uuid, cover_str)
