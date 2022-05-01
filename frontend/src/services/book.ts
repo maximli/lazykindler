@@ -44,8 +44,29 @@ export const deleteBook = (uuid: string) => {
 };
 
 // 根据关键词删除书籍
-export const deleteBookByKeyword = (keyword: string, value: string) => {
-    return axiosInstance.delete(`/api/book/delete/bykeyword?keyword=${keyword}&value=${value}`).then((data: any) => {
+export const deleteBookByKeyword = (store_type: string, keyword: string, value: string) => {
+    return axiosInstance.delete(`/api/book/delete/bykeyword?store_type=${store_type}&keyword=${keyword}&value=${value}`).then((data: any) => {
         return data.data;
+    });
+};
+
+// 根据所有书籍
+export const deleteAllBooks = () => {
+    return axiosInstance.delete(`/api/book/delete/all`)
+};
+
+// 上传书籍或书籍所在目录
+export const uploadBooks = async (filepaths: string) => {
+    const data = await axiosInstance.post(`/api/book/upload`, {
+        book_paths: filepaths,
+    });
+    return data.data;
+};
+
+// 更新书籍封面
+export const updateBookCover = (uuid: string, cover: string) => {
+    return axiosInstance.post(`/api/book/update/cover`, {
+        book_uuid: uuid,
+        cover,
     });
 };

@@ -4,21 +4,22 @@
 import os
 from flask import jsonify
 import hashlib
+from ..service import cover
+import shutil
+from pathlib import Path
+from ..routes.books import ls_books
 
 from ..service.collection import update_coll
 
 from ..database.database import db
 from ..core.kindle.meta.metadata import get_metadata
-from ..util.util import convert_to_binary_data, generate_uuid, get_md5, get_now, is_all_chinese, difference
-
+from ..util.util import generate_uuid, get_md5, get_now, is_all_chinese, difference
 
 md5_hash = hashlib.md5()
 
 
-def store_book_from_path(book_path):
+def store_book_from_path(book_path, data_path):
     uuid = generate_uuid()
-
-    book_content = convert_to_binary_data(book_path)
 
     md5 = get_md5(book_path)
     book_meta_record = db.query(
@@ -39,7 +40,6 @@ def store_book_from_path(book_path):
         # 集合
         coll_uuids = ""
 
-        extension = os.path.splitext(book_path)[1]
         book_size = os.path.getsize(book_path)
         meta = get_metadata(book_path)
 
@@ -60,13 +60,13 @@ def store_book_from_path(book_path):
             if key == "author":
                 author = ";".join(value)
 
-        if title != None:
+        if title is not None:
             title = title.strip()
-        if publisher != None:
+        if publisher is not None:
             publisher = publisher.strip()
-        if author != None:
+        if author is not None:
             author = author.strip()
-        if subjects != None:
+        if subjects is not None:
             subjects = subjects.strip()
 
         if title == "":
@@ -83,13 +83,14 @@ def store_book_from_path(book_path):
             subjects = None
         if coll_uuids == "":
             coll_uuids = None
-        db.insert_book(uuid, title, None, author, subjects,  book_content,
-                       book_size, publisher, coll_uuids, extension, md5, book_path)
+        db.insert_book(uuid, title, None, author, subjects,
+                       book_size, publisher, coll_uuids, md5, book_path)
+        shutil.copy2(book_path, data_path)
 
 
 def get_books_meta(storeType):
     data = []
-    if storeType == 'noTmp':
+    if storeType == 'no_tmp':
         # 查找正式存储的数据
         data = db.query(
             "select a.* from book_meta a where not exists (select null from tmp_book b where a.uuid = b.uuid);")
@@ -97,16 +98,21 @@ def get_books_meta(storeType):
         # 查找临时存储的数据
         data = db.query(
             "select a.* from book_meta a where exists (select null from tmp_book b where a.uuid = b.uuid); ")
+
+    data.sort(key=lambda x: x['size'], reverse=True)
     return jsonify(data)
 
 
 def get_book_cover(uuid):
     data = db.query("select content from cover where uuid='{}';".format(uuid))
+    if data is None or len(data) == 0:
+        return ""
     return data[0]['content']
 
 
 def delete_book(uuid):
-    db.run_sql("delete from book where uuid='{}'".format(uuid))
+    delete_book_data_by_uuid(uuid)
+
     db.run_sql("delete from book_meta where uuid='{}'".format(uuid))
     db.run_sql("delete from cover where uuid='{}'".format(uuid))
     db.run_sql("delete from tmp_book where uuid='{}'".format(uuid))
@@ -121,7 +127,7 @@ def delete_book(uuid):
                 "update coll set item_uuids=? where uuid=?", (None, coll['uuid']))
         else:
             update_coll(';'.join(item_uuids),
-                                   coll['uuid'])
+                        coll['uuid'])
     return "success"
 
 
@@ -154,8 +160,8 @@ def update_book_meta(uuid, key, value):
                 if l is not None and len(l) > 0:
                     coll_item_uuids = l
             if len(coll_item_uuids) == 0:
-                db.run_sql_with_params(
-                    "update coll set item_uuids=? where uuid=?", (None, coll_uuid))
+                db.run_sql(
+                    "update coll set item_uuids='{}' where uuid='{}'".format(None, coll_uuid))
             else:
                 db.run_sql("update coll set item_uuids='{}' where uuid='{}'".format(
                     ";".join(coll_item_uuids), coll_uuid))
@@ -167,7 +173,7 @@ def update_book_meta(uuid, key, value):
             coll_item_uuids = []
             if coll_info["item_uuids"] is not None:
                 l = coll_info["item_uuids"].split(";")
-                coll_item_uuids = l.append(uuid)
+                l.append(uuid)
                 coll_item_uuids = l
             else:
                 coll_item_uuids.append(uuid)
@@ -193,31 +199,175 @@ def get_books_meta_by_uuids(uuids):
     return jsonify(result)
 
 
-def delete_books_by_keyword(keyword, value):
+def delete_books_by_keyword(store_type, keyword, value):
     value = value.strip()
     uuids = []
-    if keyword == "评分":
-        books = db.query(
-            "select uuid from book_meta where stars='{}'".format(int(value)))
-        for book in books:
-            uuids.append(book['uuid'])
-    elif keyword == "标签":
-        books = db.query(
-            "select uuid from book_meta where subjects like '^{};%' or subjects like '%;{}$' or subjects like '%;{};%' or subjects='{}'".format(value, value, value, value))
-        for book in books:
-            uuids.append(book['uuid'])
-    elif keyword == "作者":
-        books = db.query(
-            "select uuid from book_meta where author='{}'".format(value))
-        for book in books:
-            uuids.append(book['uuid'])
-    elif keyword == "出版社":
-        books = db.query(
-            "select uuid from book_meta where publisher='{}'".format(value))
-        for book in books:
-            uuids.append(book['uuid'])
+
+    if value == "无标签":
+        value = None
+    if value == "无作者":
+        value = None
+    if value == "无出版社":
+        value = None
+
+    if store_type == "no_tmp":
+        if keyword == "评分":
+            if value is None:
+                books = db.query(
+                    "select uuid from book_meta a where stars is NULL and not exists (select null from tmp_book b where a.uuid = b.uuid);")
+                for book in books:
+                    uuids.append(book['uuid'])
+            else:
+                books = db.query(
+                    "select uuid from book_meta a where stars='{}' and not exists (select null from tmp_book b where a.uuid = b.uuid);".format(int(value)))
+                for book in books:
+                    uuids.append(book['uuid'])
+        elif keyword == "标签":
+            if value is None:
+                books = db.query(
+                    "select uuid from book_meta a where subjects is NULL and not exists (select null from tmp_book b where a.uuid = b.uuid);")
+                for book in books:
+                    uuids.append(book['uuid'])
+            else:
+                books = db.query(
+                    "select uuid from book_meta a where subjects like '^{};%' or subjects like '%;{}$' or subjects like '%;{};%' or subjects='{}' and not exists (select null from tmp_book b where a.uuid = b.uuid);".format(
+                        value, value, value, value))
+                for book in books:
+                    uuids.append(book['uuid'])
+        elif keyword == "作者":
+            if value is None: 
+                books = db.query(
+                    "select uuid from book_meta a where author is NULL and not exists (select null from tmp_book b where a.uuid = b.uuid);")
+                for book in books:
+                    uuids.append(book['uuid'])
+            else:
+                books = db.query(
+                    "select uuid from book_meta a where author='{}' and not exists (select null from tmp_book b where a.uuid = b.uuid);".format(value))
+                for book in books:
+                    uuids.append(book['uuid'])
+        elif keyword == "出版社":
+            if value is None:
+                books = db.query(
+                    "select uuid from book_meta a where publisher is NULL and not exists (select null from tmp_book b where a.uuid = b.uuid);")
+                for book in books:
+                    uuids.append(book['uuid'])
+            else: 
+                books = db.query(
+                    "select uuid from book_meta a where publisher='{}' and not exists (select null from tmp_book b where a.uuid = b.uuid);".format(value))
+                for book in books:
+                    uuids.append(book['uuid'])
+    else:
+        if keyword == "评分":
+            if value is None:
+                books = db.query(
+                    "select uuid from book_meta a where stars is NULL and exists (select null from tmp_book b where a.uuid = b.uuid);")
+                for book in books:
+                    uuids.append(book['uuid'])
+            else:
+                books = db.query(
+                    "select uuid from book_meta a where stars='{}' and exists (select null from tmp_book b where a.uuid = b.uuid);".format(int(value)))
+                for book in books:
+                    uuids.append(book['uuid'])
+        elif keyword == "标签":
+            if value is None:
+                books = db.query(
+                    "select uuid from book_meta a where subjects is NULL and exists (select null from tmp_book b where a.uuid = b.uuid);")
+                for book in books:
+                    uuids.append(book['uuid'])
+            else:
+                books = db.query(
+                    "select uuid from book_meta a where subjects like '^{};%' or subjects like '%;{}$' or subjects like '%;{};%' or subjects='{}' and exists (select null from tmp_book b where a.uuid = b.uuid);".format(
+                        value, value, value, value))
+                for book in books:
+                    uuids.append(book['uuid'])
+        elif keyword == "作者":
+            if value is None: 
+                books = db.query(
+                    "select uuid from book_meta a where author is NULL and exists (select null from tmp_book b where a.uuid = b.uuid);")
+                for book in books:
+                    uuids.append(book['uuid'])
+            else:
+                books = db.query(
+                    "select uuid from book_meta a where author='{}' and exists (select null from tmp_book b where a.uuid = b.uuid);".format(value))
+                for book in books:
+                    uuids.append(book['uuid'])
+        elif keyword == "出版社":
+            if value is None:
+                books = db.query(
+                    "select uuid from book_meta a where publisher is NULL and exists (select null from tmp_book b where a.uuid = b.uuid);")
+                for book in books:
+                    uuids.append(book['uuid'])
+            else: 
+                books = db.query(
+                    "select uuid from book_meta a where publisher='{}' and exists (select null from tmp_book b where a.uuid = b.uuid);".format(value))
+                for book in books:
+                    uuids.append(book['uuid'])
 
     for uuid in uuids:
         delete_book(uuid)
 
+    return "success"
+
+
+def delete_all_books():
+    books = db.query(
+        "select uuid from book_meta")
+    for book in books:
+        db.run_sql("delete from cover where uuid='{}';".format(book['uuid']))
+
+    colls = db.query(
+        "select uuid from coll where coll_type='book'")
+    for coll in colls:
+        db.run_sql("delete from cover where uuid='{}'".format(coll['uuid']))
+
+    db.run_sql("delete from book_meta")
+    db.run_sql("DELETE FROM sqlite_sequence WHERE name = 'book_meta'")
+
+    db.run_sql("delete from coll where coll_type='book'")
+
+    db.run_sql("delete from tmp_book")
+    db.run_sql("DELETE FROM sqlite_sequence WHERE name = 'tmp_book'")
+
+    covers = db.query("select uuid from cover")
+    if covers is None or len(covers) == 0:
+        db.run_sql("DELETE FROM sqlite_sequence WHERE name = 'cover'")
+
+    colls = db.query("select uuid from coll")
+    if colls is None or len(colls) == 0:
+        db.run_sql("DELETE FROM sqlite_sequence WHERE name = 'coll'")
+    
+    path = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent.absolute()
+    data_path = os.path.join(path, "data")
+    shutil.rmtree(data_path)
+    return "success"
+
+
+def upsert_book_cover(uuid, cover_str):
+    book_info = db.query(
+        "select name from book_meta where uuid='{}'".format(uuid))[0]
+    cover.upsert_book_cover(uuid, book_info['name'], cover_str)
+    return "success"
+
+
+# 从data目录删除书籍文件
+def delete_book_data_by_uuid(uuid):
+    book_info = db.query(
+        "select md5 from book_meta where uuid='{}'".format(uuid))[0]
+    target_md5 = book_info['md5']
+
+    path = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent.absolute()
+    data_path = os.path.join(path, "data")
+    is_exist = os.path.exists(data_path)
+    if not is_exist:
+        return "success"
+
+    filepaths = ls_books(data_path)
+    for filepath in filepaths:
+        md5 = get_md5(filepath)
+        if md5 == target_md5:
+            try:
+                os.remove(filepath)
+                break
+            except OSError:
+                break
     return "success"

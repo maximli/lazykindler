@@ -1,7 +1,31 @@
-from datetime import datetime
 from flask import jsonify
 import hashlib
 import uuid
+import os
+import glob
+import pathlib
+
+# 支持的电子书格式
+supportedBookFormat = {
+    ".mobi": True,
+    ".azw3": True,
+}
+
+def ls_books(dir):
+    files = list()
+    for item in os.listdir(dir):
+        abspath = os.path.join(dir, item)
+        try:
+            if os.path.isdir(abspath):
+                files = files + ls_books(abspath)
+            else:
+                if pathlib.Path(abspath).suffix in supportedBookFormat:
+                    files.append(abspath)
+                else:
+                    print("ls_books. 忽略文件: ", abspath)
+        except FileNotFoundError as err:
+            print('invalid directory\n', 'Error: ', err)
+    return files
 
 
 def handle_error(err_msg):
@@ -19,12 +43,6 @@ def handle_error(err_msg):
 
 def generate_uuid():
     return str(uuid.uuid4())
-
-def convert_to_binary_data(filename):
-    # Convert digital data to binary format
-    with open(filename, 'rb') as file:
-        blob_data = file.read()
-    return blob_data
 
 
 def get_md5(filepath):
@@ -55,3 +73,7 @@ def difference(list1, list2):
         if item not in list2:
             list_difference.append(item)
     return list_difference
+
+
+def utf8len(s):
+    return len(s.encode('utf-8'))

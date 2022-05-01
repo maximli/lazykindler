@@ -1,6 +1,6 @@
 -- 存放书籍的相关元数据信息
 CREATE TABLE book_meta (
-	id INTEGER PRIMARY KEY AUTO_INCREMENT,
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	uuid                TEXT,
     name                TEXT,         -- 书名
     description         TEXT,         -- 描述
@@ -15,20 +15,9 @@ CREATE TABLE book_meta (
 	create_time         TEXT          -- 创建时间
 );
 
--- 存放书籍的文件内容
-CREATE TABLE book (
-	id INTEGER PRIMARY KEY AUTO_INCREMENT,
-	uuid           TEXT,
-    name           TEXT,         -- 书名
-    format         TEXT,         -- 格式
-    size           INTEGER,      -- 文件大小
-	content        LONGBLOB,     -- 内容
-	create_time    TEXT          -- 创建时间
-);
-
 -- 存放书籍封面
 CREATE TABLE cover (
-	id INTEGER PRIMARY KEY AUTO_INCREMENT,
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	uuid           TEXT,
     name           TEXT,         -- 书名
     size           INTEGER,      -- 文件大小
@@ -38,14 +27,14 @@ CREATE TABLE cover (
 
 -- 临时导入的书籍
 CREATE TABLE tmp_book (
-	id INTEGER PRIMARY KEY AUTO_INCREMENT,
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	uuid                TEXT,
     create_time         TEXT
 );
 
 -- 集合
 CREATE TABLE coll (
-	id INTEGER PRIMARY KEY AUTO_INCREMENT,
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
     uuid                TEXT,
 	name                TEXT,           -- 集合名
 	coll_type           TEXT,           -- 类型，取值 book clipping
@@ -58,7 +47,7 @@ CREATE TABLE coll (
 
 -- 存放clipping
 CREATE TABLE clipping (
-	id INTEGER PRIMARY KEY AUTO_INCREMENT,
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	uuid                TEXT,
 	book_name           TEXT,         -- 书名
     author              TEXT,         -- 作者

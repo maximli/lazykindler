@@ -1,18 +1,10 @@
 import sqlite3
+from sqlite3 import Error
 import sys
 import base64
-from contextlib import closing
+from pathlib import Path
 from ..util.util import get_now
 from ..core.kindle.cover import get_mobi_cover
-from mysql.connector import pooling
-from src.instance.config import config
-
-
-def write_to_file(data, filename):
-    # Convert binary data to proper format and write it on Hard Disk
-    with open(filename, 'wb') as file:
-        file.write(data)
-    print("Stored blob data into: ", filename, "\n")
 
 
 class DB:
@@ -22,184 +14,171 @@ class DB:
             :param db_file: database file
             :return: Connection object or None
             """
-        self.connection_pool = pooling.MySQLConnectionPool(pool_name="lazykindler",
-                                                  pool_size=int(config['db']['pool_size']),
-                                                  pool_reset_session=True,
-                                                  host=config['db']['host'],
-                                                  database=config['db']['database'],
-                                                  user=config['db']['user'],
-                                                  password=config['db']['password'])
+        self.conn = None
+        try:
+            import os.path
+            path = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent.absolute()
+            db_path = os.path.join(path, "lazykindler.db")
+
+            if not os.path.isfile(db_path): 
+                open(db_path, 'w+')
+                sql_file_path = os.path.join(path, "tables.sql")
+                with open(sql_file_path, 'r') as sql_file:
+                    sql_script = sql_file.read()
+                    con = sqlite3.connect(db_path)
+                    cursor = con.cursor()
+                    cursor.executescript(sql_script)
+                    con.commit()
+                    con.close()
+            
+            self.conn = sqlite3.connect(db_path, check_same_thread=False)
+            self.conn.isolation_level = None
+        except Error as e:
+            print(e)
 
     def run_sql(self, sql):
         """
         执行sql,不返回结果
         :return:
         """
-        with closing(self.connection_pool.get_connection()) as cnx:
-            cursor = cnx.cursor()
-            cursor.execute('set global max_allowed_packet=670108864')
-            cursor.execute(sql)
-            cnx.commit()
+        cur = self.conn.cursor()
+        cur.execute(sql)
+        self.conn.commit()
 
     def run_sql_with_params(self, sql, params):
         """
         执行sql,不返回结果
         :return:
         """
-        with closing(self.connection_pool.get_connection()) as cnx:
-            cursor = cnx.cursor()
-            cursor.execute('set global max_allowed_packet=670108864')
-            cursor.execute(sql, params)
-            cnx.commit()
-
+        cur = self.conn.cursor()
+        cur.execute(sql, params)
+        self.conn.commit()
 
     def query(self, sql):
-        with closing(self.connection_pool.get_connection()) as cnx:
-            cursor = cnx.cursor()
-            cursor.execute('set global max_allowed_packet=670108864')
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute(sql)
+
+            desc = cursor.description
+            column_names = [col[0] for col in desc]
+            data = [dict(zip(column_names, row))
+                    for row in cursor.fetchall()]
+            return data
+
+        except Exception as error:
+            print("Failed to get record. ", error)
+
+    def insert_book(self, uuid, title, description, author, subjects, book_size, publisher, coll_uuids,
+                    md5, book_path):
+        cursor = self.conn.cursor()
+        cursor.execute("begin")
+
+        try:
+            # 插入书籍元数据信息
+            sql = """INSERT INTO book_meta (uuid, name, description, author, subjects, stars, size, publisher, coll_uuids, done_dates, md5, create_time) 
+                                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) """
+            err = None
+            cover_info = None
             try:
-                cursor.execute(sql)
-
-                desc = cursor.description
-                column_names = [col[0] for col in desc]
-                data = [dict(zip(column_names, row))
-                        for row in cursor.fetchall()]
-                return data
-
-            except Exception as error:
-                print("Failed to get record. ", error)
-
-
-    def insert_book(self, uuid, title, description, author, subjects,  book_content, book_size, publisher, coll_uuids, extension, md5, book_path):
-        with closing(self.connection_pool.get_connection()) as cnx:
-            cursor = cnx.cursor()
-            cursor.execute('set global max_allowed_packet=670108864')
-            try:
-                cursor.execute("begin")
-                # 插入书籍元数据信息
-                sql = """INSERT INTO book_meta (uuid, name, description, author, subjects, stars, size, publisher, coll_uuids, done_dates, md5, create_time) 
-                                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) """
                 cover_info = get_mobi_cover.get_mobi_cover(book_path)
+            except Exception as error:
+                err = error
+            finally:
+                if err is not None:
+                    cover_info = None
 
-                data_tuple = (
-                    uuid,
-                    title,
-                    description,
-                    author,
-                    subjects,
-                    0,
-                    book_size,
-                    publisher,
-                    coll_uuids,
-                    "",
-                    md5,
-                    get_now()
-                )
-                cursor.execute(sql, data_tuple)
+            data_tuple = (
+                uuid,
+                title,
+                description,
+                author,
+                subjects,
+                0,
+                book_size,
+                publisher,
+                coll_uuids,
+                "",
+                md5,
+                get_now()
+            )
+            cursor.execute(sql, data_tuple)
 
-                # 插入书籍封面信息
-                sql = """INSERT INTO cover (uuid, name, size, content, create_time ) 
-                                            VALUES (%s, %s, %s, %s, %s) """
+            # 插入书籍封面信息
+            sql = """INSERT INTO cover (uuid, name, size, content, create_time ) 
+                                        VALUES (?, ?, ?, ?, ?) """
+            if cover_info is not None:
                 data_tuple = (uuid, title, sys.getsizeof(
                     cover_info["content"]), base64.b64encode(cover_info["content"]), get_now())
                 cursor.execute(sql, data_tuple)
 
-                # 插入书籍信息
-                sql = """INSERT INTO book (uuid, name, format, size, content, create_time) 
-                                            VALUES (%s, %s, %s, %s, %s, %s) """
-                data_tuple = (uuid, title, extension, book_size,
-                            book_content, get_now())
-                cursor.execute(sql, data_tuple)
+            # 插入临时书籍
+            sql = """INSERT INTO tmp_book (uuid, create_time) VALUES (?, ?) """
+            data_tuple = (uuid, get_now())
+            cursor.execute(sql, data_tuple)
 
-                # 插入临时书籍
-                sql = """INSERT INTO tmp_book (uuid, create_time) VALUES (%s, %s) """
-                data_tuple = (uuid, get_now())
-                cursor.execute(sql, data_tuple)
+        except Exception as error:
+            self.conn.execute("rollback")
+            print("Failed to insert books. ", error)
 
-                cnx.commit()
-                cursor.close()
-
-            except Exception as error:
-                cursor.execute("rollback")
-
-
-    def get_book(self, uuid, filepath):
-        with closing(self.connection_pool.get_connection()) as cnx:
-            cursor = cnx.cursor()
-            cursor.execute('set global max_allowed_packet=670108864')
-            try:
-                sql_fetch_blob_query = """SELECT content from book where uuid = ?"""
-                cursor.execute(sql_fetch_blob_query, (uuid,))
-                record = cursor.fetchall()
-                for row in record:
-                    content = row[0]
-                    write_to_file(content, filepath)
-
-                cursor.close()
-
-            except Exception as error:
-                print("Failed to get book record. ", error)
-
+        self.conn.commit()
+        cursor.close()
 
     def insert_coll(self, uuid, name, coll_type, description, subjects, stars, cover_content):
-        with closing(self.connection_pool.get_connection()) as cnx:
-            cursor = cnx.cursor()
-            cursor.execute('set global max_allowed_packet=670108864')
-            try:
-                cursor.execute("begin")
-                sql = """INSERT INTO coll (uuid, name, coll_type, description, subjects, stars, create_time) 
-                                            VALUES (%s, %s, %s, %s, %s, %s, %s) """
-                data_tuple = (
-                    uuid,
-                    name,
-                    coll_type,
-                    description,
-                    subjects,
-                    stars,
-                    get_now()
-                )
+        cursor = self.conn.cursor()
+        cursor.execute("begin")
+        try:
+
+            sql = """INSERT INTO coll (uuid, name, coll_type, description, subjects, stars, create_time) 
+                                        VALUES (?, ?, ?, ?, ?, ?, ?) """
+            data_tuple = (
+                uuid,
+                name,
+                coll_type,
+                description,
+                subjects,
+                stars,
+                get_now()
+            )
+            cursor.execute(sql, data_tuple)
+
+            if cover_content is not None:
+                sql = """INSERT INTO cover (uuid, name, size, content, create_time ) 
+                                            VALUES (?, ?, ?, ?, ?) """
+                data_tuple = (uuid, name, sys.getsizeof(
+                    cover_content), cover_content, get_now())
                 cursor.execute(sql, data_tuple)
 
-                if cover_content is not None:
-                    sql = """INSERT INTO cover (uuid, name, size, content, create_time ) 
-                                                VALUES (%s, %s, %s, %s, %s) """
-                    data_tuple = (uuid, name, sys.getsizeof(
-                        cover_content), cover_content, get_now())
-                    cursor.execute(sql, data_tuple)
+        except Exception as error:
+            self.conn.execute("rollback")
+            print("Failed to insert coll. ", error)
 
-                cnx.commit()
-                cursor.close()
-
-            except Exception as error:
-                cnx.execute("rollback")
-                print("Failed to insert coll. ", error)
-
+        self.conn.commit()
+        cursor.close()
 
     def insert_clipping(self, uuid, book_name, author, content, addDate, md5):
-        with closing(self.connection_pool.get_connection()) as cnx:
-            cursor = cnx.cursor()
-            cursor.execute('set global max_allowed_packet=670108864')
-            try:
-                cursor.execute("begin")
-                sql = """INSERT INTO clipping (uuid, book_name, author, content, addDate, md5, stars, create_time) 
-                                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s) """
-                data_tuple = (
-                    uuid,
-                    book_name,
-                    author,
-                    str(content),
-                    addDate,
-                    md5,
-                    0,
-                    str(get_now())
-                )
-                cursor.execute(sql, data_tuple)
-                cnx.commit()
-                cursor.close()
+        cursor = self.conn.cursor()
+        cursor.execute("begin")
+        try:
+            sql = """INSERT INTO clipping (uuid, book_name, author, content, addDate, md5, stars, create_time) 
+                                        VALUES (?, ?, ?, ?, ?, ?, ?, ?) """
+            data_tuple = (
+                uuid,
+                book_name,
+                author,
+                content,
+                addDate,
+                md5,
+                0,
+                get_now()
+            )
+            cursor.execute(sql, data_tuple)
 
-            except Exception as error:
-                cursor.execute("rollback")
-                print("Failed to insert clipping. ", error)
+        except Exception as error:
+            self.conn.execute("rollback")
+            print("Failed to insert clipping. ", error)
+
+        self.conn.commit()
+        cursor.close()
 
 
 db = DB()

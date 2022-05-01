@@ -498,6 +498,7 @@ const Books: FC<BooksProps> = (props: BooksProps) => {
                                         name: '删除',
                                         handler: () => {
                                             deleteBookByKeyword(
+                                                storeType,
                                                 firstLevelType,
                                                 selectedSecondLevel,
                                             ).then(() => {

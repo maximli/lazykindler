@@ -1,22 +1,29 @@
-import { deleteBook, updateBookMeta } from '@/services';
-import { humanFileSize } from '@/util';
-import { CoffeeOutlined, SettingOutlined } from '@ant-design/icons';
+import { deleteBook, updateBookCover, updateBookMeta } from '@/services';
+import { humanFileSize, toBase64 } from '@/util';
+import { SettingOutlined } from '@ant-design/icons';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import StarIcon from '@mui/icons-material/Star';
 import StraightenIcon from '@mui/icons-material/Straighten';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import Dropzone from 'react-dropzone';
 import Divider from '@mui/material/Divider';
-import Typography from '@mui/material/Typography';
 import { Menu } from 'antd';
+import DeleteIcon from '@mui/icons-material/Delete';
+import StarIcon from '@mui/icons-material/Star';
+import {
+    Box,
+    Button,
+    Chip,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    FormControl,
+    FormHelperText,
+    Typography,
+    DialogContentText,
+} from '@mui/material';
 import { List as AntList, Card } from 'antd';
 import _ from 'lodash';
 import { useState } from 'react';
@@ -54,6 +61,19 @@ export default function BookCardList(props: BookCardListProps) {
     const [deleteBookUUID, setDeleteBookUUID] = useState('');
     const [uuid, setUUID] = useState(uuidv4());
 
+    const [formData, setFormData] = useState<any>({});
+
+    const [uuidForEditCover, setUUIDForEditCover] = useState<any>();
+    const [openForEditCover, setOpenForEditCover] = useState(false);
+
+    const handleOpenForEditCover = () => {
+        setOpenForEditCover(true);
+    };
+
+    const handleCloseForEditCover = () => {
+        setOpenForEditCover(false);
+    };
+
     const handleCloseDialog = () => {
         setDialogInfo(initialDialogInfo);
     };
@@ -65,6 +85,19 @@ export default function BookCardList(props: BookCardListProps) {
 
     const handleClose = () => {
         setOpenDeleteBook(false);
+    };
+
+    const handleEditCollCover = () => {
+        let cover = formData['cover'];
+
+        if (cover == null || cover.trim() == '') {
+            return false;
+        }
+
+        cover = cover.trim();
+
+        updateBookCover(uuidForEditCover, cover)
+        return true;
     };
 
     return (
@@ -205,6 +238,15 @@ export default function BookCardList(props: BookCardListProps) {
                                             <Menu.Item
                                                 key="6"
                                                 onClick={() => {
+                                                    handleOpenForEditCover();
+                                                    setUUIDForEditCover(item.uuid);
+                                                }}
+                                            >
+                                                修改封面
+                                            </Menu.Item>
+                                            <Menu.Item
+                                                key="7"
+                                                onClick={() => {
                                                     handleClickOpen(item.uuid);
                                                 }}
                                             >
@@ -307,9 +349,7 @@ export default function BookCardList(props: BookCardListProps) {
                                                     variant="body2"
                                                     style={{ paddingTop: 1.2, paddingLeft: 15 }}
                                                 >
-                                                    {item.subjects == null
-                                                        ? ''
-                                                        : item.subjects}
+                                                    {item.subjects == null ? '' : item.subjects}
                                                 </Typography>
                                             </Box>
 
@@ -337,9 +377,7 @@ export default function BookCardList(props: BookCardListProps) {
                                                     variant="body2"
                                                     style={{ paddingTop: 1.2, paddingLeft: 15 }}
                                                 >
-                                                    {item.publisher == null
-                                                        ? ''
-                                                        : item.publisher}
+                                                    {item.publisher == null ? '' : item.publisher}
                                                 </Typography>
                                             </Box>
                                         </div>
@@ -388,6 +426,85 @@ export default function BookCardList(props: BookCardListProps) {
                     </DialogActions>
                 </Dialog>
             </div>
+
+            <Dialog
+                open={openForEditCover}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+                fullWidth
+                maxWidth="sm"
+            >
+                <DialogTitle id="alert-dialog-title">{'修改集合封面'}</DialogTitle>
+                <DialogContent style={{ margin: '0 auto' }}>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            '& .MuiTextField-root': { width: '25ch' },
+                        }}
+                    >
+                        <FormControl variant="standard" sx={{ m: 1, mt: 3, width: '25ch' }}>
+                            <Typography
+                                style={{ position: 'relative', paddingTop: 5 }}
+                                variant="subtitle1"
+                                gutterBottom
+                                component="div"
+                            >
+                                封面:
+                            </Typography>
+                            <div style={{ position: 'absolute', paddingLeft: 45 }}>
+                                <Dropzone
+                                    onDrop={async (acceptedFiles) => {
+                                        let base64Str = await toBase64(acceptedFiles[0]);
+                                        setFormData({ ...formData, cover: base64Str });
+                                    }}
+                                >
+                                    {({ getRootProps, getInputProps }) => (
+                                        <section>
+                                            <div {...getRootProps()}>
+                                                <input {...getInputProps()} />
+                                                {formData.cover == null ? (
+                                                    <Button variant="contained">上传</Button>
+                                                ) : (
+                                                    <Chip
+                                                        label="封面"
+                                                        onDelete={() => {
+                                                            setFormData({
+                                                                ...formData,
+                                                                cover: null,
+                                                            });
+                                                        }}
+                                                        deleteIcon={<DeleteIcon />}
+                                                        variant="outlined"
+                                                    />
+                                                )}
+                                            </div>
+                                        </section>
+                                    )}
+                                </Dropzone>
+                                <FormHelperText id="standard-weight-helper-text">
+                                    不能为空
+                                </FormHelperText>
+                            </div>
+                        </FormControl>
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseForEditCover}>取消</Button>
+                    <Button
+                        onClick={() => {
+                            let ok = handleEditCollCover();
+                            if (ok) {
+                                handleCloseForEditCover();
+                            }
+                        }}
+                        autoFocus
+                    >
+                        确认
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
             <ChangeBookColl
                 key={uuid}

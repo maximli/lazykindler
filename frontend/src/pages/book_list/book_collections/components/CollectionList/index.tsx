@@ -22,8 +22,8 @@ import {
     FormControl,
     FormHelperText,
     Typography,
+    DialogContentText,
 } from '@mui/material';
-import DialogContentText from '@mui/material/DialogContentText';
 import Divider from '@mui/material/Divider';
 import { List as AntList, Card, Menu } from 'antd';
 import _ from 'lodash';
@@ -53,7 +53,7 @@ const initialDialogInfo = {
 interface OpenDialogType {
     open: boolean;
     collection_uuid: any;
-    book_type?: any; // 书籍类型。 tmp  noTmp
+    book_type?: any; // 书籍类型。 tmp  no_tmp
 }
 
 const intOpenDialogInfo: OpenDialogType = {
@@ -166,7 +166,7 @@ export default function BookCardList(props: BookCardListProps) {
                                                 setAddBooksInfo({
                                                     open: true,
                                                     collection_uuid: item.uuid,
-                                                    book_type: 'noTmp',
+                                                    book_type: 'no_tmp',
                                                 });
                                             }}
                                         >

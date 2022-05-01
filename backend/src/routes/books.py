@@ -1,14 +1,10 @@
 from flask import request
 import os
-import glob
 import pathlib
-
+from pathlib import Path
+from ..util.util import ls_books, supportedBookFormat
 from ..service import books
 
-supportedBookFormat = {
-    ".mobi": True,
-    ".azw3": True,
-}
 
 def store_books():
     """
@@ -17,27 +13,37 @@ def store_books():
 
         "Hello world, from Users!"
     """
-    content = request.json
-    book_paths = content['book_paths']
 
+    path = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent.absolute()
+    data_path = os.path.join(path, "data")
+    isExist = os.path.exists(data_path)
+    if not isExist:
+        os.makedirs(data_path)
+
+    content = request.json
+    book_paths = content['book_paths'].split(";")
+
+    i = 1
     for book_path in book_paths:
         if os.path.isdir(book_path):
-            glob_dir = os.path.join(book_path, "*")
-            bpaths = glob.glob(glob_dir)
-            for bpath in bpaths:
-                if pathlib.Path(bpath).suffix in supportedBookFormat:
-                    print(bpath)
-                    books.store_book_from_path(bpath)
+            filepaths = ls_books(book_path)
+            for filepath in filepaths:
+                print("存储书籍-----------index = {}, filepath = {}".format(i, filepath))
+                i += 1
+                books.store_book_from_path(filepath, data_path)
         else:
             if pathlib.Path(book_path).suffix in supportedBookFormat:
-                books.store_book_from_path(book_path)
+                print("存储书籍-----------index = {}, filepath = {}".format(i, book_path))
+                i += 1
+                books.store_book_from_path(book_path, data_path)
     return "success"
 
 
 def get_books_meta():
-    storeType = request.args.get('storeType')
-    data = books.get_books_meta(storeType)
+    store_type = request.args.get('storeType')
+    data = books.get_books_meta(store_type)
     return data
+
 
 def get_books_meta_by_uuids():
     uuids_str = request.args.get('uuids')
@@ -64,6 +70,18 @@ def update_book_meta():
 
 
 def delete_book_by_keyword():
+    store_type = request.args.get('store_type')
     keyword = request.args.get('keyword')
     value = request.args.get('value')
-    return books.delete_books_by_keyword(keyword, value)
+    return books.delete_books_by_keyword(store_type, keyword, value)
+
+
+def delete_all_books():
+    return books.delete_all_books()
+
+
+def update_book_cover():
+    content = request.json
+    book_uuid = content['book_uuid']
+    cover_str = content['cover']
+    return books.upsert_book_cover(book_uuid, cover_str)

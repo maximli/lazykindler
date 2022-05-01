@@ -367,7 +367,7 @@ export default function BookCollections() {
                                 gutterBottom
                                 component="div"
                             >
-                                名称:
+                                名称<span color='red'>*</span>:
                             </Typography>
                             <div style={{ position: 'absolute', paddingLeft: 45 }}>
                                 <Input
@@ -417,7 +417,7 @@ export default function BookCollections() {
                                 gutterBottom
                                 component="div"
                             >
-                                标签:
+                                标签<span color='red'>*</span>:
                             </Typography>
                             <div style={{ position: 'absolute', paddingLeft: 45 }}>
                                 <Input
@@ -442,7 +442,7 @@ export default function BookCollections() {
                                 gutterBottom
                                 component="div"
                             >
-                                评分:
+                                评分<span color='red'>*</span>:
                             </Typography>
                             <div style={{ position: 'absolute', paddingLeft: 45 }}>
                                 <Input
@@ -467,7 +467,7 @@ export default function BookCollections() {
                                 gutterBottom
                                 component="div"
                             >
-                                封面:
+                                封面<span color='red'>*</span>:
                             </Typography>
                             <div style={{ position: 'absolute', paddingLeft: 45 }}>
                                 <Dropzone

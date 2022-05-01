@@ -35,3 +35,8 @@ export const updateClipping = async (uuid: string, key: string, value: any) => {
     });
     return data.data;
 };
+
+// 删除所有摘抄
+export const deleteAllClipping = () => {
+    return axiosInstance.delete(`/api/clipping/delete/all`)
+};

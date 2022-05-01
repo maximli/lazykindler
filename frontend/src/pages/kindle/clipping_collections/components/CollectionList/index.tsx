@@ -3,20 +3,28 @@ import {
     deleteCollectionWithBooks,
     deleteCollectionWithoutBooks,
     updateCollection,
+    updateCollectionCover,
 } from '@/services';
-import { preHandleSubjects } from '@/util';
+import { preHandleSubjects, toBase64 } from '@/util';
 import { SettingOutlined, TagOutlined } from '@ant-design/icons';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import StarIcon from '@mui/icons-material/Star';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import Dropzone from 'react-dropzone';
+import DeleteIcon from '@mui/icons-material/Delete';
 import Divider from '@mui/material/Divider';
-import Typography from '@mui/material/Typography';
+import {
+    Box,
+    Button,
+    Chip,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    FormControl,
+    FormHelperText,
+    Typography,
+    DialogContentText,
+} from '@mui/material';
 import { List as AntList, Card, Menu } from 'antd';
 import _ from 'lodash';
 import { useState } from 'react';
@@ -59,6 +67,18 @@ export default function CollectionList(props: ClippingListProps) {
     const [checkCollctionClippings, setCheckCollctionClippings] =
         useState<OpenDialogType>(intOpenDialogInfo);
 
+    const [formData, setFormData] = useState<any>({});
+    const [uuidForEditCover, setUUIDForEditCover] = useState<any>();
+    const [openForEditCover, setOpenForEditCover] = useState(false);
+
+    const handleOpenForEditCover = () => {
+        setOpenForEditCover(true);
+    };
+
+    const handleCloseForEditCover = () => {
+        setOpenForEditCover(false);
+    };
+
     // deleteType
     // 0 初始值
     // 1 删除集合时不删除摘抄
@@ -74,6 +94,21 @@ export default function CollectionList(props: ClippingListProps) {
 
     const handleCloseDialog = () => {
         setDialogInfo(initialDialogInfo);
+    };
+
+    const handleEditCollCover = () => {
+        let cover = formData['cover'];
+
+        if (cover == null || cover.trim() == '') {
+            return false;
+        }
+
+        cover = cover.trim();
+
+        updateCollectionCover(uuidForEditCover, cover).then(() => {
+            fetchClippingCollections();
+        });
+        return true;
     };
 
     return (
@@ -105,7 +140,7 @@ export default function CollectionList(props: ClippingListProps) {
                                 <Menu mode="vertical" selectable={false}>
                                     <SubMenu key="sub4" icon={<SettingOutlined />} title="操作">
                                         <Menu.Item
-                                            key="-2"
+                                            key="1"
                                             onClick={() => {
                                                 setUUID1(uuidv4());
                                                 setCheckCollctionClippings({
@@ -117,7 +152,7 @@ export default function CollectionList(props: ClippingListProps) {
                                             查看摘抄
                                         </Menu.Item>
                                         <Menu.Item
-                                            key="1"
+                                            key="2"
                                             onClick={() => {
                                                 setDialogInfo({
                                                     title: '修改名称',
@@ -139,7 +174,7 @@ export default function CollectionList(props: ClippingListProps) {
                                             修改名称
                                         </Menu.Item>
                                         <Menu.Item
-                                            key="1"
+                                            key="3"
                                             onClick={() => {
                                                 setDialogInfo({
                                                     title: '修改评分',
@@ -161,7 +196,7 @@ export default function CollectionList(props: ClippingListProps) {
                                             修改评分
                                         </Menu.Item>
                                         <Menu.Item
-                                            key="2"
+                                            key="4"
                                             onClick={() => {
                                                 setDialogInfo({
                                                     title: '修改标签',
@@ -181,6 +216,15 @@ export default function CollectionList(props: ClippingListProps) {
                                             }}
                                         >
                                             修改标签
+                                        </Menu.Item>
+                                        <Menu.Item
+                                            key="5"
+                                            onClick={() => {
+                                                handleOpenForEditCover();
+                                                setUUIDForEditCover(item.uuid);
+                                            }}
+                                        >
+                                            修改封面
                                         </Menu.Item>
                                         <Menu.Item
                                             key="6"
@@ -330,6 +374,85 @@ export default function CollectionList(props: ClippingListProps) {
                     </DialogActions>
                 </Dialog>
             </div>
+
+            <Dialog
+                open={openForEditCover}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+                fullWidth
+                maxWidth="sm"
+            >
+                <DialogTitle id="alert-dialog-title">{'修改集合封面'}</DialogTitle>
+                <DialogContent style={{ margin: '0 auto' }}>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            '& .MuiTextField-root': { width: '25ch' },
+                        }}
+                    >
+                        <FormControl variant="standard" sx={{ m: 1, mt: 3, width: '25ch' }}>
+                            <Typography
+                                style={{ position: 'relative', paddingTop: 5 }}
+                                variant="subtitle1"
+                                gutterBottom
+                                component="div"
+                            >
+                                封面:
+                            </Typography>
+                            <div style={{ position: 'absolute', paddingLeft: 45 }}>
+                                <Dropzone
+                                    onDrop={async (acceptedFiles) => {
+                                        let base64Str = await toBase64(acceptedFiles[0]);
+                                        setFormData({ ...formData, cover: base64Str });
+                                    }}
+                                >
+                                    {({ getRootProps, getInputProps }) => (
+                                        <section>
+                                            <div {...getRootProps()}>
+                                                <input {...getInputProps()} />
+                                                {formData.cover == null ? (
+                                                    <Button variant="contained">上传</Button>
+                                                ) : (
+                                                    <Chip
+                                                        label="封面"
+                                                        onDelete={() => {
+                                                            setFormData({
+                                                                ...formData,
+                                                                cover: null,
+                                                            });
+                                                        }}
+                                                        deleteIcon={<DeleteIcon />}
+                                                        variant="outlined"
+                                                    />
+                                                )}
+                                            </div>
+                                        </section>
+                                    )}
+                                </Dropzone>
+                                <FormHelperText id="standard-weight-helper-text">
+                                    不能为空
+                                </FormHelperText>
+                            </div>
+                        </FormControl>
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseForEditCover}>取消</Button>
+                    <Button
+                        onClick={() => {
+                            let ok = handleEditCollCover();
+                            if (ok) {
+                                handleCloseForEditCover();
+                            }
+                        }}
+                        autoFocus
+                    >
+                        确认
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
             <CollectionClippings
                 key={uuid1}

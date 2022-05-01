@@ -143,3 +143,8 @@ backend/site
 
 # mypy
 backend/.mypy_cache/
+
+backend/lazykindler.db
+backend/data
+
+.DS_Store

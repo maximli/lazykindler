@@ -14,6 +14,8 @@ from ..util.util import difference, generate_uuid, get_md5
 from ..database.database import db
 
 clipping_path = u'/Volumes/Kindle/documents/My Clippings.txt'
+
+
 # clipping_path = u'/Users/wp/Downloads/My Clippings.txt'
 
 class ClippingHelper(object):
@@ -24,7 +26,7 @@ class ClippingHelper(object):
         exists = path.exists(clipping_path)
         if not exists:
             return
-        
+
         file = open(clipping_path, 'r')
         lines = file.readlines()
 
@@ -38,21 +40,19 @@ class ClippingHelper(object):
 
         for clip in clippings:
             self.handle_single_clipping(clip[0], clip[1], clip[3])
-        
 
     def handle_single_clipping(self, title, time_info, clip_content):
         book_name = self.extract_book_name(title)
         author = self.extract_author(title)
-        timestamp = self.extract_time(time_info) 
+        timestamp = self.extract_time(time_info)
 
         str_md5 = hashlib.md5(clip_content.encode('utf-8')).hexdigest()
 
         clips = db.query("select uuid from clipping where md5='{}';".format(str_md5))
         if clips is not None and len(clips) > 0:
             return
-        
-        db.insert_clipping(generate_uuid(), book_name, author, clip_content, timestamp, str_md5)
 
+        db.insert_clipping(generate_uuid(), book_name, author, clip_content, timestamp, str_md5)
 
     def extract_book_name(self, title):
         index = title.find('(')
@@ -61,14 +61,12 @@ class ClippingHelper(object):
         book_name = title[:index].strip()
         return book_name
 
-
     def extract_author(self, title):
-        return title[title.rfind("(")+1:title.rfind(")")]
-
+        return title[title.rfind("(") + 1:title.rfind(")")]
 
     def extract_time(self, time_info):
         index = time_info.find(',')
-        str = time_info[index+1:].strip()
+        str = time_info[index + 1:].strip()
         return time.mktime(datetime.datetime.strptime(str, '%d %B %Y %H:%M:%S').timetuple())
 
 
@@ -99,7 +97,7 @@ def delete_clipping(uuid):
                 "update coll set item_uuids=? where uuid=?", (None, coll['uuid']))
         else:
             update_coll(';'.join(item_uuids),
-                                   coll['uuid'])
+                        coll['uuid'])
     return "success"
 
 
@@ -143,7 +141,7 @@ def update_clipping(uuid, key, value):
             coll_item_uuids = []
             if coll_info["item_uuids"] is not None:
                 l = coll_info["item_uuids"].split(";")
-                coll_item_uuids = l.append(uuid)
+                l.append(uuid)
                 coll_item_uuids = l
             else:
                 coll_item_uuids.append(uuid)
@@ -162,4 +160,25 @@ def update_clipping(uuid, key, value):
         else:
             db.run_sql("update clipping set {}='{}' where uuid='{}'".format(
                 key, value, uuid))
+    return "success"
+
+
+def delete_all_clipping():
+    colls = db.query(
+        "select uuid from coll where coll_type='clipping'")
+    for coll in colls:
+        db.run_sql("delete from cover where uuid='{}'".format(coll['uuid']))
+
+    db.run_sql("delete from coll where coll_type='clipping'")
+
+    db.run_sql("delete from clipping")
+    db.run_sql("DELETE FROM sqlite_sequence WHERE name = 'collping'")
+
+    covers = db.query("select uuid from cover")
+    if covers is None or len(covers) == 0:
+        db.run_sql("DELETE FROM sqlite_sequence WHERE name = 'cover'")
+
+    colls = db.query("select uuid from coll")
+    if colls is None or len(colls) == 0:
+        db.run_sql("DELETE FROM sqlite_sequence WHERE name = 'coll'")
     return "success"
