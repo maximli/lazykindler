@@ -41,7 +41,17 @@ def store_book_from_path(book_path, data_path):
         coll_uuids = ""
 
         book_size = os.path.getsize(book_path)
-        meta = get_metadata(book_path)
+
+        meta = None
+        has_error = False
+        try:
+            meta = get_metadata(book_path)
+        except Exception as error:
+            has_error = True
+            print("store_book_from_path------------book_path = {}, error = {}".format(book_path, error))
+        finally:
+            if has_error:
+                return
 
         for key, value in meta.items():
             if key == "subject":

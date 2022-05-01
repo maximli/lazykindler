@@ -11,6 +11,9 @@ supportedBookFormat = {
     ".azw3": True,
 }
 
+def if_ext_supported(ext):
+    return ext.lower() in supportedBookFormat
+
 def ls_books(dir):
     files = list()
     for item in os.listdir(dir):
@@ -19,7 +22,7 @@ def ls_books(dir):
             if os.path.isdir(abspath):
                 files = files + ls_books(abspath)
             else:
-                if pathlib.Path(abspath).suffix in supportedBookFormat:
+                if if_ext_supported(pathlib.Path(abspath).suffix):
                     files.append(abspath)
                 else:
                     print("ls_books. 忽略文件: ", abspath)

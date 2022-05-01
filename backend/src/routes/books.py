@@ -2,7 +2,7 @@ from flask import request
 import os
 import pathlib
 from pathlib import Path
-from ..util.util import ls_books, supportedBookFormat
+from ..util.util import if_ext_supported, ls_books
 from ..service import books
 
 
@@ -32,7 +32,7 @@ def store_books():
                 i += 1
                 books.store_book_from_path(filepath, data_path)
         else:
-            if pathlib.Path(book_path).suffix in supportedBookFormat:
+            if if_ext_supported(pathlib.Path(book_path).suffix):
                 print("存储书籍-----------index = {}, filepath = {}".format(i, book_path))
                 i += 1
                 books.store_book_from_path(book_path, data_path)
