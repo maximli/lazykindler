@@ -29,6 +29,10 @@
 #### 导入kindle clippings文件内容
 这个功能目前只支持mac平台使用。kindle连接电脑后，平台会自动把 kindle的My Clippings.txt导入到系统，用于统一管理和多维度展示. 当kindle的My Clippings.txt文件发生变化后，平台会自动导入My Clippings.txt文件里新增的部分，不会重复导入.
 
+## 依赖
+python 3.10.4
+nodejs v14.19.1
+其他版本未经测试
 
 ## 启动服务
 ### 安装依赖
