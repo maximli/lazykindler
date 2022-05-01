@@ -338,7 +338,9 @@ def delete_all_books():
     
     path = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent.absolute()
     data_path = os.path.join(path, "data")
-    shutil.rmtree(data_path)
+    isExist = os.path.exists(data_path)
+    if isExist:
+        shutil.rmtree(data_path)
     return "success"
 
 
