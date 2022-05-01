@@ -85,3 +85,8 @@ def update_book_cover():
     book_uuid = content['book_uuid']
     cover_str = content['cover']
     return books.upsert_book_cover(book_uuid, cover_str)
+
+
+def download_file():
+    uuid = request.args.get('uuid')
+    return books.download_file(uuid)

@@ -13,9 +13,7 @@ from ..service.collection import update_coll
 
 from ..database.database import db
 from ..core.kindle.meta.metadata import get_metadata
-from ..util.util import generate_uuid, get_md5, get_now, is_all_chinese, difference
-
-md5_hash = hashlib.md5()
+from ..util.util import add_md5_to_filename, generate_uuid, get_md5, get_now, is_all_chinese, difference, remove_md5_from_filename
 
 
 def store_book_from_path(book_path, data_path):
@@ -95,7 +93,11 @@ def store_book_from_path(book_path, data_path):
             coll_uuids = None
         db.insert_book(uuid, title, None, author, subjects,
                        book_size, publisher, coll_uuids, md5, book_path)
+
         shutil.copy2(book_path, data_path)
+        p1 = os.path.join(data_path, os.path.basename(book_path))
+        p2 = add_md5_to_filename(p1)
+        os.rename(p1, p2)
 
 
 def get_books_meta(storeType):
@@ -382,4 +384,31 @@ def delete_book_data_by_uuid(uuid):
                 break
             except OSError:
                 break
+    return "success"
+
+
+def download_file(uuid):
+    book_info = db.query(
+        "select md5 from book_meta where uuid='{}'".format(uuid))[0]
+    target_md5 = book_info['md5']
+
+    path = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent.absolute()
+    data_path = os.path.join(path, "data")
+    is_exist = os.path.exists(data_path)
+    if not is_exist:
+        return "success"
+
+    filepaths = ls_books(data_path)
+    for filepath in filepaths:
+        if target_md5 in filepath:
+            download_path = str(Path.home() / "Downloads")
+            shutil.copy2(filepath, download_path)
+
+            md5_filename = os.path.basename(filepath)
+            original_filename = remove_md5_from_filename(md5_filename)
+
+            p1 = os.path.join(download_path, md5_filename)
+            p2 = os.path.join(download_path, original_filename)
+            os.rename(p1, p2)
+            break
     return "success"

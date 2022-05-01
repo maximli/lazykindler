@@ -26,7 +26,7 @@ export const getCover = (uuid: string) => {
 // 修改书籍元数据信息
 export const updateBookMeta = async (uuid: string, key: string, value: any) => {
     if (value == null) {
-        value = ""
+        value = '';
     }
     const data = await axiosInstance.post(`/api/book/update`, {
         uuid: uuid,
@@ -45,14 +45,18 @@ export const deleteBook = (uuid: string) => {
 
 // 根据关键词删除书籍
 export const deleteBookByKeyword = (store_type: string, keyword: string, value: string) => {
-    return axiosInstance.delete(`/api/book/delete/bykeyword?store_type=${store_type}&keyword=${keyword}&value=${value}`).then((data: any) => {
-        return data.data;
-    });
+    return axiosInstance
+        .delete(
+            `/api/book/delete/bykeyword?store_type=${store_type}&keyword=${keyword}&value=${value}`,
+        )
+        .then((data: any) => {
+            return data.data;
+        });
 };
 
 // 根据所有书籍
 export const deleteAllBooks = () => {
-    return axiosInstance.delete(`/api/book/delete/all`)
+    return axiosInstance.delete(`/api/book/delete/all`);
 };
 
 // 上传书籍或书籍所在目录
@@ -68,5 +72,12 @@ export const updateBookCover = (uuid: string, cover: string) => {
     return axiosInstance.post(`/api/book/update/cover`, {
         book_uuid: uuid,
         cover,
+    });
+};
+
+// 下载书籍
+export const downloadBook = (uuid: string) => {
+    return axiosInstance.get(`/api/book/download?uuid=${uuid}`).then((data: any) => {
+        return data.data;
     });
 };

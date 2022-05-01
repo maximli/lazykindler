@@ -1,4 +1,4 @@
-import { deleteBook, updateBookCover, updateBookMeta } from '@/services';
+import { deleteBook, downloadBook, updateBookCover, updateBookMeta } from '@/services';
 import { humanFileSize, toBase64 } from '@/util';
 import { SettingOutlined } from '@ant-design/icons';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
@@ -8,6 +8,8 @@ import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import StraightenIcon from '@mui/icons-material/Straighten';
 import Dropzone from 'react-dropzone';
 import Divider from '@mui/material/Divider';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { Menu } from 'antd';
 import DeleteIcon from '@mui/icons-material/Delete';
 import StarIcon from '@mui/icons-material/Star';
@@ -65,6 +67,8 @@ export default function BookCardList(props: BookCardListProps) {
 
     const [uuidForEditCover, setUUIDForEditCover] = useState<any>();
     const [openForEditCover, setOpenForEditCover] = useState(false);
+
+    const notify = () => toast("下载成功!");
 
     const handleOpenForEditCover = () => {
         setOpenForEditCover(true);
@@ -246,6 +250,17 @@ export default function BookCardList(props: BookCardListProps) {
                                             </Menu.Item>
                                             <Menu.Item
                                                 key="7"
+                                                onClick={() => {
+                                                    downloadBook(item.uuid)
+                                                    .then(() => {
+                                                        notify()
+                                                    })
+                                                }}
+                                            >
+                                                下载书籍
+                                            </Menu.Item>
+                                            <Menu.Item
+                                                key="8"
                                                 onClick={() => {
                                                     handleClickOpen(item.uuid);
                                                 }}
@@ -518,6 +533,8 @@ export default function BookCardList(props: BookCardListProps) {
                     });
                 }}
             />
+
+            <ToastContainer />
         </div>
     );
 }

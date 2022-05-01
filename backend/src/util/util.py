@@ -2,8 +2,9 @@ from flask import jsonify
 import hashlib
 import uuid
 import os
-import glob
 import pathlib
+import hashlib
+from pathlib import Path
 
 # 支持的电子书格式
 supportedBookFormat = {
@@ -80,3 +81,15 @@ def difference(list1, list2):
 
 def utf8len(s):
     return len(s.encode('utf-8'))
+
+
+
+def add_md5_to_filename(filepath):
+    filename, file_extension = os.path.splitext(filepath)
+    md5 = get_md5(filepath)
+    return filename + "______" + md5 + file_extension
+
+
+def remove_md5_from_filename(filepath):
+    filename, file_extension = os.path.splitext(filepath)
+    return filename.split("______", 1)[0] + file_extension
