@@ -62,3 +62,13 @@ export const humanFileSize = (bytes: any, si = false, dp = 1) => {
 
     return bytes.toFixed(dp) + ' ' + units[u];
 };
+
+export const countChOfStr = (str: string, c: string) => {
+    if (str == null) {
+        return 0
+    }
+    var result = 0,
+        i = 0;
+    for (i; i < str.length; i++) if (str[i] == c) result++;
+    return result + 1;
+};

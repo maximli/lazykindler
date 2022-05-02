@@ -5,12 +5,13 @@ import {
     updateCollection,
     updateCollectionCover,
 } from '@/services';
-import { preHandleSubjects, toBase64 } from '@/util';
+import { countChOfStr, preHandleSubjects, toBase64 } from '@/util';
 import { SettingOutlined, TagOutlined } from '@ant-design/icons';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import StarIcon from '@mui/icons-material/Star';
 import Dropzone from 'react-dropzone';
 import DeleteIcon from '@mui/icons-material/Delete';
+import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import Divider from '@mui/material/Divider';
 import {
     Box,
@@ -289,6 +290,20 @@ export default function CollectionList(props: ClippingListProps) {
                                                 style={{ paddingTop: 1.2, paddingLeft: 15 }}
                                             >
                                                 {item.stars}
+                                            </Typography>
+                                        </Box>
+
+                                        <Box
+                                            display="flex"
+                                            alignItems="center"
+                                            style={{ marginBottom: 10 }}
+                                        >
+                                            <FormatListNumberedIcon style={{ height: 20 }} />
+                                            <Typography
+                                                variant="body2"
+                                                style={{ paddingTop: 1.2, paddingLeft: 15 }}
+                                            >
+                                                {countChOfStr(item.item_uuids, ";")} 个摘抄
                                             </Typography>
                                         </Box>
 
