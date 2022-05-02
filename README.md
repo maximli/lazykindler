@@ -66,7 +66,7 @@ yarn start
 <img width="1438" alt="Snipaste_2022-03-04_18-45-40" src="https://user-images.githubusercontent.com/16133390/156749508-db0c952b-1395-4609-af33-939d576b607e.png">
 <img width="1438" alt="Snipaste_2022-03-04_18-45-40" src="https://user-images.githubusercontent.com/16133390/166182011-09a7897b-7566-426f-a535-ac09c95e0f0a.jpg">
 
-
+<img width="1438" alt="Snipaste_2022-03-04_18-45-40" src="https://user-images.githubusercontent.com/16133390/166182599-a9a92445-7640-43f0-9d28-0437a932f300.jpg">
 
 # 其他
 用于kindle的第三方工具最有名的应该是calibre，但是这个软件的功能偏向于 "编辑"，对于大量电子书的多维度展示做的相对简陋，因此才打算自己写一个方便管理大量电子书的工具.
