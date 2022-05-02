@@ -210,6 +210,7 @@ def get_books_meta_by_uuids(uuids):
         book_meta_list = db.query(
             "select * from book_meta where uuid='{}'".format(uuid))
         result = result + book_meta_list
+    result.sort(key=lambda x: x['size'], reverse=True)
     return jsonify(result)
 
 

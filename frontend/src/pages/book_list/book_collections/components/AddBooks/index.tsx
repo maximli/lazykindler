@@ -138,7 +138,7 @@ export default function AddBooks(props: AddBooksProps) {
         const keyword = e.target.value;
         setData(
             _.filter(allBooksMeta, (item: BookMetaDataType) => {
-                return item.name.includes(keyword) || item.author.includes(keyword);
+                return (item.name != null && item.name.includes(keyword)) || (item.author != null && item.author.includes(keyword));
             }),
         );
     };
