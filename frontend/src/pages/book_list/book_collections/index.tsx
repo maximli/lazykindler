@@ -336,7 +336,7 @@ export default function BookCollections() {
                             overflow: 'auto',
                         }}
                     >
-                        <div style={{ width: width - 530 }}>
+                        <div style={{ width: width - 360 }}>
                             <BookCardList data={data} fetchBookCollections={fetchBookCollections} />
                         </div>
                     </Grid>

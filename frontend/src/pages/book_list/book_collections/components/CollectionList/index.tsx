@@ -125,11 +125,11 @@ export default function BookCardList(props: BookCardListProps) {
             <AntList<any>
                 rowKey="id"
                 grid={{
-                    gutter: 16,
-                    xs: 1,
-                    sm: 2,
-                    md: 3,
-                    lg: 4,
+                    gutter: 7,
+                    xs: 3,
+                    sm: 4,
+                    md: 5,
+                    lg: 5,
                     xl: 5,
                     xxl: 6,
                 }}
