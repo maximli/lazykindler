@@ -64,8 +64,6 @@ yarn start
 <img width="1551" alt="Snipaste_2022-02-07_23-33-55" src="https://user-images.githubusercontent.com/16133390/152820863-52bfb241-33c5-4c79-bea5-21ebc04dd322.png">
 <img width="1552" alt="Snipaste_2022-02-07_23-38-05" src="https://user-images.githubusercontent.com/16133390/152820869-642779c8-82df-405f-8478-6084f981bf20.png">
 <img width="1438" alt="Snipaste_2022-03-04_18-45-40" src="https://user-images.githubusercontent.com/16133390/156749508-db0c952b-1395-4609-af33-939d576b607e.png">
-<img width="1438" alt="Snipaste_2022-03-04_18-45-40" src="https://user-images.githubusercontent.com/16133390/166182011-09a7897b-7566-426f-a535-ac09c95e0f0a.jpg">
-
 <img width="1438" alt="Snipaste_2022-03-04_18-45-40" src="https://user-images.githubusercontent.com/16133390/166182599-a9a92445-7640-43f0-9d28-0437a932f300.jpg">
 
 # 其他
