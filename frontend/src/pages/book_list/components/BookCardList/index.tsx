@@ -4,15 +4,10 @@ import { SettingOutlined } from '@ant-design/icons';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ArchiveIcon from '@mui/icons-material/Archive';
-import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import StraightenIcon from '@mui/icons-material/Straighten';
-import Dropzone from 'react-dropzone';
-import Divider from '@mui/material/Divider';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { Menu } from 'antd';
 import DeleteIcon from '@mui/icons-material/Delete';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import StarIcon from '@mui/icons-material/Star';
+import StraightenIcon from '@mui/icons-material/Straighten';
 import {
     Box,
     Button,
@@ -20,15 +15,19 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
+    DialogContentText,
     DialogTitle,
     FormControl,
     FormHelperText,
     Typography,
-    DialogContentText,
+    Snackbar,
 } from '@mui/material';
+import Divider from '@mui/material/Divider';
+import { Menu } from 'antd';
 import { List as AntList, Card } from 'antd';
 import _ from 'lodash';
 import { useState } from 'react';
+import Dropzone from 'react-dropzone';
 import { v4 as uuidv4 } from 'uuid';
 
 import { BookMetaDataType } from '../../../data';
@@ -68,7 +67,10 @@ export default function BookCardList(props: BookCardListProps) {
     const [uuidForEditCover, setUUIDForEditCover] = useState<any>();
     const [openForEditCover, setOpenForEditCover] = useState(false);
 
-    const notify = () => toast("下载成功!");
+    const [snackBar, setSnackBar] = useState<any>({
+        message: '',
+        open: false,
+    });
 
     const handleOpenForEditCover = () => {
         setOpenForEditCover(true);
@@ -100,7 +102,7 @@ export default function BookCardList(props: BookCardListProps) {
 
         cover = cover.trim();
 
-        updateBookCover(uuidForEditCover, cover)
+        updateBookCover(uuidForEditCover, cover);
         return true;
     };
 
@@ -251,10 +253,12 @@ export default function BookCardList(props: BookCardListProps) {
                                             <Menu.Item
                                                 key="7"
                                                 onClick={() => {
-                                                    downloadBook(item.uuid)
-                                                    .then(() => {
-                                                        notify()
-                                                    })
+                                                    downloadBook(item.uuid).then(() => {
+                                                        setSnackBar({
+                                                            message: "下载成功!",
+                                                            open: true
+                                                        })
+                                                    });
                                                 }}
                                             >
                                                 下载书籍
@@ -534,7 +538,18 @@ export default function BookCardList(props: BookCardListProps) {
                 }}
             />
 
-            <ToastContainer />
+            <Snackbar
+                open={snackBar.open}
+                onClose={() => {
+                    setSnackBar({
+                        message: "",
+                        open: false
+                    })
+                }}
+                autoHideDuration={3000}
+                message={snackBar.message}
+                key={snackBar.message}
+            />
         </div>
     );
 }

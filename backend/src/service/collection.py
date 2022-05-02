@@ -133,6 +133,8 @@ def delete_colls_with_items(coll_uuid):
 
 def update_collection(uuid, key, value):
     value = value.strip()
+    value = value.replace(' ', '')
+    value = value.removesuffix(';')
 
     coll_info = db.query(
         "select coll_type, item_uuids from coll where uuid='{}';".format(uuid))[0]

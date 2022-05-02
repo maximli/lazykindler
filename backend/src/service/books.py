@@ -145,6 +145,8 @@ def delete_book(uuid):
 
 def update_book_meta(uuid, key, value):
     value = value.strip()
+    value = value.replace(' ', '')
+    value = value.removesuffix(';')
 
     if key == "coll_uuids":
         db.run_sql("delete from tmp_book where uuid='{}'".format(uuid))
@@ -377,8 +379,7 @@ def delete_book_data_by_uuid(uuid):
 
     filepaths = ls_books(data_path)
     for filepath in filepaths:
-        md5 = get_md5(filepath)
-        if md5 == target_md5:
+        if target_md5 in filepath:
             try:
                 os.remove(filepath)
                 break
