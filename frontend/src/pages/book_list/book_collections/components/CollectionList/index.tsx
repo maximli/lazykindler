@@ -336,7 +336,7 @@ export default function BookCardList(props: BookCardListProps) {
                                                 variant="body2"
                                                 style={{ paddingTop: 1.2, paddingLeft: 15 }}
                                             >
-                                                {countChOfStr(item.item_uuids, ";") + 1} 本书
+                                                {countChOfStr(item.item_uuids, ";")} 本书
                                             </Typography>
                                         </Box>
 
