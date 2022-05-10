@@ -78,7 +78,14 @@ yarn start
 <img width="1551" alt="Snipaste_2022-02-07_23-33-55" src="https://user-images.githubusercontent.com/16133390/152820863-52bfb241-33c5-4c79-bea5-21ebc04dd322.png">
 <img width="1552" alt="Snipaste_2022-02-07_23-38-05" src="https://user-images.githubusercontent.com/16133390/152820869-642779c8-82df-405f-8478-6084f981bf20.png">
 <img width="1438" alt="Snipaste_2022-03-04_18-45-40" src="https://user-images.githubusercontent.com/16133390/156749508-db0c952b-1395-4609-af33-939d576b607e.png">
-<img width="1438" alt="Snipaste_2022-03-04_18-45-40" src="https://user-images.githubusercontent.com/16133390/166182599-a9a92445-7640-43f0-9d28-0437a932f300.jpg">
+
+
+<img width="1438" alt="Snipaste_2022-03-04_18-45-41" src="https://user-images.githubusercontent.com/16133390/167545605-2484499d-c53f-4819-9492-c3147b3ffca6.jpg">
+<img width="1438" alt="Snipaste_2022-03-04_18-45-42" src="https://user-images.githubusercontent.com/16133390/167545619-34eb7788-fa19-4262-9417-4ed490e464ac.jpg">
+<img width="1438" alt="Snipaste_2022-03-04_18-45-43" src="https://user-images.githubusercontent.com/16133390/167545628-82ce810d-0c77-448e-8b5c-152c859148aa.jpg">
+
+
+
 
 # 其他
 用于kindle的第三方工具最有名的应该是calibre，但是这个软件的功能偏向于 "编辑"，对于大量电子书的多维度展示做的相对简陋，因此才打算自己写一个方便管理大量电子书的工具.
