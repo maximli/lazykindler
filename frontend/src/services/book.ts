@@ -81,3 +81,8 @@ export const downloadBook = (uuid: string) => {
         return data.data;
     });
 };
+
+// 下载所有书籍
+export const downloadAllBooks = () => {
+    return axiosInstance.get(`/api/book/download/all`)
+};

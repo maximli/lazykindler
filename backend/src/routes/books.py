@@ -90,3 +90,6 @@ def update_book_cover():
 def download_file():
     uuid = request.args.get('uuid')
     return books.download_file(uuid)
+
+def download_all_files():
+    return books.download_all_files()

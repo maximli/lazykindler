@@ -107,7 +107,7 @@ export default function ChangeBookColl(props: ChangeBookCollProps) {
                                 'coll_uuids',
                                 selectedBookUUIDs.join(';'),
                             ).then(() => {
-                                fetchBooks();
+                                // fetchBooks();
                             });
                         }}
                         autoFocus

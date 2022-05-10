@@ -86,8 +86,14 @@ def utf8len(s):
 
 def add_md5_to_filename(filepath):
     filename, file_extension = os.path.splitext(filepath)
+    print(file_extension)
     md5 = get_md5(filepath)
-    return filename + "______" + md5 + file_extension
+
+    con_str = "______"
+    if con_str + md5 + file_extension not in filepath:
+        return filename + con_str  + md5 + file_extension
+    return filepath
+
 
 
 def remove_md5_from_filename(filepath):

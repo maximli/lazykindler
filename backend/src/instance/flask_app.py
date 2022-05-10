@@ -35,6 +35,7 @@ app.add_url_rule('/api/book/delete', view_func=books.delete_book, methods=['DELE
 app.add_url_rule('/api/book/delete/bykeyword', view_func=books.delete_book_by_keyword, methods=['DELETE'])
 app.add_url_rule('/api/book/delete/all', view_func=books.delete_all_books, methods=['DELETE'])
 app.add_url_rule('/api/book/download', view_func=books.download_file, methods=['GET'])
+app.add_url_rule('/api/book/download/all', view_func=books.download_all_files, methods=['GET'])
 
 app.add_url_rule('/api/collection/create', view_func=collection.create_collection, methods=['POST'])
 app.add_url_rule('/api/collection/get/all', view_func=collection.get_all_collections, methods=['GET'])

@@ -1,4 +1,4 @@
-import { deleteAllBooks, deleteAllClipping, uploadBooks } from '@/services';
+import { deleteAllBooks, deleteAllClipping, downloadAllBooks, uploadBooks } from '@/services';
 import { PageContainer } from '@ant-design/pro-layout';
 import { FmdBadTwoTone } from '@mui/icons-material';
 import {
@@ -82,6 +82,14 @@ const Welcome: React.FC = () => {
                             'aria-labelledby': 'basic-button',
                         }}
                     >
+                        <MenuItem
+                            onClick={() => {
+                                downloadAllBooks()
+                                setAnchorEl(null);
+                            }}
+                        >
+                            下载所有书籍
+                        </MenuItem>
                         <MenuItem
                             onClick={() => {
                                 setDeleteDialog(true);

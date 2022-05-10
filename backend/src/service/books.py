@@ -400,17 +400,49 @@ def download_file(uuid):
     if not is_exist:
         return "success"
 
+    download_dir = str(Path.home() / "Downloads")
+    if not os.path.isdir(download_dir):
+        download_dir = str(Path.home() / "下载")
+
     filepaths = ls_books(data_path)
     for filepath in filepaths:
         if target_md5 in filepath:
-            download_path = str(Path.home() / "Downloads")
-            shutil.copy2(filepath, download_path)
+            shutil.copy2(filepath, download_dir)
 
             md5_filename = os.path.basename(filepath)
             original_filename = remove_md5_from_filename(md5_filename)
 
-            p1 = os.path.join(download_path, md5_filename)
-            p2 = os.path.join(download_path, original_filename)
+            p1 = os.path.join(download_dir, md5_filename)
+            p2 = os.path.join(download_dir, original_filename)
             os.rename(p1, p2)
             break
+    return "success"
+
+
+def download_all_files():
+    download_dir = str(Path.home() / "Downloads")
+    if not os.path.isdir(download_dir):
+        download_dir = str(Path.home() / "下载")
+
+    target_dir = os.path.join(download_dir, "lazykindler")
+    isExist = os.path.exists(target_dir)
+    if not isExist:
+        os.makedirs(target_dir)
+    
+    path = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent.absolute()
+    data_path = os.path.join(path, "data")
+    is_exist = os.path.exists(data_path)
+    if not is_exist:
+        return "success"
+
+    filepaths = ls_books(data_path)
+    for filepath in filepaths:
+            shutil.copy2(filepath, target_dir)
+
+            md5_filename = os.path.basename(filepath)
+            original_filename = remove_md5_from_filename(md5_filename)
+
+            p1 = os.path.join(target_dir, md5_filename)
+            p2 = os.path.join(target_dir, original_filename)
+            os.rename(p1, p2)
     return "success"
