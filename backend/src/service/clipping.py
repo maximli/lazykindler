@@ -74,6 +74,7 @@ class ClippingHelper(object):
 
 def get_all_clippings():
     data = db.query("select * from clipping where deleted != 1;")
+    data.sort(key=lambda x: x['addDate'], reverse=True)
     return jsonify(data)
 
 
