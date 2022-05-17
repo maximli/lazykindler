@@ -226,7 +226,7 @@ const ClippingCardList = (props: ClippingCardListProps) => {
                             ))}
                     </ImageList>
                     <TablePagination
-                        rowsPerPageOptions={[15, 25, 50]}
+                        rowsPerPageOptions={[15, 25, 50, 100, 200, 300, 500]}
                         component="div"
                         count={data.length}
                         rowsPerPage={rowsPerPage}
