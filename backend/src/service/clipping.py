@@ -51,6 +51,8 @@ class ClippingHelper(object):
         clips = db.query("select uuid from clipping where md5='{}';".format(str_md5))
         if clips is not None and len(clips) > 0:
             return
+        
+        clip_content = "       " + clip_content.replace(' ', '\n       ') 
 
         db.insert_clipping(generate_uuid(), book_name, author, clip_content, timestamp, str_md5)
 

@@ -216,6 +216,7 @@ const ClippingCardList = (props: ClippingCardListProps) => {
                                                 height: '100%',
                                                 paddingTop: 10,
                                                 fontSize: 15,
+                                                whiteSpace: "pre-wrap"
                                             }}
                                         >
                                             {item.content}
