@@ -57,5 +57,6 @@ CREATE TABLE clipping (
 	stars               INTEGER,      -- 评分。满分10分
 	coll_uuids          LONGTEXT,     -- clipping_collections uuids列表，分号相隔
 	md5                 TEXT,         -- md5
+	deleted             INTEGER,      -- 是否被删除。1: 删除
 	create_time         TEXT          -- 创建时间
 );

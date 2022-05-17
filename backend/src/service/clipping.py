@@ -73,7 +73,7 @@ class ClippingHelper(object):
 
 
 def get_all_clippings():
-    data = db.query("select * from clipping;")
+    data = db.query("select * from clipping where deleted != 1;")
     return jsonify(data)
 
 
@@ -87,7 +87,7 @@ def get_clipping_by_uuids(uuids):
 
 
 def delete_clipping(uuid):
-    db.run_sql("delete from clipping where uuid='{}'".format(uuid))
+    db.run_sql("update clipping set deleted=1 where uuid='{}'".format(uuid))
 
     colls = db.query(
         "select uuid, item_uuids from coll where item_uuids like '%{}%'".format(uuid))
