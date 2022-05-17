@@ -43,7 +43,8 @@ mobi和azw3。其他类型的电子书在导入时会自动被忽略。\
 #### 导入kindle clippings文件内容
 这个功能目前只支持mac平台使用。kindle连接电脑后，平台会自动检测kindle是否连接，然后把 kindle的My Clippings.txt导入到系统，用于统一管理和多维度展示. 当kindle的My Clippings.txt文件发生变化后，平台会自动导入My Clippings.txt文件里新增的部分，不会重复导入。这些过程都是自动完成的，不需要用户介入。用户只要刷新页面就能看到新增的clipping。
 
-
+![Xnip2022-05-17_13-49-58](https://user-images.githubusercontent.com/16133390/168738445-5b796c99-edd8-4dfc-a1eb-7f84c96b0277.jpg)
+<img width="600" alt="Snipaste_2022-02-07_23-33-55" src="https://user-images.githubusercontent.com/16133390/168738445-5b796c99-edd8-4dfc-a1eb-7f84c96b0277.jpg">
 
 
 ## 运行环境要求
