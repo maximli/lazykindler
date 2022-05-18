@@ -341,14 +341,22 @@ const ClippingCardList = (props: ClippingCardListProps) => {
                         <Button
                             onClick={() => {
                                 setHighlightInfo(initialHighlightInfo);
-                                deleteHighlight(highlighInfo.uuid, highlighInfo.selectedText);
+                                deleteHighlight(highlighInfo.uuid, highlighInfo.selectedText).then(
+                                    () => {
+                                        fetchClippings();
+                                    },
+                                );
                             }}
                         >
                             删除高亮
                         </Button>
                         <Button
                             onClick={() => {
-                                addHighlight(highlighInfo.uuid, highlighInfo.selectedText);
+                                addHighlight(highlighInfo.uuid, highlighInfo.selectedText).then(
+                                    () => {
+                                        fetchClippings();
+                                    },
+                                );
                                 setHighlightInfo(initialHighlightInfo);
                             }}
                             autoFocus
