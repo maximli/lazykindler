@@ -48,13 +48,15 @@ class ClippingHelper(object):
 
         str_md5 = hashlib.md5(clip_content.encode('utf-8')).hexdigest()
 
-        clips = db.query("select uuid from clipping where md5='{}';".format(str_md5))
+        clips = db.query(
+            "select uuid from clipping where md5='{}';".format(str_md5))
         if clips is not None and len(clips) > 0:
             return
-        
-        clip_content = "      " + clip_content.replace(' ', '\n       ') 
 
-        db.insert_clipping(generate_uuid(), book_name, author, clip_content, timestamp, str_md5)
+        clip_content = "      " + clip_content.replace(' ', '\n       ')
+
+        db.insert_clipping(generate_uuid(), book_name, author,
+                           clip_content, timestamp, str_md5)
 
     def extract_book_name(self, title):
         index = title.find('(')
@@ -75,6 +77,9 @@ class ClippingHelper(object):
 def get_all_clippings():
     data = db.query("select * from clipping where deleted != 1;")
     data.sort(key=lambda x: x['addDate'], reverse=True)
+    for i, e in enumerate(data):
+        if e["highlights"] is not None:
+            data[i]["highlights"] = e["highlights"].split("___")
     return jsonify(data)
 
 
@@ -154,7 +159,8 @@ def update_clipping(uuid, key, value):
     if key == 'author':
         clipping = db.query(
             "select author from clipping where uuid='{}'".format(uuid))[0]
-        db.run_sql("update clipping set author='{}' where author='{}'".format(value, clipping['author']))
+        db.run_sql("update clipping set author='{}' where author='{}'".format(
+            value, clipping['author']))
     else:
         if value is None or value == "":
             db.run_sql_with_params(
@@ -184,4 +190,42 @@ def delete_all_clipping():
     colls = db.query("select uuid from coll")
     if colls is None or len(colls) == 0:
         db.run_sql("DELETE FROM sqlite_sequence WHERE name = 'coll'")
+    return "success"
+
+
+# 给clipping添加高亮
+def add_highlight_to_clipping(clipping_uuid, highlight):
+    if highlight.strip() == "":
+        return "success"
+
+    clipping = db.query(
+        "select uuid, highlights from clipping where uuid='{}'".format(clipping_uuid))[0]
+    highlight_arr = []
+    if clipping["highlights"] is not None:
+        highlight_arr = clipping["highlights"].split("___")
+
+    if highlight in highlight_arr:
+        return "success"
+
+    highlight_arr.append(highlight)
+    db.run_sql("update clipping set highlights='{}' where uuid='{}'".format(
+        "___".join(highlight_arr), clipping_uuid))
+    return "success"
+
+
+# 从clipping删除高亮
+def delete_highlight_from_clipping(clipping_uuid, highlight):
+    clipping = db.query(
+        "select uuid, highlights from clipping where uuid='{}'".format(clipping_uuid))[0]
+    if clipping["highlights"] is None:
+        return "success"
+
+    highlight_arr = clipping["highlights"].split("___")
+
+    if highlight not in highlight_arr:
+        return "success"
+
+    highlight_arr.remove(highlight)
+    db.run_sql("update clipping set highlights='{}' where uuid='{}'".format(
+        "___".join(highlight_arr), clipping_uuid))
     return "success"

@@ -1,5 +1,5 @@
 import { ClippingDataType } from '@/pages/data';
-import { deleteClipping, updateClipping } from '@/services';
+import { addHighlight, deleteClipping, deleteHighlight, updateClipping } from '@/services';
 import { SettingOutlined } from '@ant-design/icons';
 import { GridContent } from '@ant-design/pro-layout';
 import Box from '@mui/material/Box';
@@ -16,7 +16,8 @@ import Typography from '@mui/material/Typography';
 import { Card } from 'antd';
 import { Menu } from 'antd';
 import moment from 'moment';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import Highlighter from 'react-highlight-words';
 import { v4 as uuidv4 } from 'uuid';
 
 import ChangeInfo from '../../../book_list/components/ChangeInfoDialog';
@@ -39,6 +40,12 @@ const initialDialogInfo = {
     open: false,
 };
 
+const initialHighlightInfo = {
+    uuid: '',
+    selectedText: '',
+    open: false,
+};
+
 const ClippingCardList = (props: ClippingCardListProps) => {
     const { data, fetchClippings, height, columns } = props;
 
@@ -52,6 +59,7 @@ const ClippingCardList = (props: ClippingCardListProps) => {
     const [uuid, setUUID] = useState(uuidv4());
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(15);
+    const [highlighInfo, setHighlightInfo] = useState(initialHighlightInfo);
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -216,33 +224,54 @@ const ClippingCardList = (props: ClippingCardListProps) => {
                                                 height: '100%',
                                                 paddingTop: 10,
                                                 fontSize: 15,
-                                                whiteSpace: "pre-wrap"
+                                                whiteSpace: 'pre-wrap',
+                                            }}
+                                            onMouseUp={() => {
+                                                let uuid = item.uuid;
+                                                let selectedText = window
+                                                    .getSelection()!
+                                                    .toString();
+                                                if (selectedText != '') {
+                                                    let info = {
+                                                        open: true,
+                                                        selectedText: selectedText,
+                                                        uuid: uuid,
+                                                    };
+                                                    setHighlightInfo(info);
+                                                }
                                             }}
                                         >
-                                            {item.content}
+                                            <Highlighter
+                                                highlightStyle={{ color: 'red' }}
+                                                searchWords={item.highlights || []}
+                                                // searchWords={['地望着身边的雪瑞']}
+                                                autoEscape={true}
+                                                textToHighlight={item.content}
+                                            />
+                                            {/* {item.content} */}
                                         </Typography>
                                     </Card>
                                 </ImageListItem>
                             ))}
                     </ImageList>
-                    <TablePagination
-                        rowsPerPageOptions={[15, 25, 50, 100, 200, 300, 500]}
-                        component="div"
-                        count={data.length}
-                        rowsPerPage={rowsPerPage}
-                        labelRowsPerPage={<div style={{ paddingTop: 13.5 }}>每页数目</div>}
-                        labelDisplayedRows={(paginationInfo: any) => (
-                            <div style={{ paddingTop: 13.5 }}>
-                                {paginationInfo.from}-{paginationInfo.to}---总共:
-                                {paginationInfo.count}
-                            </div>
-                        )}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                    />
                 </Box>
             </GridContent>
+            <TablePagination
+                rowsPerPageOptions={[15, 25, 50, 100, 200, 300, 500]}
+                component="div"
+                count={data.length}
+                rowsPerPage={rowsPerPage}
+                labelRowsPerPage={<span style={{ paddingTop: 13.5 }}>每页数目</span>}
+                labelDisplayedRows={(paginationInfo: any) => (
+                    <span style={{ paddingTop: 13.5 }}>
+                        {paginationInfo.from}-{paginationInfo.to}---总共:
+                        {paginationInfo.count}
+                    </span>
+                )}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+            />
 
             <ChangeInfo
                 title={dialogInfo['title']}
@@ -259,6 +288,7 @@ const ClippingCardList = (props: ClippingCardListProps) => {
                     onClose={handleClose}
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
+                    fullWidth
                 >
                     <DialogTitle id="alert-dialog-title">警告</DialogTitle>
                     <DialogContent>
@@ -274,6 +304,52 @@ const ClippingCardList = (props: ClippingCardListProps) => {
                                 deleteClipping(deleteClippingUUID).then(() => {
                                     fetchClippings();
                                 });
+                            }}
+                            autoFocus
+                        >
+                            确定
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </div>
+
+            <div>
+                <Dialog
+                    open={highlighInfo.open}
+                    onClose={() => {
+                        setHighlightInfo(initialHighlightInfo);
+                    }}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                    fullWidth
+                >
+                    <DialogTitle id="alert-dialog-title">高亮操作</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            请选择要进行的操作! (要删除高亮部分，请完整选择某一高亮部分。否则
+                            "删除高亮" 操作不会成功执行)
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button
+                            onClick={() => {
+                                setHighlightInfo(initialHighlightInfo);
+                            }}
+                        >
+                            取消
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                setHighlightInfo(initialHighlightInfo);
+                                deleteHighlight(highlighInfo.uuid, highlighInfo.selectedText);
+                            }}
+                        >
+                            删除高亮
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                addHighlight(highlighInfo.uuid, highlighInfo.selectedText);
+                                setHighlightInfo(initialHighlightInfo);
                             }}
                             autoFocus
                         >

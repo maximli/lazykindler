@@ -27,3 +27,17 @@ def update_clipping():
 
 def delete_all_clipping():
     return clipping.delete_all_clipping()
+
+
+def add_highlight_to_clipping():
+    content = request.json
+    uuid = content['uuid']
+    highlight = content['highlight']
+    return clipping.add_highlight_to_clipping(uuid, highlight)
+
+
+def delete_highlight_from_clipping():
+    content = request.json
+    uuid = content['uuid']
+    highlight = content['highlight']
+    return clipping.delete_highlight_from_clipping(uuid, highlight)

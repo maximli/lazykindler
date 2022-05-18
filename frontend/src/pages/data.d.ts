@@ -44,6 +44,7 @@ export interface ClippingDataType {
     addDate: string;
     subjects: string;
     stars: number;
+    highlights: string[];
     coll_uuids: string;
     create_time: string;
 }

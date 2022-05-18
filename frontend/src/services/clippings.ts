@@ -26,7 +26,7 @@ export const deleteClipping = (uuid: string) => {
 // 修改clipping信息
 export const updateClipping = async (uuid: string, key: string, value: any) => {
     if (value == null) {
-        value = ""
+        value = '';
     }
     const data = await axiosInstance.post(`/api/clipping/update`, {
         uuid: uuid,
@@ -38,5 +38,23 @@ export const updateClipping = async (uuid: string, key: string, value: any) => {
 
 // 删除所有摘抄
 export const deleteAllClipping = () => {
-    return axiosInstance.delete(`/api/clipping/delete/all`)
+    return axiosInstance.delete(`/api/clipping/delete/all`);
+};
+
+// 添加高亮
+export const addHighlight = async (uuid: string, highlight: string) => {
+    const data = await axiosInstance.post(`/api/clipping/highlight/add`, {
+        uuid: uuid,
+        highlight,
+    });
+    return data.data;
+};
+
+// 删除高亮
+export const deleteHighlight = async (uuid: string, highlight: string) => {
+    const data = await axiosInstance.post(`/api/clipping/highlight/delete`, {
+        uuid: uuid,
+        highlight,
+    });
+    return data.data;
 };
