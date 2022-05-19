@@ -62,6 +62,7 @@ mobi 和 azw3。其他类型的电子书在导入时会自动被忽略。\
 #### 对 clipping 进行高亮操作
 
 clipping 是我们在读书时对有感触的文字进行高亮操作后记录下来的部分文字或者相关段落，往往是因为其中一句话或者一个词。当我们把 My Clippings.txt 导入平台后，在后期整理时，有必要对当时引起你共鸣的句或词进行高亮操作，方便我们在过了许久以后面对一大坨文字时，直接找到重点内容。
+使用lazykindler，你可以很轻易的做二次高亮操作.
 
 <img width="520" alt="Snipaste_2022-02-07_23-33-55" src="https://user-images.githubusercontent.com/16133390/169091261-17f64dfc-4217-425c-b7b6-fe11aaf83b14.jpg">
 
