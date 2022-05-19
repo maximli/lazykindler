@@ -22,6 +22,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import ChangeInfo from '../../../book_list/components/ChangeInfoDialog';
 import ChangeClippingColl from './ChangeClippingColl';
+import ClippingDialog from './ClippingDialog';
 import styles from './index.less';
 
 const { SubMenu } = Menu;
@@ -46,6 +47,15 @@ const initialHighlightInfo = {
     open: false,
 };
 
+const initialClippingDialogInfo = {
+    uuid: '',
+    open: false,
+    // handleClose
+    clippingContent: '',
+    // highlights: [],
+    book_name: '',
+};
+
 const ClippingCardList = (props: ClippingCardListProps) => {
     const { data, fetchClippings, height, columns } = props;
 
@@ -60,6 +70,7 @@ const ClippingCardList = (props: ClippingCardListProps) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(15);
     const [highlighInfo, setHighlightInfo] = useState(initialHighlightInfo);
+    const [clippingDialogInfo, setClippingDialogInfo] = useState<any>(initialClippingDialogInfo);
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -95,6 +106,25 @@ const ClippingCardList = (props: ClippingCardListProps) => {
                                     <Card
                                         className={styles.card}
                                         hoverable
+                                        onClick={() => {
+                                            let selectedText = window.getSelection()!.toString();
+                                            if (selectedText.length > 0) {
+                                                return;
+                                            }
+                                            setClippingDialogInfo({
+                                                uuid: item.uuid,
+                                                open: true,
+                                                handleClose: () => {
+                                                    console.log('rr11--------------');
+                                                    setChangeClippingCollInfo(
+                                                        initialClippingDialogInfo,
+                                                    );
+                                                },
+                                                clippingContent: item.content,
+                                                highlights: item.highlights,
+                                                book_name: item.book_name,
+                                            });
+                                        }}
                                         actions={[
                                             <Menu mode="vertical" selectable={false}>
                                                 <SubMenu
@@ -244,11 +274,9 @@ const ClippingCardList = (props: ClippingCardListProps) => {
                                             <Highlighter
                                                 highlightStyle={{ color: 'red' }}
                                                 searchWords={item.highlights || []}
-                                                // searchWords={['地望着身边的雪瑞']}
                                                 autoEscape={true}
                                                 textToHighlight={item.content}
                                             />
-                                            {/* {item.content} */}
                                         </Typography>
                                     </Card>
                                 </ImageListItem>
@@ -378,6 +406,21 @@ const ClippingCardList = (props: ClippingCardListProps) => {
                         open: false,
                     });
                 }}
+            />
+
+            <ClippingDialog
+                uuid={clippingDialogInfo.uuid}
+                open={clippingDialogInfo.open}
+                handleClose={() => {
+                    setClippingDialogInfo({
+                        uuid: '',
+                        open: false,
+                    });
+                }}
+                clippingContent={clippingDialogInfo.clippingContent}
+                highlights={clippingDialogInfo.highlights}
+                book_name={clippingDialogInfo.book_name}
+                fetchClippings={fetchClippings}
             />
         </div>
     );

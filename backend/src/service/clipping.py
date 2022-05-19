@@ -89,6 +89,10 @@ def get_clipping_by_uuids(uuids):
         clipping_list = db.query(
             "select * from clipping where uuid='{}'".format(uuid))
         result = result + clipping_list
+
+    for i, e in enumerate(result):
+        if e["highlights"] is not None:
+            result[i]["highlights"] = e["highlights"].split("___")
     return jsonify(result)
 
 
@@ -222,10 +226,15 @@ def delete_highlight_from_clipping(clipping_uuid, highlight):
 
     highlight_arr = clipping["highlights"].split("___")
 
-    if highlight not in highlight_arr:
-        return "success"
+    updated_highlight_arr = highlight_arr.copy()
+    for item in highlight_arr:
+        if item in highlight:
+            updated_highlight_arr.remove(item)
 
-    highlight_arr.remove(highlight)
-    db.run_sql("update clipping set highlights='{}' where uuid='{}'".format(
-        "___".join(highlight_arr), clipping_uuid))
+    if len(updated_highlight_arr) == 0:
+        db.run_sql_with_params(
+            "update clipping set highlights=? where uuid=?", (None, clipping_uuid))
+    else:
+        db.run_sql("update clipping set highlights='{}' where uuid='{}'".format(
+            "___".join(updated_highlight_arr), clipping_uuid))
     return "success"

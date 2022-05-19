@@ -73,7 +73,7 @@ const Clippings: FC = () => {
     });
 
     const fetchClippings = () => {
-        getAllClippings().then((data: any) => {
+        return getAllClippings().then((data: any) => {
             if (data == null) {
                 data = [];
             }
@@ -495,7 +495,12 @@ const Clippings: FC = () => {
                         paddingLeft: 5,
                     }}
                 >
-                    <ClippingCardList data={data} fetchClippings={fetchClippings} height={83} columns={3} />
+                    <ClippingCardList
+                        data={data}
+                        fetchClippings={fetchClippings}
+                        height={83}
+                        columns={3}
+                    />
                 </Grid>
             </Grid>
         </div>
