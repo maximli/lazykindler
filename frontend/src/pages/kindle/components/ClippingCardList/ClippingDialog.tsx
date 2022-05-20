@@ -109,6 +109,7 @@ export default function ClippingDialog(props: ClippingDialogProps) {
                             paddingTop: 10,
                             fontSize: 15,
                             whiteSpace: 'pre-wrap',
+                            textIndent: '2em',
                         }}
                         onMouseUp={() => {
                             let selectedText = window.getSelection()!.toString();
