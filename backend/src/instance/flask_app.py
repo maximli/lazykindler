@@ -8,7 +8,7 @@ import time
 
 from ..service.clipping import ClippingHelper
 
-from ..routes import books, clipping, collection
+from ..routes import books, clipping, collection, comment
 
 
 # flask application initialization
@@ -79,3 +79,13 @@ app.add_url_rule('/api/clipping/highlight/add',
                  view_func=clipping.add_highlight_to_clipping, methods=['POST'])
 app.add_url_rule('/api/clipping/highlight/delete',
                  view_func=clipping.delete_highlight_from_clipping, methods=['POST'])
+
+
+app.add_url_rule('/api/comment/get/by_related_uuid',
+                 view_func=comment.get_comments_of_related_uuid, methods=['GET'])
+app.add_url_rule('/api/comment/create',
+                 view_func=comment.create_comment, methods=['POST'])
+app.add_url_rule('/api/comment/update',
+                 view_func=comment.update_comment, methods=['POST'])
+app.add_url_rule('/api/comment/delete',
+                 view_func=comment.delete_comment, methods=['DELETE'])

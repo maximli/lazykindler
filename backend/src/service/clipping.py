@@ -16,7 +16,8 @@ from ..database.database import db
 clipping_path = u'/Volumes/Kindle/documents/My Clippings.txt'
 
 
-# clipping_path = u'/Users/wp/Downloads/My Clippings.txt'
+# clipping_path = u'/Users/wupeng/Downloads/My Clippings.txt'
+
 
 class ClippingHelper(object):
     def __init__(self):
@@ -98,6 +99,8 @@ def get_clipping_by_uuids(uuids):
 
 def delete_clipping(uuid):
     db.run_sql("update clipping set deleted=1 where uuid='{}'".format(uuid))
+    db.run_sql(
+        "delete from comment where related_uuid='{}'".format('uuid'))
 
     colls = db.query(
         "select uuid, item_uuids from coll where item_uuids like '%{}%'".format(uuid))
@@ -184,7 +187,13 @@ def delete_all_clipping():
 
     db.run_sql("delete from coll where coll_type='clipping'")
 
+    all_clippings = db.query(
+        "select uuid from clipping")
+    for clip in all_clippings:
+        db.run_sql(
+            "delete from comment where related_uuid='{}'".format(clip['uuid']))
     db.run_sql("delete from clipping")
+
     db.run_sql("DELETE FROM sqlite_sequence WHERE name = 'collping'")
 
     covers = db.query("select uuid from cover")

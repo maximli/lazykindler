@@ -65,10 +65,16 @@ export const humanFileSize = (bytes: any, si = false, dp = 1) => {
 
 export const countChOfStr = (str: string, c: string) => {
     if (str == null) {
-        return 0
+        return 0;
     }
     var result = 0,
         i = 0;
     for (i; i < str.length; i++) if (str[i] == c) result++;
     return result + 1;
+};
+
+export const getRandomInt = (min: number, max: number) => {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min) + min);
 };

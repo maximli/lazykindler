@@ -23,6 +23,7 @@ import { v4 as uuidv4 } from 'uuid';
 import ChangeInfo from '../../../book_list/components/ChangeInfoDialog';
 import ChangeClippingColl from './ChangeClippingColl';
 import ClippingDialog from './ClippingDialog';
+import hetiStyles from './heti.min.css';
 import styles from './index.less';
 
 const { SubMenu } = Menu;
@@ -104,7 +105,8 @@ const ClippingCardList = (props: ClippingCardListProps) => {
                             .map((item: ClippingDataType) => (
                                 <ImageListItem key={item.uuid}>
                                     <Card
-                                        className={styles.card}
+                                        // className={styles.card}
+                                        className={`${hetiStyles.entry} ${hetiStyles['heti--ancient']}`}
                                         hoverable
                                         onClick={() => {
                                             let selectedText = window.getSelection()!.toString();
@@ -272,6 +274,7 @@ const ClippingCardList = (props: ClippingCardListProps) => {
                                             }}
                                         >
                                             <Highlighter
+                                                // style={{ fontSize: 17 }}
                                                 highlightStyle={{ color: 'red' }}
                                                 searchWords={item.highlights || []}
                                                 autoEscape={true}

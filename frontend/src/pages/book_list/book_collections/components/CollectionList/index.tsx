@@ -145,21 +145,16 @@ export default function BookCardList(props: BookCardListProps) {
                         <Card
                             hoverable
                             cover={<Cover uuid={item.uuid} />}
+                            onClick={() => {
+                                setUUID1(uuidv4());
+                                setCheckCollctionBooks({
+                                    open: true,
+                                    collection_uuid: item.uuid,
+                                });
+                            }}
                             actions={[
                                 <Menu mode="vertical" selectable={false}>
                                     <SubMenu key="sub4" icon={<SettingOutlined />} title="操作">
-                                        <Menu.Item
-                                            key="1"
-                                            onClick={() => {
-                                                setUUID1(uuidv4());
-                                                setCheckCollctionBooks({
-                                                    open: true,
-                                                    collection_uuid: item.uuid,
-                                                });
-                                            }}
-                                        >
-                                            查看书籍
-                                        </Menu.Item>
                                         <Menu.Item
                                             key="2"
                                             onClick={() => {
@@ -336,7 +331,7 @@ export default function BookCardList(props: BookCardListProps) {
                                                 variant="body2"
                                                 style={{ paddingTop: 1.2, paddingLeft: 15 }}
                                             >
-                                                {countChOfStr(item.item_uuids, ";")} 本书
+                                                {countChOfStr(item.item_uuids, ';')} 本书
                                             </Typography>
                                         </Box>
 

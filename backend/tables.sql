@@ -61,3 +61,12 @@ CREATE TABLE clipping (
 	deleted             INTEGER,      -- 是否被删除。1: 删除
 	create_time         TEXT          -- 创建时间
 );
+
+-- 存放 comment
+CREATE TABLE comment (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	uuid                TEXT,
+	related_uuid        TEXT,         -- 被关联的uuid。比如该评论属于某个摘抄的
+    content             TEXT,         -- 内容
+	create_time         TEXT          -- 创建时间
+);

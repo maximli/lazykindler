@@ -17,10 +17,11 @@ class DB:
         self.conn = None
         try:
             import os.path
-            path = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent.absolute()
+            path = Path(os.path.dirname(os.path.abspath(__file__))
+                        ).parent.parent.absolute()
             db_path = os.path.join(path, "lazykindler.db")
 
-            if not os.path.isfile(db_path): 
+            if not os.path.isfile(db_path):
                 open(db_path, 'w+')
                 sql_file_path = os.path.join(path, "tables.sql")
                 with open(sql_file_path, 'r') as sql_file:
@@ -30,7 +31,7 @@ class DB:
                     cursor.executescript(sql_script)
                     con.commit()
                     con.close()
-            
+
             self.conn = sqlite3.connect(db_path, check_same_thread=False)
             self.conn.isolation_level = None
         except Error as e:
@@ -176,6 +177,27 @@ class DB:
         except Exception as error:
             self.conn.execute("rollback")
             print("Failed to insert clipping. ", error)
+
+        self.conn.commit()
+        cursor.close()
+
+    def insert_comment(self, uuid, related_uuid, content):
+        cursor = self.conn.cursor()
+        cursor.execute("begin")
+        try:
+            sql = """INSERT INTO comment (uuid, related_uuid, content, create_time) 
+                                        VALUES (?, ?, ?, ?) """
+            data_tuple = (
+                uuid,
+                related_uuid,
+                content,
+                get_now()
+            )
+            cursor.execute(sql, data_tuple)
+
+        except Exception as error:
+            self.conn.execute("rollback")
+            print("Failed to insert comment. ", error)
 
         self.conn.commit()
         cursor.close()

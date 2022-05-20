@@ -59,3 +59,10 @@ export interface ClippingCollectionDataType {
     stars: number;
     create_time: string;
 }
+
+export interface CommentDataType {
+    uuid: string;
+    related_uuid: string;
+    content: string;
+    create_time: string;
+}
