@@ -111,10 +111,8 @@ export default function ClippingDialog(props: ClippingDialogProps) {
                     </DialogTitle>
                     <DialogContent style={{ paddingBottom: 0 }}>
                         <Divider />
-                        <Typography
-                            variant="body1"
-                            gutterBottom
-                            className={styles.cardItemContent}
+                        <article
+                            className={`${hetiStyles.entry} ${hetiStyles['heti--ancient']} ${hetiStyles['heti-hang']} ${hetiStyles['heti-meta heti-small']} `}
                             style={{
                                 height: '100%',
                                 paddingTop: 10,
@@ -136,18 +134,14 @@ export default function ClippingDialog(props: ClippingDialogProps) {
                                 }
                             }}
                         >
-                            <article
-                                className={`${hetiStyles.entry} ${hetiStyles['heti--ancient']} ${hetiStyles['heti-hang']} ${hetiStyles['heti-meta heti-small']} `}
-                            >
-                                <Highlighter
-                                    // style={{ fontSize: 17 }}
-                                    highlightStyle={{ color: 'red' }}
-                                    searchWords={clippingHighlights || []}
-                                    autoEscape={true}
-                                    textToHighlight={clippingContent || ''}
-                                />
-                            </article>
-                        </Typography>
+                            <Highlighter
+                                // style={{ fontSize: 17 }}
+                                highlightStyle={{ color: 'red' }}
+                                searchWords={clippingHighlights || []}
+                                autoEscape={true}
+                                textToHighlight={clippingContent || ''}
+                            />
+                        </article>
                         <br />
 
                         {comments.length > 1 && `${comments.length}条评论`}

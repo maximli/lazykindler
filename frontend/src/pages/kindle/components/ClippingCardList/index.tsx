@@ -229,10 +229,8 @@ const ClippingCardList = (props: ClippingCardListProps) => {
                                                 </div>
                                             }
                                         />
-                                        <Typography
-                                            variant="body1"
-                                            gutterBottom
-                                            className={styles.cardItemContent}
+                                        <article
+                                            className={`${hetiStyles.entry} ${hetiStyles['heti--ancient']} ${hetiStyles['heti-hang']} ${hetiStyles['heti-meta heti-small']} `}
                                             style={{
                                                 height: '100%',
                                                 paddingTop: 10,
@@ -274,18 +272,14 @@ const ClippingCardList = (props: ClippingCardListProps) => {
                                                 }
                                             }}
                                         >
-                                            <article
-                                                className={`${hetiStyles.entry} ${hetiStyles['heti--ancient']} ${hetiStyles['heti-hang']} ${hetiStyles['heti-meta heti-small']} `}
-                                            >
-                                                <Highlighter
-                                                    // style={{ fontSize: 17 }}
-                                                    highlightStyle={{ color: 'red' }}
-                                                    searchWords={item.highlights || []}
-                                                    autoEscape={true}
-                                                    textToHighlight={item.content}
-                                                />
-                                            </article>
-                                        </Typography>
+                                            <Highlighter
+                                                // style={{ fontSize: 17 }}
+                                                highlightStyle={{ color: 'red' }}
+                                                searchWords={item.highlights || []}
+                                                autoEscape={true}
+                                                textToHighlight={item.content}
+                                            />
+                                        </article>
                                     </Card>
                                 </ImageListItem>
                             ))}

@@ -74,5 +74,6 @@ export const countChOfStr = (str: string, c: string) => {
 };
 
 export const convertRange = (value: any, r1: any, r2: any) => {
-    return ((value - r1[0]) * (r2[1] - r2[0])) / (r1[1] - r1[0]) + r2[0];
+    let v = ((value - r1[0]) * (r2[1] - r2[0])) / (r1[1] - r1[0]) + r2[0];
+    return Math.floor(v);
 };
