@@ -273,13 +273,17 @@ const ClippingCardList = (props: ClippingCardListProps) => {
                                                 }
                                             }}
                                         >
-                                            <Highlighter
-                                                // style={{ fontSize: 17 }}
-                                                highlightStyle={{ color: 'red' }}
-                                                searchWords={item.highlights || []}
-                                                autoEscape={true}
-                                                textToHighlight={item.content}
-                                            />
+                                            <article
+                                                className={`${hetiStyles.entry} ${hetiStyles['heti--ancient']} ${hetiStyles['heti-hang']} ${hetiStyles['heti-meta heti-small']} `}
+                                            >
+                                                <Highlighter
+                                                    // style={{ fontSize: 17 }}
+                                                    highlightStyle={{ color: 'red' }}
+                                                    searchWords={item.highlights || []}
+                                                    autoEscape={true}
+                                                    textToHighlight={item.content}
+                                                />
+                                            </article>
                                         </Typography>
                                     </Card>
                                 </ImageListItem>

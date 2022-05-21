@@ -16,6 +16,7 @@ import moment from 'moment';
 import { useEffect, useState } from 'react';
 import Highlighter from 'react-highlight-words';
 
+import hetiStyles from './heti.min.css';
 import styles from './index.less';
 
 const { TextArea } = Input;
@@ -43,10 +44,15 @@ const initialDeleteCommentInfo = {
 
 const Editor = ({ onChange, onSubmit, submitting, value }: any) => (
     <>
-        <Form.Item>
-            <TextArea rows={4} onChange={onChange} value={value} />
+        <Form.Item style={{ float: 'left' }}>
+            <TextArea
+                style={{ backgroundColor: 'darkseagreen', width: 650 }}
+                rows={3}
+                onChange={onChange}
+                value={value}
+            />
         </Form.Item>
-        <Form.Item>
+        <Form.Item style={{ float: 'right', marginBottom: 0, paddingTop: 41 }}>
             <AntdButton htmlType="submit" loading={submitting} onClick={onSubmit} type="primary">
                 添加评论
             </AntdButton>
@@ -97,115 +103,126 @@ export default function ClippingDialog(props: ClippingDialogProps) {
                 maxWidth="md"
                 fullWidth
             >
-                <DialogTitle id="alert-dialog-title">{`来自的《${book_name} 》笔记`}</DialogTitle>
-                <DialogContent>
-                    <br />
-                    <Typography
-                        variant="body1"
-                        gutterBottom
-                        className={styles.cardItemContent}
-                        style={{
-                            height: '100%',
-                            paddingTop: 10,
-                            fontSize: 15,
-                            whiteSpace: 'pre-wrap',
-                            textIndent: '2em',
-                        }}
-                        onMouseUp={() => {
-                            let selectedText = window.getSelection()!.toString();
-                            if (selectedText != '') {
-                                let info = {
-                                    open: true,
-                                    selectedText: selectedText,
-                                    uuid: uuid,
-                                };
-                                setHighlightInfo(info);
+                <div style={{ backgroundColor: 'darkseagreen' }}>
+                    <DialogTitle id="alert-dialog-title">
+                        <article className={`${hetiStyles.entry} ${hetiStyles['heti--ancient']}`}>
+                            {`来自《${book_name} 》的笔记`}
+                        </article>
+                    </DialogTitle>
+                    <DialogContent style={{ paddingBottom: 0 }}>
+                        <Divider />
+                        <Typography
+                            variant="body1"
+                            gutterBottom
+                            className={styles.cardItemContent}
+                            style={{
+                                height: '100%',
+                                paddingTop: 10,
+                                fontSize: 16,
+                                whiteSpace: 'pre-wrap',
+                                textIndent: '2em',
+                                maxHeight: '37vh',
+                                overflow: 'auto',
+                            }}
+                            onMouseUp={() => {
+                                let selectedText = window.getSelection()!.toString();
+                                if (selectedText != '') {
+                                    let info = {
+                                        open: true,
+                                        selectedText: selectedText,
+                                        uuid: uuid,
+                                    };
+                                    setHighlightInfo(info);
+                                }
+                            }}
+                        >
+                            <article
+                                className={`${hetiStyles.entry} ${hetiStyles['heti--ancient']} ${hetiStyles['heti-hang']} ${hetiStyles['heti-meta heti-small']} `}
+                            >
+                                <Highlighter
+                                    // style={{ fontSize: 17 }}
+                                    highlightStyle={{ color: 'red' }}
+                                    searchWords={clippingHighlights || []}
+                                    autoEscape={true}
+                                    textToHighlight={clippingContent || ''}
+                                />
+                            </article>
+                        </Typography>
+                        <br />
+
+                        {comments.length > 1 && `${comments.length}条评论`}
+                        <Divider />
+
+                        <div style={{ maxHeight: '20vh', overflow: 'auto' }}>
+                            {comments.length > 0 &&
+                                _.map(comments, (item: CommentDataType, index: number) => {
+                                    return (
+                                        <Comment
+                                            key={index}
+                                            actions={[
+                                                <span
+                                                    key="comment-list-reply-to-0"
+                                                    onClick={() => {
+                                                        setDeleteCommentInfo({
+                                                            open: true,
+                                                            comment_uuid: item.uuid,
+                                                        });
+                                                    }}
+                                                >
+                                                    删除
+                                                </span>,
+                                            ]}
+                                            author={'天外来客'}
+                                            avatar={`/avatar/${convertRange(
+                                                new Date().getDate(),
+                                                [1, 31],
+                                                [1, 16],
+                                            )}.svg`}
+                                            content={<p>{item.content}</p>}
+                                            datetime={moment(item.create_time).fromNow()}
+                                        />
+                                    );
+                                })}
+                        </div>
+                        <Comment
+                            avatar={
+                                <Avatar
+                                    src={`/avatar/${convertRange(
+                                        new Date().getDate(),
+                                        [1, 31],
+                                        [1, 16],
+                                    )}.svg`}
+                                    alt="Han Solo"
+                                />
                             }
-                        }}
-                    >
-                        <Highlighter
-                            // style={{ fontSize: 17 }}
-                            highlightStyle={{ color: 'red' }}
-                            searchWords={clippingHighlights || []}
-                            autoEscape={true}
-                            textToHighlight={clippingContent || ''}
+                            content={
+                                <Editor
+                                    onChange={(e: any) => {
+                                        setTextArea(e.target.value);
+                                    }}
+                                    onSubmit={() => {
+                                        if (textArea == '') {
+                                            return;
+                                        }
+                                        setSubmitting(true);
+                                        setTimeout(() => {
+                                            createComment(uuid, textArea).then(() => {
+                                                getComments(uuid);
+                                            });
+                                            setTextArea('');
+                                            setSubmitting(false);
+                                        }, 600);
+                                    }}
+                                    submitting={submitting}
+                                    value={textArea}
+                                />
+                            }
                         />
-                    </Typography>
-                    <br />
-                    <br />
-
-                    {comments.length > 1 && `${comments.length}条评论`}
-                    <Divider />
-
-                    <div style={{ maxHeight: 320, overflow: 'auto' }}>
-                        {comments.length > 0 &&
-                            _.map(comments, (item: CommentDataType, index: number) => {
-                                return (
-                                    <Comment
-                                        key={index}
-                                        actions={[
-                                            <span
-                                                key="comment-list-reply-to-0"
-                                                onClick={() => {
-                                                    setDeleteCommentInfo({
-                                                        open: true,
-                                                        comment_uuid: item.uuid,
-                                                    });
-                                                }}
-                                            >
-                                                删除
-                                            </span>,
-                                        ]}
-                                        author={'天外来客'}
-                                        avatar={`/avatar/${convertRange(
-                                            new Date().getDate(),
-                                            [1, 31],
-                                            [1, 16],
-                                        )}.svg`}
-                                        content={<p>{item.content}</p>}
-                                        datetime={moment(item.create_time).fromNow()}
-                                    />
-                                );
-                            })}
-                    </div>
-                    <Comment
-                        avatar={
-                            <Avatar
-                                src={`/avatar/${convertRange(
-                                    new Date().getDate(),
-                                    [1, 31],
-                                    [1, 16],
-                                )}.svg`}
-                                alt="Han Solo"
-                            />
-                        }
-                        content={
-                            <Editor
-                                onChange={(e: any) => {
-                                    setTextArea(e.target.value);
-                                }}
-                                onSubmit={() => {
-                                    if (textArea == '') {
-                                        return;
-                                    }
-                                    setSubmitting(true);
-                                    setTimeout(() => {
-                                        createComment(uuid, textArea).then(() => {
-                                            getComments(uuid);
-                                        });
-                                        setTextArea('');
-                                        setSubmitting(false);
-                                    }, 600);
-                                }}
-                                submitting={submitting}
-                                value={textArea}
-                            />
-                        }
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>取消</Button>
-                </DialogActions>
+                    </DialogContent>
+                    {/* <DialogActions>
+                        <Button onClick={handleClose}>取消</Button>
+                    </DialogActions> */}
+                </div>
             </Dialog>
 
             <div>
