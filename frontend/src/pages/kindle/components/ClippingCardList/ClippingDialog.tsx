@@ -1,7 +1,7 @@
 import { ClippingDataType, CommentDataType } from '@/pages/data';
 import { addHighlight, deleteHighlight, getClippingByUUIDs } from '@/services';
 import { createComment, deleteComment, getCommentsByRelatedUUID } from '@/services/comment';
-import { getRandomInt } from '@/util';
+import { convertRange } from '@/util';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -157,7 +157,11 @@ export default function ClippingDialog(props: ClippingDialogProps) {
                                             </span>,
                                         ]}
                                         author={'天外来客'}
-                                        avatar={`/avatar/${getRandomInt(1, 16)}.svg`}
+                                        avatar={`/avatar/${convertRange(
+                                            new Date().getDate(),
+                                            [1, 31],
+                                            [1, 16],
+                                        )}.svg`}
                                         content={<p>{item.content}</p>}
                                         datetime={moment(item.create_time).fromNow()}
                                     />
@@ -166,7 +170,14 @@ export default function ClippingDialog(props: ClippingDialogProps) {
                     </div>
                     <Comment
                         avatar={
-                            <Avatar src={`/avatar/${getRandomInt(1, 16)}.svg`} alt="Han Solo" />
+                            <Avatar
+                                src={`/avatar/${convertRange(
+                                    new Date().getDate(),
+                                    [1, 31],
+                                    [1, 16],
+                                )}.svg`}
+                                alt="Han Solo"
+                            />
                         }
                         content={
                             <Editor
