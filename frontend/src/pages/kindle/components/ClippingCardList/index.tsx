@@ -108,25 +108,6 @@ const ClippingCardList = (props: ClippingCardListProps) => {
                                         // className={styles.card}
                                         className={`${hetiStyles.entry} ${hetiStyles['heti--ancient']}`}
                                         hoverable
-                                        onClick={() => {
-                                            let selectedText = window.getSelection()!.toString();
-                                            if (selectedText.length > 0) {
-                                                return;
-                                            }
-                                            setClippingDialogInfo({
-                                                uuid: item.uuid,
-                                                open: true,
-                                                handleClose: () => {
-                                                    console.log('rr11--------------');
-                                                    setChangeClippingCollInfo(
-                                                        initialClippingDialogInfo,
-                                                    );
-                                                },
-                                                clippingContent: item.content,
-                                                highlights: item.highlights,
-                                                book_name: item.book_name,
-                                            });
-                                        }}
                                         actions={[
                                             <Menu mode="vertical" selectable={false}>
                                                 <SubMenu
@@ -257,6 +238,26 @@ const ClippingCardList = (props: ClippingCardListProps) => {
                                                 paddingTop: 10,
                                                 fontSize: 15,
                                                 whiteSpace: 'pre-wrap',
+                                            }}
+                                            onClick={() => {
+                                                let selectedText = window
+                                                    .getSelection()!
+                                                    .toString();
+                                                if (selectedText.length > 0) {
+                                                    return;
+                                                }
+                                                setClippingDialogInfo({
+                                                    uuid: item.uuid,
+                                                    open: true,
+                                                    handleClose: () => {
+                                                        setChangeClippingCollInfo(
+                                                            initialClippingDialogInfo,
+                                                        );
+                                                    },
+                                                    clippingContent: item.content,
+                                                    highlights: item.highlights,
+                                                    book_name: item.book_name,
+                                                });
                                             }}
                                             onMouseUp={() => {
                                                 let uuid = item.uuid;

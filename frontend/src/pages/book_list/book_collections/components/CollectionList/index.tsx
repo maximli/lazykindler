@@ -145,13 +145,6 @@ export default function BookCardList(props: BookCardListProps) {
                         <Card
                             hoverable
                             cover={<Cover uuid={item.uuid} />}
-                            onClick={() => {
-                                setUUID1(uuidv4());
-                                setCheckCollctionBooks({
-                                    open: true,
-                                    collection_uuid: item.uuid,
-                                });
-                            }}
                             actions={[
                                 <Menu mode="vertical" selectable={false}>
                                     <SubMenu key="sub4" icon={<SettingOutlined />} title="操作">
@@ -306,7 +299,16 @@ export default function BookCardList(props: BookCardListProps) {
                                     </div>
                                 }
                                 description={
-                                    <div style={{ maxHeight: 150, overflow: 'auto' }}>
+                                    <div
+                                        style={{ maxHeight: 150, overflow: 'auto' }}
+                                        onClick={() => {
+                                            setUUID1(uuidv4());
+                                            setCheckCollctionBooks({
+                                                open: true,
+                                                collection_uuid: item.uuid,
+                                            });
+                                        }}
+                                    >
                                         <Divider style={{ marginBottom: 10 }} />
                                         <Box
                                             display="flex"
