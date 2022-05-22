@@ -1,6 +1,5 @@
 import { deleteAllBooks, deleteAllClipping, downloadAllBooks, uploadBooks } from '@/services';
 import { PageContainer } from '@ant-design/pro-layout';
-import { FmdBadTwoTone } from '@mui/icons-material';
 import {
     Button,
     Dialog,
@@ -11,7 +10,7 @@ import {
     Menu,
     MenuItem,
 } from '@mui/material';
-import { Input, Space } from 'antd';
+import { Input } from 'antd';
 import { Alert, Card } from 'antd';
 import React, { useState } from 'react';
 
@@ -35,7 +34,7 @@ const Welcome: React.FC = () => {
     };
 
     const onUploadFiles = (filepath: any) => {
-        uploadBooks(filepath)
+        uploadBooks(filepath);
     };
 
     return (
@@ -84,7 +83,7 @@ const Welcome: React.FC = () => {
                     >
                         <MenuItem
                             onClick={() => {
-                                downloadAllBooks()
+                                downloadAllBooks();
                                 setAnchorEl(null);
                             }}
                         >

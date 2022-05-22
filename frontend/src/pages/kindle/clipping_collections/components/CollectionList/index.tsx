@@ -8,11 +8,9 @@ import {
 import { countChOfStr, preHandleSubjects, toBase64 } from '@/util';
 import { SettingOutlined, TagOutlined } from '@ant-design/icons';
 import DateRangeIcon from '@mui/icons-material/DateRange';
-import StarIcon from '@mui/icons-material/Star';
-import Dropzone from 'react-dropzone';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
-import Divider from '@mui/material/Divider';
+import StarIcon from '@mui/icons-material/Star';
 import {
     Box,
     Button,
@@ -20,15 +18,17 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
+    DialogContentText,
     DialogTitle,
     FormControl,
     FormHelperText,
     Typography,
-    DialogContentText,
 } from '@mui/material';
+import Divider from '@mui/material/Divider';
 import { List as AntList, Card, Menu } from 'antd';
 import _ from 'lodash';
 import { useState } from 'react';
+import Dropzone from 'react-dropzone';
 import { v4 as uuidv4 } from 'uuid';
 
 import ChangeInfo from '../../../../book_list/components/ChangeInfoDialog';
@@ -114,7 +114,7 @@ export default function CollectionList(props: ClippingListProps) {
 
     return (
         <div>
-            <AntList<any>
+            <AntList
                 rowKey="id"
                 grid={{
                     gutter: 16,
@@ -303,7 +303,7 @@ export default function CollectionList(props: ClippingListProps) {
                                                 variant="body2"
                                                 style={{ paddingTop: 1.2, paddingLeft: 15 }}
                                             >
-                                                {countChOfStr(item.item_uuids, ";")} 个摘抄
+                                                {countChOfStr(item.item_uuids, ';')} 个摘抄
                                             </Typography>
                                         </Box>
 

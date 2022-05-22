@@ -1,5 +1,5 @@
 import { BookMetaDataType, CollectionDataType } from '@/pages/data';
-import { getAllCollections, getClippingByUUIDs, updateBookMeta, updateClipping } from '@/services';
+import { getAllCollections, getClippingByUUIDs, updateClipping } from '@/services';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import Dialog from '@mui/material/Dialog';

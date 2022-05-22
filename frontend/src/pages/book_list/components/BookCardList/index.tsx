@@ -19,8 +19,8 @@ import {
     DialogTitle,
     FormControl,
     FormHelperText,
-    Typography,
     Snackbar,
+    Typography,
 } from '@mui/material';
 import Divider from '@mui/material/Divider';
 import { Menu } from 'antd';
@@ -109,7 +109,7 @@ export default function BookCardList(props: BookCardListProps) {
     return (
         <div style={{ paddingLeft: 5 }}>
             <div style={{ height: '100%', overflow: 'auto' }}>
-                <AntList<any>
+                <AntList
                     style={{ width: '99%', height: `${height}vh` }}
                     rowKey="id"
                     grid={{
@@ -255,9 +255,9 @@ export default function BookCardList(props: BookCardListProps) {
                                                 onClick={() => {
                                                     downloadBook(item.uuid).then(() => {
                                                         setSnackBar({
-                                                            message: "下载成功!",
-                                                            open: true
-                                                        })
+                                                            message: '下载成功!',
+                                                            open: true,
+                                                        });
                                                     });
                                                 }}
                                             >
@@ -542,9 +542,9 @@ export default function BookCardList(props: BookCardListProps) {
                 open={snackBar.open}
                 onClose={() => {
                     setSnackBar({
-                        message: "",
-                        open: false
-                    })
+                        message: '',
+                        open: false,
+                    });
                 }}
                 autoHideDuration={3000}
                 message={snackBar.message}

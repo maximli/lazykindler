@@ -12,7 +12,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import TablePagination from '@mui/material/TablePagination';
-import Typography from '@mui/material/Typography';
 import { Card } from 'antd';
 import { Menu } from 'antd';
 import moment from 'moment';
@@ -24,7 +23,6 @@ import ChangeInfo from '../../../book_list/components/ChangeInfoDialog';
 import ChangeClippingColl from './ChangeClippingColl';
 import ClippingDialog from './ClippingDialog';
 import hetiStyles from './heti.min.css';
-import styles from './index.less';
 
 const { SubMenu } = Menu;
 

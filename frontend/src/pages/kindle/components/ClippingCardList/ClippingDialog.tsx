@@ -9,7 +9,6 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Divider from '@mui/material/Divider';
-import Typography from '@mui/material/Typography';
 import { Button as AntdButton, Avatar, Comment, Form, Input } from 'antd';
 import _ from 'lodash';
 import moment from 'moment';
@@ -17,7 +16,6 @@ import { useEffect, useState } from 'react';
 import Highlighter from 'react-highlight-words';
 
 import hetiStyles from './heti.min.css';
-import styles from './index.less';
 
 const { TextArea } = Input;
 
@@ -97,7 +95,10 @@ export default function ClippingDialog(props: ClippingDialogProps) {
         <div>
             <Dialog
                 open={open}
-                onClose={handleClose}
+                onClose={() => {
+                    handleClose();
+                    setTextArea('');
+                }}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
                 maxWidth="md"

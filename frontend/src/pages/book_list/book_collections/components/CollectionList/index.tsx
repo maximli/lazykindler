@@ -122,7 +122,7 @@ export default function BookCardList(props: BookCardListProps) {
 
     return (
         <div>
-            <AntList<any>
+            <AntList
                 rowKey="id"
                 grid={{
                     gutter: 7,
