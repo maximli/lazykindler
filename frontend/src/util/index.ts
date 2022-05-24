@@ -77,3 +77,15 @@ export const convertRange = (value: any, r1: any, r2: any) => {
     let v = ((value - r1[0]) * (r2[1] - r2[0])) / (r1[1] - r1[0]) + r2[0];
     return Math.floor(v);
 };
+
+export const handleClippingContent = (content: string) => {
+    if (content == null) {
+        return '';
+    }
+    const arr = content.split('\n');
+    let newArr: string[] = _.map(arr, (item: string) => {
+        return '        ' + item;
+    });
+    console.log(newArr);
+    return newArr.join('\n');
+};

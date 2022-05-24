@@ -1,7 +1,7 @@
 import { ClippingDataType, CommentDataType } from '@/pages/data';
 import { addHighlight, deleteHighlight, getClippingByUUIDs } from '@/services';
 import { createComment, deleteComment, getCommentsByRelatedUUID } from '@/services/comment';
-import { convertRange } from '@/util';
+import { convertRange, handleClippingContent } from '@/util';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -119,7 +119,7 @@ export default function ClippingDialog(props: ClippingDialogProps) {
                                 paddingTop: 10,
                                 fontSize: 16,
                                 whiteSpace: 'pre-wrap',
-                                textIndent: '2em',
+                                // textIndent: '2em',
                                 maxHeight: '37vh',
                                 overflow: 'auto',
                             }}
@@ -140,7 +140,7 @@ export default function ClippingDialog(props: ClippingDialogProps) {
                                 highlightStyle={{ color: 'red' }}
                                 searchWords={clippingHighlights || []}
                                 autoEscape={true}
-                                textToHighlight={clippingContent || ''}
+                                textToHighlight={handleClippingContent(clippingContent) || ''}
                             />
                         </article>
                         <br />

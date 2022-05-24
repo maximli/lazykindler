@@ -1,5 +1,6 @@
 import { ClippingDataType } from '@/pages/data';
 import { addHighlight, deleteClipping, deleteHighlight, updateClipping } from '@/services';
+import { handleClippingContent } from '@/util';
 import { SettingOutlined } from '@ant-design/icons';
 import { GridContent } from '@ant-design/pro-layout';
 import Box from '@mui/material/Box';
@@ -275,7 +276,10 @@ const ClippingCardList = (props: ClippingCardListProps) => {
                                                 highlightStyle={{ color: 'red' }}
                                                 searchWords={item.highlights || []}
                                                 autoEscape={true}
-                                                textToHighlight={item.content}
+                                                // textToHighlight={item.content}
+                                                textToHighlight={handleClippingContent(
+                                                    item.content,
+                                                )}
                                             />
                                         </article>
                                     </Card>
