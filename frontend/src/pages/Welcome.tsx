@@ -9,18 +9,29 @@ import {
     DialogTitle,
     Menu,
     MenuItem,
+    Popover,
+    Typography,
 } from '@mui/material';
-import { Input } from 'antd';
 import { Alert, Card } from 'antd';
 import React, { useState } from 'react';
-
-const { Search } = Input;
 
 const Welcome: React.FC = () => {
     const [deleteType, setDeleteType] = useState<number>(0);
     const [deleteDialog, setDeleteDialog] = useState(false);
 
     const [anchorEl, setAnchorEl] = React.useState(null);
+
+    const [anchorElForPopover, setAnchorElForPopover] = React.useState<HTMLElement | null>(null);
+
+    const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorElForPopover(event.currentTarget);
+    };
+
+    const handlePopoverClose = () => {
+        setAnchorElForPopover(null);
+    };
+    const openForPopover = Boolean(anchorElForPopover);
+
     const open = Boolean(anchorEl);
     const handleClick = (event: any) => {
         setAnchorEl(event.currentTarget);
@@ -33,8 +44,8 @@ const Welcome: React.FC = () => {
         setDeleteDialog(false);
     };
 
-    const onUploadFiles = (filepath: any) => {
-        uploadBooks(filepath);
+    const onUploadFiles = () => {
+        uploadBooks();
     };
 
     return (
@@ -53,14 +64,40 @@ const Welcome: React.FC = () => {
                     }}
                 />
 
-                <Search
-                    style={{ width: 800, float: 'left' }}
-                    placeholder="请粘贴将要上传文件的路径或目录路径。如果是多个文件，用分号拼接!"
-                    allowClear
-                    size="large"
-                    onSearch={onUploadFiles}
-                    enterButton={<Button variant="contained">上传</Button>}
-                />
+                <Button
+                    variant="outlined"
+                    aria-owns={openForPopover ? 'mouse-over-popover' : undefined}
+                    aria-haspopup="true"
+                    onMouseEnter={handlePopoverOpen}
+                    onMouseLeave={handlePopoverClose}
+                    onClick={onUploadFiles}
+                >
+                    上传文件
+                </Button>
+
+                <Popover
+                    id="mouse-over-popover"
+                    sx={{
+                        pointerEvents: 'none',
+                    }}
+                    open={openForPopover}
+                    anchorEl={anchorElForPopover}
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'left',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'left',
+                    }}
+                    onClose={handlePopoverClose}
+                    disableRestoreFocus
+                >
+                    <Typography sx={{ p: 1 }}>
+                        平台将递归扫描 ~/Download、~/下载、~/Desktop、~/桌面
+                        等目录下受支持的电子书文件。相同文件不会重复上传
+                    </Typography>
+                </Popover>
 
                 <div style={{ float: 'right' }}>
                     <Button
@@ -111,7 +148,7 @@ const Welcome: React.FC = () => {
                                 setDeleteType(3);
                             }}
                         >
-                            删除所有
+                            删除所有数据
                         </MenuItem>
                     </Menu>
                 </div>

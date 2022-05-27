@@ -14,26 +14,37 @@ def store_books():
         "Hello world, from Users!"
     """
 
-    path = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent.absolute()
+    path = Path(os.path.dirname(os.path.abspath(__file__))
+                ).parent.parent.absolute()
     data_path = os.path.join(path, "data")
     isExist = os.path.exists(data_path)
     if not isExist:
         os.makedirs(data_path)
 
-    content = request.json
-    book_paths = content['book_paths'].split(";")
+    # 扫描下载、桌面等目录的书籍
+    download_dir = str(Path.home() / "Downloads")
+    if not os.path.isdir(download_dir):
+        download_dir = str(Path.home() / "下载")
+
+    desktop_dir = str(Path.home() / "Desktop")
+    if not os.path.isdir(desktop_dir):
+        desktop_dir = str(Path.home() / "桌面")
+
+    book_paths = [download_dir, desktop_dir]
 
     i = 1
     for book_path in book_paths:
         if os.path.isdir(book_path):
             filepaths = ls_books(book_path)
             for filepath in filepaths:
-                print("存储书籍-----------index = {}, filepath = {}".format(i, filepath))
+                print(
+                    "存储书籍-----------index = {}, filepath = {}".format(i, filepath))
                 i += 1
                 books.store_book_from_path(filepath, data_path)
         else:
             if if_ext_supported(pathlib.Path(book_path).suffix):
-                print("存储书籍-----------index = {}, filepath = {}".format(i, book_path))
+                print(
+                    "存储书籍-----------index = {}, filepath = {}".format(i, book_path))
                 i += 1
                 books.store_book_from_path(book_path, data_path)
     return "success"
@@ -90,6 +101,7 @@ def update_book_cover():
 def download_file():
     uuid = request.args.get('uuid')
     return books.download_file(uuid)
+
 
 def download_all_files():
     return books.download_all_files()

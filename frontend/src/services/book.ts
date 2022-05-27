@@ -60,10 +60,8 @@ export const deleteAllBooks = () => {
 };
 
 // 上传书籍或书籍所在目录
-export const uploadBooks = async (filepaths: string) => {
-    const data = await axiosInstance.post(`/api/book/upload`, {
-        book_paths: filepaths,
-    });
+export const uploadBooks = async () => {
+    const data = await axiosInstance.post(`/api/book/upload`);
     return data.data;
 };
 
@@ -84,5 +82,5 @@ export const downloadBook = (uuid: string) => {
 
 // 下载所有书籍
 export const downloadAllBooks = () => {
-    return axiosInstance.get(`/api/book/download/all`)
+    return axiosInstance.get(`/api/book/download/all`);
 };
