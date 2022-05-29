@@ -25,8 +25,7 @@ import {
 import Divider from '@mui/material/Divider';
 import { Menu } from 'antd';
 import { List as AntList, Card } from 'antd';
-import _ from 'lodash';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Dropzone from 'react-dropzone';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -134,6 +133,7 @@ export default function BookCardList(props: BookCardListProps) {
                                 hoverable
                                 cover={<Cover uuid={item.uuid} />}
                                 actions={[
+                                    // eslint-disable-next-line react/jsx-key
                                     <Menu mode="vertical" selectable={false}>
                                         <SubMenu
                                             key="sub4"

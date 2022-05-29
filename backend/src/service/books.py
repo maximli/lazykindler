@@ -17,6 +17,7 @@ from ..util.util import add_md5_to_filename, generate_uuid, get_md5, get_now, is
 
 
 def store_book_from_path(book_path, data_path):
+    if_new_item = None
     uuid = generate_uuid()
 
     md5 = get_md5(book_path)
@@ -26,6 +27,7 @@ def store_book_from_path(book_path, data_path):
         uuid = book_meta_record[0]["uuid"]
         db.run_sql(
             "update tmp_book set create_time='{}' where uuid='{}'".format(get_now(), uuid))
+        if_new_item = False
     else:
         # 书名
         title = ""
@@ -46,7 +48,8 @@ def store_book_from_path(book_path, data_path):
             meta = get_metadata(book_path)
         except Exception as error:
             has_error = True
-            print("store_book_from_path------------book_path = {}, error = {}".format(book_path, error))
+            print(
+                "store_book_from_path------------book_path = {}, error = {}".format(book_path, error))
         finally:
             if has_error:
                 return
@@ -98,6 +101,9 @@ def store_book_from_path(book_path, data_path):
         p1 = os.path.join(data_path, os.path.basename(book_path))
         p2 = add_md5_to_filename(p1)
         os.rename(p1, p2)
+
+        if_new_item = True
+    return if_new_item
 
 
 def get_books_meta(storeType):
@@ -250,7 +256,7 @@ def delete_books_by_keyword(store_type, keyword, value):
                 for book in books:
                     uuids.append(book['uuid'])
         elif keyword == "作者":
-            if value is None: 
+            if value is None:
                 books = db.query(
                     "select uuid from book_meta a where author is NULL and not exists (select null from tmp_book b where a.uuid = b.uuid);")
                 for book in books:
@@ -266,7 +272,7 @@ def delete_books_by_keyword(store_type, keyword, value):
                     "select uuid from book_meta a where publisher is NULL and not exists (select null from tmp_book b where a.uuid = b.uuid);")
                 for book in books:
                     uuids.append(book['uuid'])
-            else: 
+            else:
                 books = db.query(
                     "select uuid from book_meta a where publisher='{}' and not exists (select null from tmp_book b where a.uuid = b.uuid);".format(value))
                 for book in books:
@@ -296,7 +302,7 @@ def delete_books_by_keyword(store_type, keyword, value):
                 for book in books:
                     uuids.append(book['uuid'])
         elif keyword == "作者":
-            if value is None: 
+            if value is None:
                 books = db.query(
                     "select uuid from book_meta a where author is NULL and exists (select null from tmp_book b where a.uuid = b.uuid);")
                 for book in books:
@@ -312,7 +318,7 @@ def delete_books_by_keyword(store_type, keyword, value):
                     "select uuid from book_meta a where publisher is NULL and exists (select null from tmp_book b where a.uuid = b.uuid);")
                 for book in books:
                     uuids.append(book['uuid'])
-            else: 
+            else:
                 books = db.query(
                     "select uuid from book_meta a where publisher='{}' and exists (select null from tmp_book b where a.uuid = b.uuid);".format(value))
                 for book in books:
@@ -350,8 +356,9 @@ def delete_all_books():
     colls = db.query("select uuid from coll")
     if colls is None or len(colls) == 0:
         db.run_sql("DELETE FROM sqlite_sequence WHERE name = 'coll'")
-    
-    path = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent.absolute()
+
+    path = Path(os.path.dirname(os.path.abspath(__file__))
+                ).parent.parent.absolute()
     data_path = os.path.join(path, "data")
     isExist = os.path.exists(data_path)
     if isExist:
@@ -372,7 +379,8 @@ def delete_book_data_by_uuid(uuid):
         "select md5 from book_meta where uuid='{}'".format(uuid))[0]
     target_md5 = book_info['md5']
 
-    path = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent.absolute()
+    path = Path(os.path.dirname(os.path.abspath(__file__))
+                ).parent.parent.absolute()
     data_path = os.path.join(path, "data")
     is_exist = os.path.exists(data_path)
     if not is_exist:
@@ -394,7 +402,8 @@ def download_file(uuid):
         "select md5 from book_meta where uuid='{}'".format(uuid))[0]
     target_md5 = book_info['md5']
 
-    path = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent.absolute()
+    path = Path(os.path.dirname(os.path.abspath(__file__))
+                ).parent.parent.absolute()
     data_path = os.path.join(path, "data")
     is_exist = os.path.exists(data_path)
     if not is_exist:
@@ -428,8 +437,9 @@ def download_all_files():
     isExist = os.path.exists(target_dir)
     if not isExist:
         os.makedirs(target_dir)
-    
-    path = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent.absolute()
+
+    path = Path(os.path.dirname(os.path.abspath(__file__))
+                ).parent.parent.absolute()
     data_path = os.path.join(path, "data")
     is_exist = os.path.exists(data_path)
     if not is_exist:
@@ -437,12 +447,12 @@ def download_all_files():
 
     filepaths = ls_books(data_path)
     for filepath in filepaths:
-            shutil.copy2(filepath, target_dir)
+        shutil.copy2(filepath, target_dir)
 
-            md5_filename = os.path.basename(filepath)
-            original_filename = remove_md5_from_filename(md5_filename)
+        md5_filename = os.path.basename(filepath)
+        original_filename = remove_md5_from_filename(md5_filename)
 
-            p1 = os.path.join(target_dir, md5_filename)
-            p2 = os.path.join(target_dir, original_filename)
-            os.rename(p1, p2)
+        p1 = os.path.join(target_dir, md5_filename)
+        p2 = os.path.join(target_dir, original_filename)
+        os.rename(p1, p2)
     return "success"

@@ -10,6 +10,7 @@ import {
     Menu,
     MenuItem,
     Popover,
+    Snackbar,
     Typography,
 } from '@mui/material';
 import { Alert, Card } from 'antd';
@@ -18,6 +19,10 @@ import React, { useState } from 'react';
 const Welcome: React.FC = () => {
     const [deleteType, setDeleteType] = useState<number>(0);
     const [deleteDialog, setDeleteDialog] = useState(false);
+    const [snackBar, setSnackBar] = useState<any>({
+        message: '',
+        open: false,
+    });
 
     const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -45,7 +50,17 @@ const Welcome: React.FC = () => {
     };
 
     const onUploadFiles = () => {
-        uploadBooks();
+        uploadBooks().then((count: number) => {
+            let message = `成功上传 ${count}本 书籍!`;
+            if (Number(count) === 0) {
+                message = '未发现需要上传的新书籍!';
+            }
+
+            setSnackBar({
+                message,
+                open: true,
+            });
+        });
     };
 
     return (
@@ -198,6 +213,18 @@ const Welcome: React.FC = () => {
                     </Dialog>
                 </div>
             </Card>
+            <Snackbar
+                open={snackBar.open}
+                onClose={() => {
+                    setSnackBar({
+                        message: '',
+                        open: false,
+                    });
+                }}
+                autoHideDuration={3000}
+                message={snackBar.message}
+                key={snackBar.message}
+            />
         </PageContainer>
     );
 };

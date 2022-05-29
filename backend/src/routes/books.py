@@ -32,22 +32,26 @@ def store_books():
 
     book_paths = [download_dir, desktop_dir]
 
-    i = 1
+    count = 0
+    index = 0
     for book_path in book_paths:
         if os.path.isdir(book_path):
             filepaths = ls_books(book_path)
             for filepath in filepaths:
+                index += 1
                 print(
-                    "存储书籍-----------index = {}, filepath = {}".format(i, filepath))
-                i += 1
-                books.store_book_from_path(filepath, data_path)
+                    "扫描书籍-----------index = {}, filepath = {}".format(index, filepath))
+                if books.store_book_from_path(filepath, data_path):
+                    count += 1
+
         else:
             if if_ext_supported(pathlib.Path(book_path).suffix):
+                index += 1
                 print(
-                    "存储书籍-----------index = {}, filepath = {}".format(i, book_path))
-                i += 1
-                books.store_book_from_path(book_path, data_path)
-    return "success"
+                    "扫描书籍-----------index = {}, filepath = {}".format(index, book_path))
+                if books.store_book_from_path(book_path, data_path):
+                    count += 1
+    return str(count)
 
 
 def get_books_meta():
